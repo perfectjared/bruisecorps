@@ -1,14 +1,50 @@
 import { Scene } from 'phaser';
+import { IFlags } from '../utilities';
 
-export class Game extends Scene {
-  constructor() {
+export class Game extends Scene 
+{
+  constructor() 
+  {
     super({
       key: 'GameScene'
     });
   }
+  
+  preload(): void //TODO move this to preload.ts
+  {
 
-  create(): void {
-    const image = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'phaser_logo');
-    image.setOrigin(0.5);
+  }
+
+  create(): void 
+  {
+
+  }
+
+  update(): void 
+  {
+    this.controller();
+    this.model();
+    this.view();
+    this.debug();
+  }
+
+  controller(): void
+  {
+
+  }
+
+  model(): void
+  {
+
+  }
+
+  view(): void
+  {
+    
+  }
+
+  debug(): void
+  {
+
   }
 }

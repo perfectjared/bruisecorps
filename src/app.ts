@@ -4,11 +4,12 @@ import 'phaser';
 import Boot from './scenes/boot';
 import Preload from './scenes/preload';
 import { Game as GameScene } from './scenes/game';
+import { Marge as MargeScene } from "./scenes/game/marge";
 
 const config: Phaser.Types.Core.GameConfig = {
-  title: 'bruisecorps summer-tour: margemaster',
+  title: 'bruisecorps presents summer-tour: margemaster',
 
-  scene: [Boot, Preload, GameScene],
+  scene: [Boot, Preload, GameScene, MargeScene],
   backgroundColor: '#333',
   scale: {
     mode: Phaser.Scale.FIT,
