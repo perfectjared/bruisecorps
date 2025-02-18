@@ -4,8 +4,8 @@
  */
 
 import { Scene } from 'phaser';
-import ProgressBar from '../lib/progress-bar';
-import * as manifest from '../../assets/manifest.json';
+import ProgressBar from '../../lib/progress-bar';
+import * as manifest from '../../../assets/manifest.json';
 
 export default class Preload extends Scene {
   private downloadedSize: number;

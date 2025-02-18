@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { IFlags } from '../utilities';
 
 export class Game extends Scene 
 {
@@ -10,35 +9,32 @@ export class Game extends Scene
     });
   }
   
-  preload(): void //TODO move this to preload.ts
+  preload(): void
   {
 
   }
 
   create(): void 
   {
-
+    this.scene.launch('RoadScene');
   }
 
   update(): void 
   {
-    this.controller();
-    this.model();
-    this.view();
-    this.debug();
+    
   }
 
-  controller(): void
+  control(): void
   {
 
   }
 
-  model(): void
+  system(): void
   {
 
   }
 
-  view(): void
+  feedback(): void
   {
     
   }
