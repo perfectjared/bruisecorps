@@ -40,19 +40,16 @@ export class Road extends Scene
 
   create(): void 
   {
-    let fps = 60; // how many 'update' frames per second
-    let step = 1 / fps; // how long is each frame (in seconds)
-
     this.renderSettings = {
       width: this.sys.game.config.width, // logical canvas width
       height: this.sys.game.config.height, // logical canvas height
       resolution: null, // scaling factor to provide resolution independence (computed)
-      fieldOfView: 100, // angle (degrees) for field of view
-      cameraHeight: 1000, // z height of camera
+      fieldOfView: 90, // angle (degrees) for field of view
+      cameraHeight: 600, // z height of camera
       cameraDepth: null, // z distance camera is from screen (computed)
-      drawDistance: 300, // number of segments to draw
+      drawDistance: 80, // number of segments to draw
       position: 0, // current camera Z position (add playerZ to get player's absolute Z position)
-      fogDensity: 10 // exponential fog density
+      fogDensity: 0 // exponential fog density
     }
 
     this.ROAD = {
@@ -79,11 +76,11 @@ export class Road extends Scene
     this.segments = []; // array of road segments
     this.segmentSprites = [];
 
-    this.roadWidth = 1000; // actually half the roads width, easier math if the road spans from -roadWidth to +roadWidth
-    this.segmentLength = 200; // length of a single segment
+    this.roadWidth = 800; // actually half the roads width, easier math if the road spans from -roadWidth to +roadWidth
+    this.segmentLength = 300; // length of a single segment
     this.rumbleLength = 3; // number of segments per red/white rumble strip
     this.trackLength = null; // z length of entire track (computed)
-    this.lanes = 3; // number of lanes
+    this.lanes = 2; // number of lanes
 
     this.playerX = 0; // player x offset from center of road (-1 to 1 to stay independent of roadWidth)
     this.playerY = 0;
@@ -101,16 +98,11 @@ export class Road extends Scene
     });
     this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
 
-    this.cursors = this.input.keyboard?.createCursorKeys();
-
-
     this.build();
   }
 
   update(): void 
   {
-    this.controller();
-    this.model();
     this.view();
     this.debug();
 
@@ -133,12 +125,9 @@ export class Road extends Scene
 
     this.addStraight(this.ROAD.LENGTH.SHORT / 2);
     this.addCurve(this.ROAD.LENGTH.MEDIUM, this.ROAD.CURVE.MEDIUM, this.ROAD.HILL.LOW);
-
-
     this.addCurve(this.ROAD.LENGTH.MEDIUM, this.ROAD.CURVE.MEDIUM, this.ROAD.HILL.LOW);
     this.addCurve(this.ROAD.LENGTH.MEDIUM, this.ROAD.CURVE.MEDIUM, this.ROAD.HILL.LOW);
     this.addCurve(this.ROAD.LENGTH.MEDIUM, this.ROAD.CURVE.MEDIUM, this.ROAD.HILL.LOW);
-
     this.addHill(this.ROAD.LENGTH.SHORT, this.ROAD.HILL.LOW);
     this.addLowRollingHills();
     this.addLowRollingHills();
@@ -160,8 +149,6 @@ export class Road extends Scene
 
     this.trackLength = this.segments.length * this.segmentLength;
     this.buildSprites();
-
-    //console.log(this.segments);
   }
 
   updateRoad() {
@@ -179,7 +166,7 @@ export class Road extends Scene
     let dx = -(baseSegment.curve * basePercent);
     let n, segment;
 
-    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, 1, this.trackLength); //replaced second arg from this.playerCar.speed
+    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, 66, this.trackLength); //replaced second arg from this.playerCar.speed
 
     for (n = 0; n < this.renderSettings.drawDistance; n++) {
       segment = this.segments[(baseSegment.index + n) % this.segments.length];
