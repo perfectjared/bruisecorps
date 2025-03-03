@@ -70,18 +70,16 @@ class RenderHelpers {
 
         this.scene = scene;
         this.COLORS = {
-          SKY: "0x72D7EE",
-          TREE: "0x005108",
-          FOG: "0x4b692f",
+          SKY: "0xF5F5F5",
           LIGHT: {
-            road: "0x6B6B6B",
-            grass: "0x10AA10",
-            rumble: "0xfb6262",
-            lane: "0xCCCCCC"
+            road: "0x616161",
+            grass: "0xE0E0E0",
+            rumble: "0xe9e9e9",
+            lane: "0xF5F5F5"
           },
           DARK: {
-            road: "0x696969",
-            grass: "0x009A00",
+            road: "0x424242",
+            grass: "0xBDBDBD",
             rumble: "0xe9e9e9"
           },
           START: {
