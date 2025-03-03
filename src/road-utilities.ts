@@ -1,9 +1,8 @@
 //https://github.com/jamessimo/Phaser3-Road
 
 class MathHelpers {
-    constructor(test) {
+    constructor(test) {}
     
-    }
     project(p, cameraX, cameraY, cameraZ, cameraDepth, width, height, roadWidth) {
         p.camera.x = (p.world.x || 0) - cameraX;
         p.camera.y = (p.world.y || 0) - cameraY;
@@ -161,12 +160,7 @@ class RenderHelpers {
       }
 }
 
-interface IFlags {
-    [key: string]: boolean;
-}
-
 export {
-    IFlags,
     MathHelpers,
     RenderHelpers,
 }

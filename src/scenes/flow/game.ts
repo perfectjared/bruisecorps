@@ -2,11 +2,19 @@ import { Scene } from 'phaser';
 
 export class Game extends Scene 
 {
+  State
+
   constructor() 
   {
     super({
       key: 'GameScene'
     });
+
+    //local state
+    let State = 
+    {
+
+    }
   }
   
   preload(): void
@@ -25,6 +33,7 @@ export class Game extends Scene
   update(): void 
   {
     this.control()
+    this.process()
     this.system()
     this.feedback()
     this.debug()
@@ -32,21 +41,31 @@ export class Game extends Scene
 
   control(): void
   {
+    //listen for input from RoadScene
+    //listen for input from MargeScene
+    //listen for input from UIScene
+    //listen for input from MenuScene
     
+    //listen for player input
+  }
+
+  process(): void
+  {
+    //respond to input
   }
 
   system(): void
   {
-
+    //what happens always
   }
 
   feedback(): void
   {
-    
+    //
   }
 
   debug(): void
   {
-
+    //
   }
 }
