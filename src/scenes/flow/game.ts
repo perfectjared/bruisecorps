@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { appState } from '../../app';
 
 export class Game extends Scene 
 {
@@ -9,12 +10,6 @@ export class Game extends Scene
     super({
       key: 'GameScene'
     });
-
-    //local state
-    let State = 
-    {
-
-    }
   }
   
   preload(): void
@@ -28,6 +23,13 @@ export class Game extends Scene
     let margeScene = this.scene.launch('MargeScene')
     let uiScene = this.scene.launch('UIScene')
     let menuScene = this.scene.launch('MenuScene')
+    let phoneScene = this.scene.launch('PhoneScene')
+
+    //local state
+    this.State = 
+    {
+      scale: innerWidth / (this.sys.game.config.width as number)
+    }
   }
 
   update(): void 
@@ -57,6 +59,8 @@ export class Game extends Scene
   system(): void
   {
     //what happens always
+    //update State
+    this.State.scale = innerWidth / (this.sys.game.config.width as number)
   }
 
   feedback(): void

@@ -49,7 +49,7 @@ export class Road extends Scene
       width: this.sys.game.config.width, // logical canvas width
       height: this.sys.game.config.height, // logical canvas height
       resolution: null, // scaling factor to provide resolution independence (computed)
-      fieldOfView: 120, // angle (degrees) for field of view
+      fieldOfView: 150, // angle (degrees) for field of view
       cameraHeight: 600, // z height of camera
       cameraDepth: null, // z distance camera is from screen (computed)
       drawDistance: 33, // number of segments to draw
@@ -81,7 +81,7 @@ export class Road extends Scene
     this.segments = []; // array of road segments
     this.segmentSprites = [];
 
-    this.roadWidth = 800; // actually half the roads width, easier math if the road spans from -roadWidth to +roadWidth
+    this.roadWidth = 666; // actually half the roads width, easier math if the road spans from -roadWidth to +roadWidth
     this.segmentLength = 333; // length of a single segment
     this.rumbleLength = 2; // number of segments per red/white rumble strip
     this.trackLength = null; // z length of entire track (computed)
@@ -98,13 +98,13 @@ export class Road extends Scene
     this.renderHelper = new RenderHelpers(this);
 
     this.speeds = [
-      0,
-      33,
-      99,
+      -1,
+      11,
+      22,
       133,
-      300
+      666
     ]
-    this.speed = 0;
+    this.speed = 1;
 
     this.graphics = this.add.graphics({
       x: 0,
@@ -192,7 +192,7 @@ export class Road extends Scene
 
     for (let i = 0; i < 19; i++)
     {
-      this.addStraight(this.ROAD.LENGTH.SHORT / 2);
+      this.addHill(this.ROAD.LENGTH.SHORT, this.ROAD.HILL.MEDIUM);
     }
 
     this.segments[this.findSegment(this.playerZ).index + 2].color = this.renderHelper.COLORS.START;
