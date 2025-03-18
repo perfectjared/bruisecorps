@@ -1,12 +1,18 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
+import { GUI } from 'dat.gui'
+import { BoundedNumber } from '../../data-types';
 
 export class Marge extends Scene 
 {
   indicator: GameObjects.Sprite
   rearview: GameObjects.Sprite
-  shifter: GameObjects.Sprite
+  shifter: any
+  shifterSprite: GameObjects.Sprite
+  dash: GameObjects.Sprite
   renderSettings: any
+
+  gui: GUI
 
   constructor() 
   {
@@ -24,6 +30,8 @@ export class Marge extends Scene
   
   create(): void 
   {
+    const margeGui = new GUI({name: 'marge'})
+
     this.renderSettings =
     {
       width: this.sys.game.config.width,
@@ -32,14 +40,22 @@ export class Marge extends Scene
     }
 
     this.rearview = this.add.sprite(0, 0, 'rearview')
-    this.shifter = this.add.sprite(0, 0, 'shifter')
     this.placeRearview()
-    this.placeShifter()
-  }
 
+    this.shifter = 
+    {
+      gear: 2
+    }
+    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
+
+    const shifterFolder = margeGui.addFolder('shifter')
+    shifterFolder.add(this.shifter, 'gear' as keyof Object, 1, 3, 1)
+  }
+  
   update(): void 
   {
-
+    this.placeShifter()
+    this.placeRearview()
   }
 
   //TODO trigger on window resize
@@ -47,13 +63,27 @@ export class Marge extends Scene
   {
     this.rearview.setOrigin(0.5, 0.5)
     this.rearview.setScale(0.85, 0.85)
-    this.rearview.setPosition(this.renderSettings.width / 2, this.renderSettings.height * 0.08);
+    this.rearview.setPosition(
+      this.renderSettings.width / 2, 
+      this.renderSettings.height * 0.08);
   }
 
   placeShifter(): void
   {
-    this.shifter.setOrigin(1, 1)
-    this.shifter.setScale(0.66, 0.66)
-    this.shifter.setPosition(this.renderSettings.width * 0.9, this.renderSettings.height * .99, 0)
+    this.shifterSprite.setOrigin(.1 , .9)
+    this.shifterSprite.setScale(0.66, 0.66)
+    this.shifterSprite.setPosition
+    (
+      this.renderSettings.width * .4, 
+      this.renderSettings.height * .9, 
+      0
+    )
+    this.shifterSprite.angle = 
+    (
+      (this.shifter.gear == 1) ? 30 :
+      (this.shifter.gear == 2) ? 0 :
+      (this.shifter.gear == 3) ? -30 :
+      0
+    )
   }
 }

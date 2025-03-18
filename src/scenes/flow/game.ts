@@ -29,6 +29,7 @@ export class Game extends Scene
     this.State = 
     {
       scale: innerWidth / (this.sys.game.config.width as number)
+      
     }
   }
 

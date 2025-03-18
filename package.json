@@ -12,9 +12,11 @@
   "author": "cloakedninjas",
   "license": "ISC",
   "devDependencies": {
+    "@types/dat.gui": "^0.7.13",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "copy-webpack-plugin": "^10.0.0",
+    "dat.gui": "^0.7.9",
     "eslint": "^8.56.0",
     "eslint-config-google": "^0.14.0",
     "gh-pages": "^6.3.0",

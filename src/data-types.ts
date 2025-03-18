@@ -2,17 +2,18 @@ class BoundedNumber
 {
     constructor
     (
-        public number: number = 0, 
+        private number: number = 0, 
         public floor: number = 0, 
-        public ceiling: number = 1, 
-        public overflow: boolean = false, 
-        public underflow: boolean = false
+        public ceiling: number = 1,
+        public discrete: boolean = true, //todo
+        public overflow: boolean = false, //todo
+        public underflow: boolean = false //todo
     )
     {
-        this.process()
+        this.Process()
     }
 
-    process()
+    Process()
     {
         let ceiling = this.ceiling
         let floor = this.floor 
@@ -24,6 +25,11 @@ class BoundedNumber
 
         if (this.number <= this.floor) this.number = (this.underflow) ? this.ceiling : this.floor
         if (this.number >= this.ceiling) this.number = (this.overflow) ? this.floor : this.ceiling
+    }
+
+    Number() : number
+    {
+        return this.number
     }
 }
 
