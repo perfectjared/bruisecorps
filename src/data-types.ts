@@ -1,38 +1,3 @@
-class BoundedNumber
-{
-    constructor
-    (
-        private number: number = 0, 
-        public floor: number = 0, 
-        public ceiling: number = 1,
-        public discrete: boolean = true, //todo
-        public overflow: boolean = false, //todo
-        public underflow: boolean = false //todo
-    )
-    {
-        this.Process()
-    }
-
-    Process()
-    {
-        let ceiling = this.ceiling
-        let floor = this.floor 
-        if (this.floor > this.ceiling || this.ceiling < this.floor)
-        {
-            this.floor = ceiling
-            this.ceiling = floor
-        } 
-
-        if (this.number <= this.floor) this.number = (this.underflow) ? this.ceiling : this.floor
-        if (this.number >= this.ceiling) this.number = (this.overflow) ? this.floor : this.ceiling
-    }
-
-    Number() : number
-    {
-        return this.number
-    }
-}
-
 class City
 {
     "name": string
@@ -99,7 +64,6 @@ enum Resource
 
 export
 {
-    BoundedNumber,
     City,
     Event,
     Road,

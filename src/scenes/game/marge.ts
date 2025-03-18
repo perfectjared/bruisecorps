@@ -1,11 +1,11 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { GUI } from 'dat.gui'
-import { BoundedNumber } from '../../data-types';
 
 export class Marge extends Scene 
 {
-  indicator: GameObjects.Sprite
+  indicator: any
+  indicatorSprite: GameObjects.Sprite
   rearview: GameObjects.Sprite
   shifter: any
   shifterSprite: GameObjects.Sprite
@@ -25,7 +25,7 @@ export class Marge extends Scene
   {
     this.load.image('rearview', '../../../assets/image/marge/rearview.png')
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
-    this.load.image('indicator', '../../../assets/image/marge/shifter.png')
+    this.load.image('indicator', '../../../assets/image/marge/indicator.png')
   }
   
   create(): void 
@@ -47,15 +47,23 @@ export class Marge extends Scene
       gear: 2
     }
     this.shifterSprite = this.add.sprite(0, 0, 'shifter')
-
     const shifterFolder = margeGui.addFolder('shifter')
     shifterFolder.add(this.shifter, 'gear' as keyof Object, 1, 3, 1)
+
+    this.indicator =
+    {
+      signal: false
+    }
+    this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
+    const indicatorFolder = margeGui.addFolder('indicator')
+    indicatorFolder.add(this.indicator, 'signal', false)
   }
   
   update(): void 
   {
     this.placeShifter()
     this.placeRearview()
+    this.placeIndicator()
   }
 
   //TODO trigger on window resize
@@ -71,12 +79,11 @@ export class Marge extends Scene
   placeShifter(): void
   {
     this.shifterSprite.setOrigin(.1 , .9)
-    this.shifterSprite.setScale(0.66, 0.66)
+    this.shifterSprite.setScale(0.4, 0.4)
     this.shifterSprite.setPosition
     (
-      this.renderSettings.width * .4, 
-      this.renderSettings.height * .9, 
-      0
+      this.renderSettings.width * .5, 
+      this.renderSettings.height * .925
     )
     this.shifterSprite.angle = 
     (
@@ -85,5 +92,17 @@ export class Marge extends Scene
       (this.shifter.gear == 3) ? -30 :
       0
     )
+  }
+
+  placeIndicator(): void
+  {
+    this.indicatorSprite.setOrigin(.9, .9)
+    this.indicatorSprite.setScale(0.25, 0.25)
+    this.indicatorSprite.setPosition
+    (
+      this.renderSettings.width * .28,
+      this.renderSettings.height * .95
+    )
+    this.indicatorSprite.angle = (this.indicator.signal == true) ? 33 : 0
   }
 }
