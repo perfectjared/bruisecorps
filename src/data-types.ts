@@ -55,8 +55,6 @@ class Sign
     "miles-added": number
 }
 
-
-
 enum Resource
 {
 

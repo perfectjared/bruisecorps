@@ -90,14 +90,14 @@ export class Phone extends Scene
                 let minPosition: number = 0.2
                 let maxPosition: number = 1
                 
-                let scale = gameScene.State.scale
+                let scale = gameScene.state.scale
                 scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
                 
                 let scalePosition = (scale - minScale) / (maxScale - minScale)
                 let position: number = ((scalePosition - (minPosition * width)) / ((maxPosition * width) - (minPosition * width)) + (sprite.width))
                 if (scalePosition == 0)
                 {
-                    position -= (gameScene.State.scale / scale) * .5
+                    position -= (gameScene.state.scale / scale) * .5
                 }
                 sprite.setOrigin(-.4, 0.5)
                 sprite.setPosition(position, height)

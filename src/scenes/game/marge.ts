@@ -1,10 +1,9 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import { GUI } from 'dat.gui'
-import { datGui } from '../../app';
 
 export class Marge extends Scene 
 {
+  state : any
   indicator: any
   indicatorSprite: GameObjects.Sprite
   rearview: GameObjects.Sprite
@@ -13,8 +12,6 @@ export class Marge extends Scene
   dash: GameObjects.Sprite
   renderSettings: any
 
-  gui: GUI
-
   constructor() 
   {
     super({
@@ -22,53 +19,42 @@ export class Marge extends Scene
     });
   }
 
-  preload(): void
+  preload(): void 
   {
     this.load.image('rearview', '../../../assets/image/marge/rearview.png')
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
     this.load.image('indicator', '../../../assets/image/marge/indicator.png')
-  }
-  
-  create(): void 
-  {
-    const margeFolder = datGui.addFolder('control')
 
     this.renderSettings =
     {
       width: this.sys.game.config.width,
-      height: this.sys.game.config.height,
-      resolution: null //(computed)
+      height: this.sys.game.config.height
     }
-
-    this.rearview = this.add.sprite(0, 0, 'rearview')
-    this.placeRearview()
-
     this.shifter = 
     {
-      gear: 2
+      gear: 0
     }
-    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
-    const shifterFolder = margeFolder.addFolder('shifter')
-    shifterFolder.add(this.shifter, 'gear' as keyof Object, 0, 4, 1)
-    shifterFolder.open()
-
-
     this.indicator =
     {
       signal: false
     }
+    this.state = {
+      shifter: this.shifter,
+      indicator: this.indicator
+    }
+  }
+  
+  create(): void 
+  {
+    this.rearview = this.add.sprite(0, 0, 'rearview')
+    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
     this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
-    const indicatorFolder = margeFolder.addFolder('indicator')
-    indicatorFolder.add(this.indicator, 'signal', false)
-    indicatorFolder.open()
-
-    margeFolder.open()
   }
   
   update(): void 
   {
-    this.placeShifter()
     this.placeRearview()
+    this.placeShifter()
     this.placeIndicator()
   }
 
