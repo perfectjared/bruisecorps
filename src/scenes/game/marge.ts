@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { GUI } from 'dat.gui'
+import { datGui } from '../../app';
 
 export class Marge extends Scene 
 {
@@ -30,7 +31,7 @@ export class Marge extends Scene
   
   create(): void 
   {
-    const margeGui = new GUI({name: 'marge'})
+    const margeFolder = datGui.addFolder('control')
 
     this.renderSettings =
     {
@@ -47,16 +48,21 @@ export class Marge extends Scene
       gear: 2
     }
     this.shifterSprite = this.add.sprite(0, 0, 'shifter')
-    const shifterFolder = margeGui.addFolder('shifter')
-    shifterFolder.add(this.shifter, 'gear' as keyof Object, 1, 3, 1)
+    const shifterFolder = margeFolder.addFolder('shifter')
+    shifterFolder.add(this.shifter, 'gear' as keyof Object, 0, 4, 1)
+    shifterFolder.open()
+
 
     this.indicator =
     {
       signal: false
     }
     this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
-    const indicatorFolder = margeGui.addFolder('indicator')
+    const indicatorFolder = margeFolder.addFolder('indicator')
     indicatorFolder.add(this.indicator, 'signal', false)
+    indicatorFolder.open()
+
+    margeFolder.open()
   }
   
   update(): void 
@@ -87,9 +93,11 @@ export class Marge extends Scene
     )
     this.shifterSprite.angle = 
     (
-      (this.shifter.gear == 1) ? 30 :
+      (this.shifter.gear == 0) ? 45 :
+      (this.shifter.gear == 1) ? 15 :
       (this.shifter.gear == 2) ? 0 :
-      (this.shifter.gear == 3) ? -30 :
+      (this.shifter.gear == 3) ? -15 :
+      (this.shifter.gear == 4) ? -30 :
       0
     )
   }

@@ -2,6 +2,8 @@ import { Scene } from 'phaser';
 import { MathHelpers } from '../../road-utilities';
 import { RenderHelpers } from '../../road-utilities';
 
+//todo clean up this whole thing
+
 export class Road extends Scene 
 {
   renderSettings
@@ -104,7 +106,7 @@ export class Road extends Scene
       133,
       666
     ]
-    this.speed = 1;
+    this.speed = 0;
 
     this.graphics = this.add.graphics({
       x: 0,
@@ -117,17 +119,18 @@ export class Road extends Scene
 
   update(): void 
   {
-    this.view();
-    this.debug();
+    this.controller()
+    this.view()
+    this.debug()
 
-    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, 1, this.trackLength);
+    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, 1, this.trackLength)
 
-    this.updateRoad();
+    this.updateRoad()
   }
 
   controller(): void
   {
-
+    //TODO listen for update to gear to change road
   }
 
   model(): void

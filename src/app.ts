@@ -7,6 +7,14 @@ import { Game as GameScene } from './scenes/flow/game'
 import { Marge as MargeScene } from './scenes/game/marge'
 import { Phone as PhoneScene } from './scenes/game/phone'
 import { Road as RoadScene } from './scenes/game/road'
+import { GUI } from 'dat.gui'
+
+export var appState =
+{
+  width: 0
+}
+
+export var datGui = new GUI({ name: 'debug' })
 
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
@@ -14,11 +22,6 @@ export let gameScene: GameScene = new GameScene()
 let roadScene: RoadScene = new RoadScene()
 let margeScene: MargeScene = new MargeScene()
 let phoneScene: PhoneScene = new PhoneScene()
-
-export var appState =
-{
-  width: 0
-}
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',

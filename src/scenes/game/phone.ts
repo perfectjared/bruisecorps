@@ -85,10 +85,10 @@ export class Phone extends Scene
             {
                 let height: number = this.sys.game.config.height as number
                 let width: number = this.sys.game.config.width as number
-                let minScale: number = 0.68
-                let maxScale: number = 0.98
+                let minScale: number = 0.5
+                let maxScale: number = 0.6
                 let minPosition: number = 0.2
-                let maxPosition: number = 1.1
+                let maxPosition: number = 1
                 
                 let scale = gameScene.State.scale
                 scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
@@ -97,11 +97,9 @@ export class Phone extends Scene
                 let position: number = ((scalePosition - (minPosition * width)) / ((maxPosition * width) - (minPosition * width)) + (sprite.width))
                 if (scalePosition == 0)
                 {
-                    position -= 100 * (gameScene.State.scale / scale)
+                    position -= (gameScene.State.scale / scale) * .5
                 }
-
-
-                sprite.setOrigin(0, 0.5)
+                sprite.setOrigin(-.4, 0.5)
                 sprite.setPosition(position, height)
                 sprite.setScale(scale)
             },
