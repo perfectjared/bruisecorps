@@ -30,8 +30,8 @@ export class Debug extends Scene {
     let gameState = gameScene.state
     let margeState = margeScene.state
 
-    console.log(gameState)
-    console.log(margeState)
+    //console.log(gameState)
+    //console.log(margeState)
     
     controlFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
     controlFolder.add(margeState.indicator, 'signal', false)

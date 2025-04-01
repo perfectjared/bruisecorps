@@ -1,16 +1,22 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
+import { Rearview as RearviewScene } from '../game/rearview'
 
 export class Marge extends Scene 
 {
+  constants : any
   state : any
+
   indicator: any
   indicatorSprite: GameObjects.Sprite
-  rearview: GameObjects.Sprite
+
+  rearviewScene: RearviewScene
+
   shifter: any
   shifterSprite: GameObjects.Sprite
   dash: GameObjects.Sprite
   renderSettings: any
+  bandConfig: object
 
   constructor() 
   {
@@ -19,11 +25,23 @@ export class Marge extends Scene
     });
   }
 
+  //load and manage things having to do with this object only
   preload(): void 
   {
-    this.load.image('rearview', '../../../assets/image/marge/rearview.png')
+    this.constants =
+    {
+      indicatorConfig:
+      {},
+      shifterConfig:
+      {},
+      startingGear: 0,
+    }
+    
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
     this.load.image('indicator', '../../../assets/image/marge/indicator.png')
+
+    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
+    this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
 
     this.renderSettings =
     {
@@ -32,13 +50,14 @@ export class Marge extends Scene
     }
     this.shifter = 
     {
-      gear: 0
+      gear: this.constants.startingGear
     }
     this.indicator =
     {
       signal: false
     }
-    this.state = {
+    this.state = 
+    {
       shifter: this.shifter,
       indicator: this.indicator
     }
@@ -46,27 +65,16 @@ export class Marge extends Scene
   
   create(): void 
   {
-    this.rearview = this.add.sprite(0, 0, 'rearview')
-    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
-    this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
+    this.scene.launch('RearviewScene')
   }
   
   update(): void 
   {
-    this.placeRearview()
     this.placeShifter()
     this.placeIndicator()
   }
 
-  //TODO trigger on window resize
-  placeRearview(): void
-  {
-    this.rearview.setOrigin(0.5, 0.5)
-    this.rearview.setScale(0.85, 0.85)
-    this.rearview.setPosition(
-      this.renderSettings.width / 2, 
-      this.renderSettings.height * 0.08);
-  }
+
 
   placeShifter(): void
   {

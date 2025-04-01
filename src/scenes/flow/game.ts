@@ -18,6 +18,9 @@ export class Game extends Scene
       scale: innerWidth / (this.sys.game.config.width as number),
       started: false,
       playing: false,
+      step: 0,
+
+      //not being used yet really
       health: 86,
       money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
       speed: 0, //0 - 100, .1 steps, interpreted into a mph amount, exponential
