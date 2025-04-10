@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { BandMember, Tamagotchi } from './tamagotchi';
 
-export class Rearview extends Scene
+export default class Rearview extends Scene
 {
     renderSettings: any
 

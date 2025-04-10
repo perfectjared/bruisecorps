@@ -1,22 +1,25 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import { Rearview as RearviewScene } from '../game/rearview'
+import Rearview from '../game/rearview'
 
 export default class Marge extends Scene 
 {
   constants : any
   state : any
+  renderSettings: any
+
+  bandConfig: object
 
   indicator: any
   indicatorSprite: GameObjects.Sprite
 
-  rearviewScene: RearviewScene
+  rearview: any
+  rearviewScene: Rearview
 
   shifter: any
   shifterSprite: GameObjects.Sprite
+
   dash: GameObjects.Sprite
-  renderSettings: any
-  bandConfig: object
 
   constructor() 
   {

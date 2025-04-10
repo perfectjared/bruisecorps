@@ -7,6 +7,7 @@ export default class Game extends Scene
   state : any
   
   road: Scene
+  tour: Scene
   marge: Scene
   phone: Scene
 
@@ -41,6 +42,7 @@ export default class Game extends Scene
   create(): void 
   {
     this.road = this.scene.launch('RoadScene').scene
+    this.tour = this.scene.launch('TourScene').scene
     this.marge = this.scene.launch('MargeScene').scene
     this.phone = this.scene.launch('PhoneScene').scene
     
