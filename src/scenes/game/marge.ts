@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { Rearview as RearviewScene } from '../game/rearview'
 
-export class Marge extends Scene 
+export default class Marge extends Scene 
 {
   constants : any
   state : any

@@ -2,7 +2,7 @@ import { Scene } from "phaser"
 import { GameObjects } from "phaser"
 import { appState, gameScene } from "../../app"
 
-export class Phone extends Scene
+export default class Phone extends Scene
 {
     phoneBase: GameObjects.Sprite
     phoneScreen: GameObjects.Sprite

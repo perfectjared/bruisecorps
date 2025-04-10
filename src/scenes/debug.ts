@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { datGui, gameScene, margeScene } from '../app';
 import { GUI } from 'dat.gui';
 
-export class Debug extends Scene {
+export default class Debug extends Scene {
   control : GUI
   process: GUI
   system: GUI
