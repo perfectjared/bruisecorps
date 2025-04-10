@@ -11,7 +11,6 @@ import Phone from './scenes/game/phone'
 import Road from './scenes/game/road'
 import UI from './scenes/game/ui'
 import Debug from './scenes/debug'
-import { GUI } from 'dat.gui'
 
 export var appState =
 {
@@ -32,7 +31,7 @@ export let debugScene: Debug = new Debug()
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
 
-  scene: [bootScene, preloadScene, gameScene, roadScene, margeScene, phoneScene, rearviewScene, uiScene, debugScene],
+  scene: [bootScene, preloadScene, gameScene, roadScene, margeScene, phoneScene, uiScene, debugScene],
   backgroundColor: '#facade',
   scale: {
     mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH, //TODO Phaser.Scale.RESIZE
