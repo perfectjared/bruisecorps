@@ -14,7 +14,8 @@ import Debug from './scenes/debug'
 
 export var appState =
 {
-  width: 0
+  width: 0,
+  height: 0
 }
 
 export var datGui = new GUI({ name: 'debug' })
