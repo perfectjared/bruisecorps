@@ -51,7 +51,7 @@ export default class Game extends Scene
 
   startRoad(): void
   {
-
+    
   }
 
   update(): void 
