@@ -1,9 +1,16 @@
 import { Scene } from 'phaser';
 import { appState } from '../../app';
+import { Tuple } from '../../data-types'
 
 export default class Game extends Scene 
 {
   state : any
+  
+  road: Scene
+  marge: Scene
+  phone: Scene
+
+  relationships: Tuple<Scene, Scene>[]
 
   constructor() 
   {
@@ -33,12 +40,11 @@ export default class Game extends Scene
 
   create(): void 
   {
-    let roadScene = this.scene.launch('RoadScene')
-    let margeScene = this.scene.launch('MargeScene')
-    let uiScene = this.scene.launch('UIScene')
-    let debugScene = this.scene.launch('DebugScene')
-    //let menuScene = this.scene.launch('MenuScene')
-    //let phoneScene = this.scene.launch('PhoneScene')
+    this.road = this.scene.launch('RoadScene').scene
+    this.marge = this.scene.launch('MargeScene').scene
+    this.phone = this.scene.launch('PhoneScene').scene
+    
+    this.scene.launch('DebugScene')
   }
 
   startGame(): void

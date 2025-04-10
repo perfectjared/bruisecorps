@@ -9,6 +9,7 @@ import Game from './scenes/flow/game'
 import Marge from './scenes/game/marge'
 import Phone from './scenes/game/phone'
 import Road from './scenes/game/road'
+import Tour from './scenes/game/tour'
 import UI from './scenes/game/ui'
 import Debug from './scenes/debug'
 
@@ -25,7 +26,8 @@ let preloadScene: Preload = new Preload()
 export let gameScene: Game = new Game()
 export let roadScene: Road = new Road()
 export let margeScene: Marge = new Marge()
-let phoneScene: Phone = new Phone()
+export let phoneScene: Phone = new Phone()
+export let tourScene: Tour = new Tour()
 export let uiScene: UI = new UI()
 export let debugScene: Debug = new Debug()
 
