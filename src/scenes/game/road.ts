@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { MathHelpers } from '../../road-utilities';
 import { RenderHelpers } from '../../road-utilities';
+import { appState } from '../../app';
 
 //todo clean up this whole thing
 
@@ -30,8 +31,11 @@ export class Road extends Scene
 
   roadConfig
 
+  //jared
   speeds
   speed
+  starting
+  startingSpeed
 
   constructor() 
   {
@@ -93,7 +97,7 @@ export class Road extends Scene
     this.playerY = 0;
     this.playerZ = null; // player relative z distance from camera (computed)
 
-    this.background = this.add.sprite(this.renderSettings.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
+    this.background = this.add.sprite(appState.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
     //this.camera = this.cameras3d.add(90).setPosition(0, -40, 100).setPixelScale(64);
 
     this.mathHelper = new MathHelpers(this);
@@ -115,6 +119,10 @@ export class Road extends Scene
     this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
 
     this.build();
+
+    this.starting = false
+    this.startingSpeed = -1
+    this.startRoad()
   }
 
   update(): void 
@@ -126,6 +134,25 @@ export class Road extends Scene
     this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, 1, this.trackLength)
 
     this.updateRoad()
+  }
+
+  //jared additions
+  startRoad(): void
+  {
+    this.starting = true
+    let startingTween = this.tweens.add({
+      callbackScope: this,
+      targets: this.startingSpeed,
+      duration: 1000,
+      ease: 'Linear',
+      repeat: 0,
+      key: 11,
+      onComplete: function(tween, targets)
+      {
+        this.speed = 1
+      }
+    })
+    startingTween.play()
   }
 
   controller(): void
@@ -225,7 +252,7 @@ export class Road extends Scene
     let dx = -(baseSegment.curve * basePercent);
     let n, segment;
 
-    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, this.speeds[this.speed], this.trackLength);
+    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, (this.starting) ? this.startingSpeed : this.speeds[this.speed], this.trackLength);
 
     for (n = 0; n < this.renderSettings.drawDistance; n++) {
       segment = this.segments[(baseSegment.index + n) % this.segments.length];

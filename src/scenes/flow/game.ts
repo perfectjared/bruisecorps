@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { appState } from '../../app';
 
 export class Game extends Scene 
 {
@@ -42,8 +43,15 @@ export class Game extends Scene
 
   startGame(): void
   {
-    this.state.started = true
     console.log("game start")
+    this.state.started = true
+    this.state.playing = true
+    this.startRoad()
+  }
+
+  startRoad(): void
+  {
+
   }
 
   update(): void 
@@ -66,6 +74,8 @@ export class Game extends Scene
 
   process(): void
   {
+    if (!this.state.started) return
+    if (!this.state.playing) return
   }
 
   system(): void

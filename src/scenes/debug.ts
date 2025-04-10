@@ -9,7 +9,6 @@ export class Debug extends Scene {
   feedback: GUI
   debug: GUI
   
-  gameState : any
   margeState : any
 
   constructor() {
@@ -19,6 +18,7 @@ export class Debug extends Scene {
   }
 
   preload(): void {
+    
   }
 
   create(): void {
@@ -29,9 +29,6 @@ export class Debug extends Scene {
 
     let gameState = gameScene.state
     let margeState = margeScene.state
-
-    //console.log(gameState)
-    //console.log(margeState)
     
     controlFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
     controlFolder.add(margeState.indicator, 'signal', false)

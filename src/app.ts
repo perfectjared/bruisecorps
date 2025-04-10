@@ -14,13 +14,6 @@ import { Road as RoadScene } from './scenes/game/road'
 import { UI as UIScene } from './scenes/game/ui'
 import { Debug as DebugScene} from './scenes/debug'
 
-export var appState =
-{
-  width: 0
-}
-
-export var datGui = new GUI({ name: 'debug' })
-
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
 export let gameScene: GameScene = new GameScene()
@@ -30,7 +23,13 @@ export let phoneScene: PhoneScene = new PhoneScene()
 export let rearviewScene: RearviewScene = new RearviewScene()
 export let uiScene: UIScene = new UIScene()
 export let debugScene: DebugScene = new DebugScene()
+export var datGui = new GUI({ name: 'debug' })
 
+export var appState =
+{
+  width: window.innerWidth,
+  height: window.innerHeight
+}
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
@@ -52,4 +51,5 @@ window.addEventListener('load', () => {
 window.addEventListener
 ('resize', () => {
   appState.width = window.innerWidth
+  appState.height = window.innerHeight
 })
