@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 
-export class Marge extends Scene 
+export default class Marge extends Scene 
 {
   state : any
   indicator: any

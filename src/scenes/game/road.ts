@@ -4,7 +4,7 @@ import { RenderHelpers } from '../../road-utilities';
 
 //todo clean up this whole thing
 
-export class Road extends Scene 
+export default class Road extends Scene 
 {
   renderSettings
   ROAD

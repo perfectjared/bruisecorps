@@ -3,12 +3,12 @@
 import 'phaser'
 import Boot from './scenes/flow/boot'
 import Preload from './scenes/flow/preload'
-import { Game as GameScene } from './scenes/flow/game'
-import { Marge as MargeScene } from './scenes/game/marge'
-import { Phone as PhoneScene } from './scenes/game/phone'
-import { Road as RoadScene } from './scenes/game/road'
-import { UI as UIScene } from './scenes/game/ui'
-import { Debug as DebugScene} from './scenes/debug'
+import Game from './scenes/flow/game'
+import Marge from './scenes/game/marge'
+import Phone from './scenes/game/phone'
+import Road from './scenes/game/road'
+import UI from './scenes/game/ui'
+import Debug from './scenes/debug'
 import { GUI } from 'dat.gui'
 
 export var appState =
@@ -20,12 +20,12 @@ export var datGui = new GUI({ name: 'debug' })
 
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
-export let gameScene: GameScene = new GameScene()
-export let roadScene: RoadScene = new RoadScene()
-export let margeScene: MargeScene = new MargeScene()
-let phoneScene: PhoneScene = new PhoneScene()
-export let uiScene: UIScene = new UIScene()
-export let debugScene: DebugScene = new DebugScene()
+export let gameScene: Game = new Game()
+export let roadScene: Road = new Road()
+export let margeScene: Marge = new Marge()
+let phoneScene: Phone = new Phone()
+export let uiScene: UI = new UI()
+export let debugScene: Debug = new Debug()
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',

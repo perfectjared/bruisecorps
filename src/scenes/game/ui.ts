@@ -2,7 +2,7 @@ import { Scene } from "phaser"
 import { GameObjects } from "phaser"
 import { appState, datGui, gameScene } from "../../app"
 
-export class UI extends Scene
+export default class UI extends Scene
 {
     state : any
     uiFolder : any

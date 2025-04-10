@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 
-export class Game extends Scene 
+export default class Game extends Scene 
 {
   state : any
 

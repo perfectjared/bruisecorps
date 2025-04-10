@@ -64,6 +64,10 @@ export
 {
     City,
     Event,
+    Resource,
     Road,
-    Tuple
+    Sign,
+    Store,
+    Tuple,
+    Venue
 }
