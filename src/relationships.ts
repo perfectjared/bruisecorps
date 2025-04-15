@@ -1,8 +1,10 @@
+import { gameScene, margeScene, roadScene } from './app'
+import { Scene } from 'phaser'
 import { Tuple } from './data-types'
 
-
-class Relationships
+export interface Relationship
 {
-    constants: any
-    state: any
+    from: any
+    to: any
+    functions: any
 }

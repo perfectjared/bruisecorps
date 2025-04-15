@@ -22,10 +22,10 @@ export default class Debug extends Scene {
   }
 
   create(): void {
-    const controlFolder = datGui.addFolder('control')
-    const processFolder = datGui.addFolder('process')
-    const systemFolder = datGui.addFolder('system')
-    const debugFolder = datGui.addFolder('debug')
+    const controlFolder = datGui.addFolder('controls')
+    const gameFolder = datGui.addFolder('game')
+    const margeFolder = datGui.addFolder('marge')
+    const bandFolder = datGui.addFolder('band')
 
     let gameState = gameScene.state
     let margeState = margeScene.state
@@ -34,15 +34,17 @@ export default class Debug extends Scene {
     controlFolder.add(margeState.indicator, 'signal', false)
     controlFolder.open()
 
-    processFolder.add(gameState, 'started' as keyof Object, false)
-    processFolder.add(gameState, 'playing' as keyof Object, false)
-    processFolder.open()
+    gameFolder.add(gameState, 'started' as keyof Object, false)
+    gameFolder.add(gameState, 'playing' as keyof Object, false)
+    gameFolder.add(gameState, 'step' as keyof Object, 0, 256, 1)
+    gameFolder.add(gameState, 'speed' as keyof Object, 60, 240, 1)
+    gameFolder.open()
 
-    systemFolder.add(gameState, 'health' as keyof Object, 0, 100, 1)
-    systemFolder.add(gameState, 'money' as keyof Object, 0, 100, .1)
-    systemFolder.add(gameState, 'speed' as keyof Object, 0, 100, .1)
-    systemFolder.add(gameState, 'gear' as keyof Object, 0, 4, 1)
-    systemFolder.open()
+    //TODO: these need to come from margeState
+    margeFolder.add(gameState, 'health' as keyof Object, 0, 100, 1)
+    margeFolder.add(gameState, 'money' as keyof Object, 0, 100, .1)
+    margeFolder.add(gameState, 'gear' as keyof Object, 0, 4, 1)
+    margeFolder.open()
   }
 
   update(): void {

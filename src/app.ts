@@ -30,6 +30,20 @@ export let phoneScene: Phone = new Phone()
 export let tourScene: Tour = new Tour()
 export let uiScene: UI = new UI()
 export let debugScene: Debug = new Debug()
+export let scenes =
+{
+    game: gameScene,
+    road: roadScene,
+    marge: margeScene,
+    phone: phoneScene,
+    tour: tourScene,
+    ui: uiScene,
+    debug: debugScene
+}
+
+// [
+//   gameScene, roadScene, margeScene, phoneScene, tourScene, uiScene, debugScene
+// ]
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
@@ -53,3 +67,8 @@ window.addEventListener
   appState.width = window.innerWidth
   appState.height = window.innerHeight
 })
+
+export
+{
+
+}

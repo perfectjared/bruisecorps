@@ -4,6 +4,8 @@ import { Tuple } from '../../data-types'
 
 export default class Game extends Scene 
 {
+  buffer: any
+  constants: any
   state : any
   
   road: Scene
@@ -11,7 +13,9 @@ export default class Game extends Scene
   marge: Scene
   phone: Scene
 
-  relationships: Tuple<Scene, Scene>[]
+  relationships: any[]
+
+  metronomeTween: any
 
   constructor() 
   {
@@ -22,20 +26,34 @@ export default class Game extends Scene
   
   preload(): void
   {
+    this.constants = 
+    {
+      speedMin: 60,
+      speedMax: 240,
+      stepMax: 256
+    }
+
     this.state = 
     {
       scale: innerWidth / (this.sys.game.config.width as number),
       started: false,
       playing: false,
       step: 0,
+      speed: 60,
 
-      //not being used yet really
+      //TODO: this needs to be coming from marge
       health: 86,
       money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
-      speed: 0, //0 - 100, .1 steps, interpreted into a mph amount, exponential
+      //speed: 0, //0 - 100, .1 steps, interpreted into a mph amount, exponential
       gear: 0, //0 - 4, 1 steps
       distance: 100, //100 - 0, 1 steps, interpreted into a miles amount, exponential
       signal: false
+    }
+
+    this.buffer = 
+    {
+      lastPlaying: false,
+      lastSpeed: 0
     }
   }
 
@@ -45,8 +63,33 @@ export default class Game extends Scene
     this.tour = this.scene.launch('TourScene').scene
     this.marge = this.scene.launch('MargeScene').scene
     this.phone = this.scene.launch('PhoneScene').scene
-    
     this.scene.launch('DebugScene')
+
+    this.metronomeTween = this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+          if (this.state.playing) 
+            {
+              {
+                let speedChanged = this.state.speed != this.buffer.lastSpeed
+                if (speedChanged)
+                {
+                  let constrainedSpeed = Math.min(Math.max(this.state.speed, this.constants.speedMin), this.constants.speedMax)
+                  this.metronomeTween.delay = 60000 / constrainedSpeed
+                  this.buffer.lastSpeed = this.state.speed
+                  console.log(this.metronomeTween.delay)
+                }
+                else
+                {
+                  console.log("metronome")
+                  let stepMax = this.state.step == this.constants.stepMax
+                  this.state.step = (stepMax) ? 0 : this.state.step + 1
+                }
+              }
+            }
+      },
+      loop: true,
+  });
   }
 
   startGame(): void
@@ -54,12 +97,13 @@ export default class Game extends Scene
     console.log("game start")
     this.state.started = true
     this.state.playing = true
+    this.metronomeTween.play
     this.startRoad()
   }
 
   startRoad(): void
   {
-    
+    console.log("implement startRoad()")
   }
 
   update(): void 
@@ -82,8 +126,24 @@ export default class Game extends Scene
 
   process(): void
   {
-    if (!this.state.started) return
+    if (!this.state.started) 
+    {
+      this.state.playing = false
+      return
+    }
     if (!this.state.playing) return
+
+    let startPlaying = this.state.playing && !this.buffer.lastPlaying
+    if (startPlaying)
+    {
+      this.startGame()
+    }
+
+    let stopPlaying = !this.state.playing && this.buffer.lastPlaying
+    {
+
+    }
+    this.buffer.lastPlaying = this.state.playing
   }
 
   system(): void
@@ -97,5 +157,6 @@ export default class Game extends Scene
 
   debug(): void
   {
+    
   }
 }
