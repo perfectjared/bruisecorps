@@ -3,6 +3,10 @@ import { MathHelpers } from '../../road-utilities';
 import { RenderHelpers } from '../../road-utilities';
 import { appState, gameScene, margeScene } from '../../app';
 
+//TODO: ROAD NEEDS POTHOLES YOU HAVE TO GO SLOW OVER
+//ALSO COPS
+//ALSO PSYCHO TRUCKS
+
 export default class Road extends Scene 
 {
   renderSettings

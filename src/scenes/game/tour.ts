@@ -19,7 +19,7 @@ export default class Tour extends Scene
 
     preload()
     {
-
+        
     }
 
     create()

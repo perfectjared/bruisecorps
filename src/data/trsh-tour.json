@@ -1,0 +1,110 @@
+{
+    "shows":
+    [
+        {
+            "date": 0,
+            "city": "",
+            "timeTo": 0,
+            "venue": "",
+            "events": []
+        },
+        {
+            "date": 419,
+            "city": "dallas-tx",
+            "timeTo": 0,
+            "venue": "ferris-wheelers-backyard-and-bbq",
+            "events": []
+        },
+        {
+            "date": 421,
+            "city": "tucson-az",
+            "timeTo": 13.37,
+            "venue": "club-congress",
+            "events": []
+        },
+        {
+            "date": 425,
+            "city": "oakland-ca",
+            "timeTo": 12.36,
+            "venue": "stay-gold-deli",
+            "events": []
+        },
+        {
+            "date": 426,
+            "city": "sacramento-ca",
+            "timeTo": 1.22,
+            "venue": "the-starlet-room",
+            "events": []
+        },
+        {
+            "date": 429,
+            "city": "salt_lake_city-ut",
+            "timeTo": 9.25,
+            "venue": "the-beehive",
+            "events": []
+        },
+        {
+            "date": 430,
+            "city": "denver-co",
+            "timeTo": 7.53,
+            "venue": "globe-hall",
+            "events": []
+        },
+        {
+            "date": 503,
+            "city": "iowa_city-ia",
+            "timeTo": 11.09,
+            "venue": "gabe's",
+            "events": []
+        },
+        {
+            "date": 505,
+            "city": "cudahy-wi",
+            "timeTo": 3.58,
+            "venue": "x_ray-arcade",
+            "events": []
+        },
+        {
+            "date": 506,
+            "city": "chicago-il",
+            "timeTo": 1.29,
+            "venue": "cobra-lounge",
+            "events": []
+        },
+        {
+            "date": 507,
+            "city": "grand_rapids-mi",
+            "timeTo": 2.47,
+            "venue": "the-pyramid-scheme",
+            "events": []
+        },
+        {
+            "date": 508,
+            "city": "lakewood-oh",
+            "timeTo": 4.2,
+            "venue": "mahall's",
+            "events": []
+        },
+        {
+            "date": 511,
+            "city": "providence-ri",
+            "timeTo": 9.44,
+            "venue": "alchemy",
+            "events": []
+        },
+        {
+            "date": 513,
+            "city": "baltimore-md",
+            "timeTo": 5.57,
+            "venue": "metro-baltimore",
+            "events": []
+        },
+        {
+            "date": 516,
+            "city": "atlanta-ga",
+            "timeTo": 10.17,
+            "venue": "the-masquerade",
+            "events": []
+        }
+    ]
+}
