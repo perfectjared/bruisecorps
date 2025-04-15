@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
-import { appState } from '../../app';
+import { appState, margeScene } from '../../app';
 import { Tuple } from '../../data-types'
+import  Marge from '../game/marge'
 
 export default class Game extends Scene 
 {
@@ -31,11 +32,10 @@ export default class Game extends Scene
       speedMin: 60,
       speedMax: 240,
       stepMax: 256,
-      healthValues: { min: 0, max: 100, start: 86, step : .01 },
-      bleedValues: [.11, .33, .66, .99],
-      
-      speedValues: { min: 60, max: 240, start: 60, step: 1 },
-      stepValues: { min: 0, max: 256, start: 0, 
+      healthNumbers: { min: 0, max: 100, start: 86, step : .01 },
+      bleedValues: [0, .11, .33, .66, .99],
+      speedNumbers: { min: 60, max: 240, start: 60, step: 1 },
+      stepNumbers: { min: 0, max: 256, start: 0, 
         step: function() 
         { 
           this.min +=1
@@ -45,14 +45,13 @@ export default class Game extends Scene
 
     this.state = 
     {
-      scale: innerWidth / (this.sys.game.config.width as number),
-
       step: 0,
+      scale: innerWidth / (this.sys.game.config.width as number),
       
       started: false,
       playing: false,
-      speed: this.constants.speedValues.start,
-      health: this.constants.healthValues.start,
+      speed: this.constants.speedNumbers.start,
+      health: this.constants.healthNumbers.start,
       money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
       distance: 100, //100 - 0, 1 steps, interpreted into a miles amount, exponential
     }
@@ -60,7 +59,8 @@ export default class Game extends Scene
     this.buffer = 
     {
       lastPlaying: false,
-      lastSpeed: 0
+      lastSpeed: 0,
+      lastStep: 0,
     }
   }
 
@@ -68,7 +68,9 @@ export default class Game extends Scene
   {
     this.road = this.scene.launch('RoadScene').scene
     this.tour = this.scene.launch('TourScene').scene
-    this.marge = this.scene.launch('MargeScene').scene
+
+    this.marge = this.scene.launch(margeScene).scene
+
     this.phone = this.scene.launch('PhoneScene').scene
     this.scene.launch('DebugScene')
 
@@ -84,13 +86,13 @@ export default class Game extends Scene
                   let constrainedSpeed = Math.min(Math.max(this.state.speed, this.constants.speedMin), this.constants.speedMax)
                   this.metronomeTween.delay = 60000 / constrainedSpeed
                   this.buffer.lastSpeed = this.state.speed
-                  console.log(this.metronomeTween.delay)
+                  console.log("mtrnm bpm @ " + this.metronomeTween.delay)
                 }
                 else
                 {
-                  console.log("metronome")
-                  let stepMax = this.state.step == this.constants.stepMax
-                  this.state.step = (stepMax) ? 0 : this.state.step + 1
+                  let stepMax = this.state.step == this.constants.stepNumbers.max
+                  this.state.step = (stepMax == true) ? 0 : this.state.step + 1
+                  console.log("mtrnm step @ " + this.state.step)
                 }
               }
             }
@@ -124,11 +126,28 @@ export default class Game extends Scene
 
   control(): void
   {
+    let nextStep = (this.buffer.lastStep != this.state.step)
+    if (nextStep) this.step()
     //listen for input from RoadScene
     //listen for input from MargeScene
     //listen for input from UIScene
     //listen for input from MenuScene
     //listen for player input
+  }
+
+  step(): number
+  {
+    this.healthBleed()
+    this.buffer.lastStep = this.state.step
+    return this.state.step
+  }
+
+  healthBleed(): number
+  {
+    let bleedAmount = this.constants.bleedValues[Math.round(Math.random() * margeScene.state.shifter.gear)]
+    this.state.health -= bleedAmount
+    console.log('bleed ' + bleedAmount + ', health ' + this.state.health)
+    return this.state.health
   }
 
   process(): void
@@ -160,6 +179,7 @@ export default class Game extends Scene
 
   feedback(): void
   {
+
   }
 
   debug(): void

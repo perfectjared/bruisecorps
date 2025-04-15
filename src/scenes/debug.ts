@@ -24,12 +24,12 @@ export default class Debug extends Scene {
   create(): void {
     const appFolder = datGui.addFolder('app')
     const gameFolder = datGui.addFolder('game')
+    const playerFolder = datGui.addFolder('player')
     const margeFolder = datGui.addFolder('marge')
     const bandFolder = datGui.addFolder('band')
 
     let gameState = gameScene.state
     let margeState = margeScene.state
-    
     
     appFolder.add(gameState, 'started' as keyof Object, false)
     appFolder.open()
@@ -39,10 +39,13 @@ export default class Debug extends Scene {
     gameFolder.add(gameState, 'speed' as keyof Object, 60, 240, 1)
     gameFolder.open()
 
-    margeFolder.add(gameState, 'health' as keyof Object, 0, 100, .1)
-    //margeFolder.add(gameState, 'money' as keyof Object, 0, 100, .1)
+    playerFolder.add(gameState, 'health' as keyof Object, 0, 100, .1)
+    //playerFolder.add(gameState, 'money' as keyof Object, 0, integer max or whatever, 1)
+    playerFolder.open()
+
+    
     margeFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
-    //margeFolder.add(margeState.indicator, 'signal', false)
+    margeFolder.add(margeState.indicator, 'signal', false)
     margeFolder.open()
   }
 

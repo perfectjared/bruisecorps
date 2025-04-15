@@ -41,7 +41,6 @@ export default class Marge extends Scene
       shifterConfig:
       {},
       startingGear: 0,
-      bleedValues: [.11, .33, .66, .99],
     }
     
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
@@ -98,16 +97,7 @@ export default class Marge extends Scene
   
   step(): void
   {
-    this.bleedHealth()
-  }
-
-  bleedHealth(): number //do this AT game.state
-  {
-    let bleedAmount = this.constants.bleedValues
-      [Math.ceil(Math.random() * this.state.shifter.gear )]
-    this.state.health -= bleedAmount
-    console.log(bleedAmount)
-    return bleedAmount
+    
   }
 
   process(): void
