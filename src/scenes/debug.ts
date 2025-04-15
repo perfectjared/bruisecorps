@@ -30,8 +30,8 @@ export default class Debug extends Scene {
     let gameState = gameScene.state
     let margeState = margeScene.state
     
-    controlFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
-    controlFolder.add(margeState.indicator, 'signal', false)
+    controlFolder.add(margeState.gear, 'value' as keyof Object, 0, 4, 1)
+    controlFolder.add(margeState.signal, 'value', false)
     controlFolder.open()
 
     gameFolder.add(gameState, 'started' as keyof Object, false)
