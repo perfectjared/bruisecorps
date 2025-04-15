@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { appState, margeScene } from '../../app';
+import { appState, margeScene, roadScene } from '../../app';
 import { Tuple } from '../../data-types'
 import  Marge from '../game/marge'
 
@@ -107,12 +107,6 @@ export default class Game extends Scene
     this.state.started = true
     this.state.playing = true
     this.metronomeTween.play
-    this.startRoad()
-  }
-
-  startRoad(): void
-  {
-    console.log("implement startRoad()")
   }
 
   update(): void 

@@ -1,9 +1,7 @@
 import { Scene } from 'phaser';
 import { MathHelpers } from '../../road-utilities';
 import { RenderHelpers } from '../../road-utilities';
-import { appState } from '../../app';
-
-//todo clean up this whole thing
+import { appState, gameScene, margeScene } from '../../app';
 
 export default class Road extends Scene 
 {
@@ -32,10 +30,9 @@ export default class Road extends Scene
   roadConfig
 
   //jared
-  speeds
-  speed
-  starting
-  startingSpeed
+  constants
+  state
+  buffer
 
   constructor() 
   {
@@ -45,11 +42,6 @@ export default class Road extends Scene
   }
   
   preload(): void //TODO move this to preload.ts
-  {
-
-  }
-
-  create(): void 
   {
     this.renderSettings = {
       width: this.sys.game.config.width, // logical canvas width
@@ -95,7 +87,7 @@ export default class Road extends Scene
 
     this.playerX = .33; // player x offset from center of road (-1 to 1 to stay independent of roadWidth)
     this.playerY = 0;
-    this.playerZ = null; // player relative z distance from camera (computed)
+    this.playerZ = 0; // player relative z distance from camera (computed)
 
     this.background = this.add.sprite(appState.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
     //this.camera = this.cameras3d.add(90).setPosition(0, -40, 100).setPixelScale(64);
@@ -103,14 +95,26 @@ export default class Road extends Scene
     this.mathHelper = new MathHelpers(this);
     this.renderHelper = new RenderHelpers(this);
 
-    this.speeds = [
-      -1,
-      11,
-      22,
-      133,
-      666
-    ]
-    this.speed = 0;
+    this.constants =
+    {
+      speeds: [
+        -1,
+        11,
+        22,
+        66,
+        133
+      ]
+    }
+
+    this.state = 
+    {
+      speed: 0,
+    }
+
+    this.buffer = 
+    {
+      lastGear: 0
+    }
 
     this.graphics = this.add.graphics({
       x: 0,
@@ -119,10 +123,11 @@ export default class Road extends Scene
     this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
 
     this.build();
+  }
 
-    this.starting = false
-    this.startingSpeed = -1
-    this.startRoad()
+  create(): void 
+  {
+   
   }
 
   update(): void 
@@ -136,28 +141,18 @@ export default class Road extends Scene
     this.updateRoad()
   }
 
-  //jared additions
-  startRoad(): void
-  {
-    this.starting = true
-    let startingTween = this.tweens.add({
-      callbackScope: this,
-      targets: this.startingSpeed,
-      duration: 1000,
-      ease: 'Linear',
-      repeat: 0,
-      key: 11,
-      onComplete: function(tween, targets)
-      {
-        this.speed = 1
-      }
-    })
-    startingTween.play()
-  }
-
   controller(): void
   {
-    //TODO listen for update to gear to change road
+    let paused = !gameScene.state.playing
+    if (paused)
+    {
+      this.state.speed = 0
+      return
+    }
+
+    let gear = margeScene.state.shifter.gear
+    this.state.speed = gear
+
   }
 
   model(): void
@@ -252,7 +247,7 @@ export default class Road extends Scene
     let dx = -(baseSegment.curve * basePercent);
     let n, segment;
 
-    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, (this.starting) ? this.startingSpeed : this.speeds[this.speed], this.trackLength);
+    this.renderSettings.position = this.mathHelper.increase(this.renderSettings.position, this.constants.speeds[this.state.speed], this.trackLength);
 
     for (n = 0; n < this.renderSettings.drawDistance; n++) {
       segment = this.segments[(baseSegment.index + n) % this.segments.length];
@@ -327,6 +322,7 @@ export default class Road extends Scene
   lastY() {
     return (this.segments.length == 0) ? 0 : this.segments[this.segments.length - 1].p2.world.y;
   }
+
   addSegmentSprite(index, spriteKey, offset) {
     let sprite = this.add.sprite(0, 0, spriteKey);
 
@@ -364,6 +360,7 @@ export default class Road extends Scene
       color: Math.floor(n / this.rumbleLength) % 2 ? this.renderHelper.COLORS.DARK : this.renderHelper.COLORS.LIGHT
     });
   }
+
   addRoad(enter, hold, leave, curve, y) {
     let startY = this.lastY();
     let endY = startY + (this.mathHelper.toInt(y, 0) * this.segmentLength);
@@ -379,9 +376,11 @@ export default class Road extends Scene
   addStraight(num = this.ROAD.LENGTH.MEDIUM) {
     this.addRoad(num, num, num, 0, 0);
   }
+
   addHill(num = this.ROAD.LENGTH.MEDIUM, height = this.ROAD.HILL.MEDIUM) {
     this.addRoad(num, num, num, 0, height);
   }
+  
   addCurve(num = this.ROAD.LENGTH.MEDIUM, curve = this.ROAD.CURVE.MEDIUM, height = this.ROAD.HILL.NONE) {
     this.addRoad(num, num, num, curve, height);
   }
@@ -401,6 +400,7 @@ export default class Road extends Scene
     this.addRoad(this.ROAD.LENGTH.MEDIUM, this.ROAD.LENGTH.MEDIUM, this.ROAD.LENGTH.MEDIUM, -this.ROAD.CURVE.EASY, this.ROAD.HILL.MEDIUM);
     this.addRoad(this.ROAD.LENGTH.MEDIUM, this.ROAD.LENGTH.MEDIUM, this.ROAD.LENGTH.MEDIUM, -this.ROAD.CURVE.MEDIUM, -this.ROAD.HILL.MEDIUM);
   }
+
   addDownhillToEnd(num = 200) {
     this.addRoad(num, num, num, -this.ROAD.CURVE.EASY, -this.lastY() / this.segmentLength);
   }
