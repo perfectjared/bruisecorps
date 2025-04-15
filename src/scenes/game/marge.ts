@@ -59,8 +59,8 @@ export default class Marge extends Scene
     this.state = 
     {
       step: 0,
-      gear: { value: this.constants.gearValues.start },
-      signal : { value: false }
+      shifter: { gear: this.constants.gearValues.start },
+      indicator : { signal: false }
     }
 
     this.buffer = 
@@ -101,10 +101,10 @@ export default class Marge extends Scene
     this.bleedHealth()
   }
 
-  bleedHealth(): number
+  bleedHealth(): number //do this AT game.state
   {
     let bleedAmount = this.constants.bleedValues
-      [Math.floor(Math.random() * this.constants.bleedValues.length)]
+      [Math.ceil(Math.random() * this.state.shifter.gear )]
     this.state.health -= bleedAmount
     console.log(bleedAmount)
     return bleedAmount
@@ -142,11 +142,11 @@ export default class Marge extends Scene
     )
     this.shifterSprite.angle = 
     (
-      (this.state.gear.value == 0) ? 45 :
-      (this.state.gear.value == 1) ? 15 :
-      (this.state.gear.value == 2) ? 0 :
-      (this.state.gear.value == 3) ? -15 :
-      (this.state.gear.value == 4) ? -30 :
+      (this.state.shifter.gear == 0) ? 45 :
+      (this.state.shifter.gear == 1) ? 15 :
+      (this.state.shifter.gear == 2) ? 0 :
+      (this.state.shifter.gear == 3) ? -15 :
+      (this.state.shifter.gear == 4) ? -30 :
       0
     )
   }
@@ -160,6 +160,6 @@ export default class Marge extends Scene
       this.renderSettings.width * .28,
       this.renderSettings.height * .95
     )
-    this.indicatorSprite.angle = (this.state.signal.value == true) ? 33 : 0
+    this.indicatorSprite.angle = (this.state.indicator.signal == true) ? 33 : 0
   }
 }

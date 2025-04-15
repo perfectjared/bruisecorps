@@ -30,24 +30,31 @@ export default class Game extends Scene
     {
       speedMin: 60,
       speedMax: 240,
-      stepMax: 256
+      stepMax: 256,
+      healthValues: { min: 0, max: 100, start: 86, step : .01 },
+      bleedValues: [.11, .33, .66, .99],
+      
+      speedValues: { min: 60, max: 240, start: 60, step: 1 },
+      stepValues: { min: 0, max: 256, start: 0, 
+        step: function() 
+        { 
+          this.min +=1
+        }
+      }
     }
 
     this.state = 
     {
       scale: innerWidth / (this.sys.game.config.width as number),
+
+      step: 0,
+      
       started: false,
       playing: false,
-      step: 0,
-      speed: 60,
-
-      //TODO: this needs to be coming from marge
-      health: 86,
+      speed: this.constants.speedValues.start,
+      health: this.constants.healthValues.start,
       money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
-      //speed: 0, //0 - 100, .1 steps, interpreted into a mph amount, exponential
-      gear: 0, //0 - 4, 1 steps
       distance: 100, //100 - 0, 1 steps, interpreted into a miles amount, exponential
-      signal: false
     }
 
     this.buffer = 
