@@ -1,10 +1,17 @@
 import { Scene } from 'phaser';
-import { appState, margeScene, roadScene } from '../../app';
+import { appState, debugScene, margeScene, phoneScene, roadScene, tourScene } from '../../app';
 import { Tuple } from '../../data-types'
 import  Marge from '../game/marge'
 
 export default class Game extends Scene 
 {
+  //organize it this way VV book of lenses
+  space: any
+  time: any
+  objects: any
+  actions: any
+  rules: any
+
   buffer: any
   constants: any
   state : any
@@ -33,14 +40,16 @@ export default class Game extends Scene
       speedMax: 240,
       stepMax: 256,
       healthNumbers: { min: 0, max: 100, start: 86, step : .01 },
-      bleedValues: [0, .11, .33, .66, .99],
+      bleedValues: [0, .1, .4, 1.6, 3.1],
       speedNumbers: { min: 60, max: 240, start: 60, step: 1 },
       stepNumbers: { min: 0, max: 256, start: 0, 
         step: function() 
         { 
           this.min +=1
         }
-      }
+      },
+      progressNumbers: { min: 0, max: 100, start: 0, step: .01 },
+      progressValues: [0, 1, 2, 4, 8]
     }
 
     this.state = 
@@ -53,7 +62,7 @@ export default class Game extends Scene
       speed: this.constants.speedNumbers.start,
       health: this.constants.healthNumbers.start,
       money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
-      distance: 100, //100 - 0, 1 steps, interpreted into a miles amount, exponential
+      progress: 0, //0 - 100, .1 steps, interpreted into miles with tour state
     }
 
     this.buffer = 
@@ -66,13 +75,12 @@ export default class Game extends Scene
 
   create(): void 
   {
-    this.road = this.scene.launch('RoadScene').scene
-    this.tour = this.scene.launch('TourScene').scene
-
+    this.road = this.scene.launch(roadScene).scene
+    this.tour = this.scene.launch(tourScene).scene
     this.marge = this.scene.launch(margeScene).scene
+    this.phone = this.scene.launch(phoneScene).scene
 
-    this.phone = this.scene.launch('PhoneScene').scene
-    this.scene.launch('DebugScene')
+    this.scene.launch(debugScene)
 
     this.metronomeTween = this.time.addEvent({
       delay: 1000,
@@ -132,6 +140,8 @@ export default class Game extends Scene
   step(): number
   {
     this.healthBleed()
+    this.progressIncrement()
+
     this.buffer.lastStep = this.state.step
     return this.state.step
   }
@@ -142,6 +152,14 @@ export default class Game extends Scene
     this.state.health -= bleedAmount
     console.log('bleed ' + bleedAmount + ', health ' + this.state.health)
     return this.state.health
+  }
+
+  progressIncrement(): number
+  {
+    let progressAmount = this.constants.progressValues[margeScene.state.shifter.gear]
+    this.state.progress += progressAmount
+    console.log('progress ' + progressAmount)
+    return this.state.progress
   }
 
   process(): void

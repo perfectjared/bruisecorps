@@ -26,6 +26,7 @@ export default class Debug extends Scene {
     const gameFolder = datGui.addFolder('game')
     const playerFolder = datGui.addFolder('player')
     const margeFolder = datGui.addFolder('marge')
+    const tourFolder = datGui.addFolder('tour')
     const bandFolder = datGui.addFolder('band')
 
     let gameState = gameScene.state
@@ -41,6 +42,7 @@ export default class Debug extends Scene {
 
     playerFolder.add(gameState, 'health' as keyof Object, 0, 100, .1)
     //playerFolder.add(gameState, 'money' as keyof Object, 0, integer max or whatever, 1)
+    playerFolder.add(gameState, 'progress' as keyof Object, 0, 100, 1)
     playerFolder.open()
 
     
