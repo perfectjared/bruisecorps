@@ -8,5 +8,4 @@ interface City
 interface Venue
 {
     name: string
-    
 }

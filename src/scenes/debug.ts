@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
-import { datGui, gameScene, margeScene } from '../app';
+import { datGui, gameScene, margeScene, rearviewScene } from '../app';
 import { GUI } from 'dat.gui';
+import { Tamagotchi } from './game/tamagotchi';
 
 export default class Debug extends Scene {
   control : GUI
@@ -44,11 +45,27 @@ export default class Debug extends Scene {
     //playerFolder.add(gameState, 'money' as keyof Object, 0, integer max or whatever, 1)
     playerFolder.add(gameState, 'progress' as keyof Object, 0, 100, 1)
     playerFolder.open()
-
     
     margeFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
     margeFolder.add(margeState.indicator, 'signal', false)
     margeFolder.open()
+
+    let bandFolders : any[] = []
+    bandFolders.push(bandFolder.addFolder('cora'))
+    bandFolders.push(bandFolder.addFolder('john'))
+    bandFolders.push(bandFolder.addFolder('mike'))
+    bandFolders.push(bandFolder.addFolder('mitch'))
+    bandFolders.push(bandFolder.addFolder('stanli'))
+
+    let iterator = 0
+    let tamagotchis = rearviewScene.bandMembers
+    bandFolders.forEach((folder: any) =>
+    {
+      folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
+      folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
+      folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)
+      iterator++
+    })
   }
 
   update(): void {

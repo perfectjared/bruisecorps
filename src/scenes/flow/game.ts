@@ -1,16 +1,17 @@
 import { Scene } from 'phaser';
-import { appState, debugScene, margeScene, phoneScene, roadScene, tourScene } from '../../app';
-import { Tuple } from '../../data-types'
-import  Marge from '../game/marge'
+import { debugScene, margeScene, phoneScene, rearviewScene, roadScene, tourScene } from '../../app';
 
 export default class Game extends Scene 
 {
   //organize it this way VV book of lenses
-  space: any
-  time: any
-  objects: any
-  actions: any
-  rules: any
+  mechanics:
+  {
+    space: any
+    time: any
+    objects: any
+    actions: any
+    rules: any
+  }
 
   buffer: any
   constants: any
@@ -20,6 +21,7 @@ export default class Game extends Scene
   tour: Scene
   marge: Scene
   phone: Scene
+  rearview: Scene
 
   relationships: any[]
 
@@ -76,9 +78,10 @@ export default class Game extends Scene
   create(): void 
   {
     this.road = this.scene.launch(roadScene).scene
-    this.tour = this.scene.launch(tourScene).scene
     this.marge = this.scene.launch(margeScene).scene
     this.phone = this.scene.launch(phoneScene).scene
+    this.tour = this.scene.launch(tourScene).scene
+    this.rearview = this.scene.launch(rearviewScene).scene
 
     this.scene.launch(debugScene)
 

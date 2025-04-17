@@ -30,10 +30,7 @@ export default class Rearview extends Scene
           width: this.sys.game.config.width,
           height: this.sys.game.config.height
         }
-    }
 
-    create()
-    {
         this.rearviewSprite = this.add.sprite(0, 0, 'rearview')
         this.bandContainer = new GameObjects.Container(this, this.rearviewSprite.x, this.rearviewSprite.y).setSize(this.rearviewSprite.width, this.rearviewSprite.height)
         this.bandMembers = 
@@ -48,6 +45,11 @@ export default class Rearview extends Scene
         (member: Tamagotchi) => {
             this.game.scene.add(member.key as string, member, true)
         })
+    }
+
+    create()
+    {
+
     }
 
     update()
