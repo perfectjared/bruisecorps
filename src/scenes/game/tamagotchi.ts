@@ -1,5 +1,6 @@
 import { Scene } from 'phaser'
 import { GameObjects } from 'phaser'
+import { gameScene } from '../../app'
 
 export enum BandMember
 {
@@ -22,7 +23,7 @@ export class Tamagotchi extends Scene
     feedButton: GameObjects.Text
     giveButton: GameObjects.Text
 
-    stepButton: GameObjects.Text
+    // stepButton: GameObjects.Text
     
     bathroomText: GameObjects.Text
     boredText: GameObjects.Text
@@ -108,7 +109,7 @@ export class Tamagotchi extends Scene
 
         this.state = 
         {
-            stepAt: 0,
+            step: 0,
             bathroom: 0,
             bathroomCurveAt: 0,
             bored: 0,
@@ -138,7 +139,12 @@ export class Tamagotchi extends Scene
 
     control()
     {
-
+        let nextStep = (this.state.step != gameScene.state.step)
+        if (nextStep)
+        {
+            this.step()
+            this.state.step = gameScene.state.step
+        }
     }
 
     process()
@@ -190,28 +196,28 @@ export class Tamagotchi extends Scene
         this.boredValueText = this.add.text(x + 83, y + 28, '00 %', { color: '#000000'})
         this.bathroomValueText = this.add.text(x + 83, y + 44, '00 %', { color: '#000000'})
 
-        this.stepButton = this.add.text(x + 5, y + 86, '(step 0)', { color: '#000000'})
-        this.stepButton.setInteractive()
-        this.stepButton.on('pointerup', 
-            () => {
-                this.step()
-            }
-        )
+        // this.stepButton = this.add.text(x + 5, y + 86, '(step 0)', { color: '#000000'})
+        // this.stepButton.setInteractive()
+        // this.stepButton.on('pointerup', 
+        //     () => {
+        //         this.step()
+        //     }
+        // )
     }
 
     step(stepAmount: number = 1)
     {
-        this.state.stepAt += stepAmount
+        this.state.step += stepAmount
         this.updateBathroom(stepAmount)
         this.updateBored(stepAmount)
         this.updateHunger(stepAmount)
-        this.updatestepButton()
+        // this.updatestepButton()
     }
 
-    updatestepButton()
-    {
-        this.stepButton.text = '(step ' + this.state.stepAt + ')'
-    }
+    // updatestepButton()
+    // {
+    //     this.stepButton.text = '(step ' + this.state.step + ')'
+    // }
 
     updateTextLocations()
     {
@@ -224,7 +230,7 @@ export class Tamagotchi extends Scene
         this.hungerValueText.setPosition(x + 83,  y + 10)
         this.boredValueText.setPosition(x + 83,  y + 28)
         this.bathroomValueText.setPosition(x + 83,  y + 44)
-        this.stepButton.setPosition(x + 5, y + 86)
+        // this.stepButton.setPosition(x + 5, y + 86)
     }
 
     updateBathroomValueText()
