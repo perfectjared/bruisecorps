@@ -164,8 +164,7 @@ export class Tamagotchi extends Scene
 
     debug()
     {
-        //this.graphics.lineStyle(1, 0xFF00FF)
-        //this.graphics.arc(this.state.position[this.bandMember].x, this.state.position[this.bandMember].y, 10, Phaser.Math.DegToRad(0), Phaser.Math.DegToRad(360))
+
     }
 
     addDebugTexts()
@@ -177,14 +176,14 @@ export class Tamagotchi extends Scene
         this.feedButton.setInteractive()
         this.feedButton.on('pointerup', 
             () => {
-                this.feed()
+                this.tryFeed()
             }
         )
         this.giveButton = this.add.text(x + 66, y + 66, '(give)', { color: '#f6300a'})
         this.giveButton.setInteractive()
         this.giveButton.on('pointerup',
             () => {
-                this.give()
+                this.tryGive()
             }
         )
 
@@ -195,29 +194,15 @@ export class Tamagotchi extends Scene
         this.hungerValueText = this.add.text(x + 83, y + 10, '00 %', { color: '#000000'})
         this.boredValueText = this.add.text(x + 83, y + 28, '00 %', { color: '#000000'})
         this.bathroomValueText = this.add.text(x + 83, y + 44, '00 %', { color: '#000000'})
-
-        // this.stepButton = this.add.text(x + 5, y + 86, '(step 0)', { color: '#000000'})
-        // this.stepButton.setInteractive()
-        // this.stepButton.on('pointerup', 
-        //     () => {
-        //         this.step()
-        //     }
-        // )
     }
 
-    step(stepAmount: number = 1)
+    step(stepAmount: number = .1)
     {
         this.state.step += stepAmount
         this.updateBathroom(stepAmount)
         this.updateBored(stepAmount)
         this.updateHunger(stepAmount)
-        // this.updatestepButton()
     }
-
-    // updatestepButton()
-    // {
-    //     this.stepButton.text = '(step ' + this.state.step + ')'
-    // }
 
     updateTextLocations()
     {
@@ -230,7 +215,6 @@ export class Tamagotchi extends Scene
         this.hungerValueText.setPosition(x + 83,  y + 10)
         this.boredValueText.setPosition(x + 83,  y + 28)
         this.bathroomValueText.setPosition(x + 83,  y + 44)
-        // this.stepButton.setPosition(x + 5, y + 86)
     }
 
     updateBathroomValueText()
@@ -284,6 +268,24 @@ export class Tamagotchi extends Scene
         this.updateHungerValueText()
 
         this.state.hungerCurveAt = (this.state.hungerCurveAt == 10) ? 10 : this.state.hungerCurveAt + amount
+    }
+
+    tryFeed()
+    {
+        if (gameScene.state.playing && gameScene.state.resources.snacks > 0) 
+        {
+            this.feed()
+            gameScene.state.resources.snacks--
+        }
+    }
+
+    tryGive()
+    {
+        if (gameScene.state.playing && gameScene.state.resources.weed > 0) 
+        {
+            this.give()
+            gameScene.state.resources.weed--
+        }
     }
 
     feed()

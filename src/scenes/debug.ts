@@ -33,18 +33,26 @@ export default class Debug extends Scene {
     let gameState = gameScene.state
     let margeState = margeScene.state
     
-    appFolder.add(gameState, 'started' as keyof Object, false)
+    appFolder.add(gameState, 'started', false)
     appFolder.open()
 
-    gameFolder.add(gameState, 'playing' as keyof Object, false)
-    gameFolder.add(gameState, 'step' as keyof Object, 0, 256, 1)
-    gameFolder.add(gameState, 'speed' as keyof Object, 60, 240, 1)
+    gameFolder.add(gameState, 'playing', false)
+    gameFolder.add(gameState, 'step', 0, 256, 1)
+    gameFolder.add(gameState, 'speed', 60, 240, 1)
     gameFolder.open()
 
-    playerFolder.add(gameState, 'health' as keyof Object, 0, 100, .1)
-    //playerFolder.add(gameState, 'money' as keyof Object, 0, integer max or whatever, 1)
-    playerFolder.add(gameState, 'progress' as keyof Object, 0, 100, 1)
+    playerFolder.add(gameState, 'health', 0, 100, .1)
+    playerFolder.add(gameState, 'progress', 0, 100, 1)
+    playerFolder.add(gameState, 'timeLeft', 0, 100, .01)
+    playerFolder.add(gameState, 'time2Arrive', "")
     playerFolder.open()
+
+    let resourcesFolder = playerFolder.addFolder('resources')
+    resourcesFolder.add(gameState.resources, 'pussy', 0, 10, 1)
+    resourcesFolder.add(gameState.resources, 'money', 0, 99999, 1)
+    resourcesFolder.add(gameState.resources, 'weed', 0, 10, 1)
+    resourcesFolder.add(gameState.resources, 'snacks', 0, 10, 1)
+    resourcesFolder.open()
     
     margeFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
     margeFolder.add(margeState.indicator, 'signal', false)
@@ -56,6 +64,7 @@ export default class Debug extends Scene {
     bandFolders.push(bandFolder.addFolder('mike'))
     bandFolders.push(bandFolder.addFolder('mitch'))
     bandFolders.push(bandFolder.addFolder('stanli'))
+    //bandFolder.open()
 
     let iterator = 0
     let tamagotchis = rearviewScene.bandMembers
@@ -64,8 +73,16 @@ export default class Debug extends Scene {
       folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)
+      //folder.open()
       iterator++
     })
+
+    tourFolder.add(gameState, 'lastShow')
+    tourFolder.add(gameState, 'nextShow')
+    tourFolder.add(gameState.tour.shows[2], 'timeTo', 0, 100, .01)
+    tourFolder.add(gameState, 'showsLeft')
+    
+    tourFolder.open()
   }
 
   update(): void {

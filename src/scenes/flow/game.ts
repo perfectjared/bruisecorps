@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 import { debugScene, margeScene, phoneScene, rearviewScene, roadScene, tourScene } from '../../app';
+import Tour from '../game/tour';
+import * as trashTour from '../../data/trsh-tour.json'
 
 export default class Game extends Scene 
 {
@@ -13,9 +15,40 @@ export default class Game extends Scene
     rules: any
   }
 
-  buffer: any
-  constants: any
-  state : any
+  //TODO actually declare things here
+  buffer : any
+
+  //TODO actually declare things here
+  constants : any
+
+  state : 
+  {
+    started //should be app level
+    scale
+
+    playing
+    step
+    speed
+
+    health
+    progress
+    timeLeft
+    time2Arrive
+
+    resources :
+    {
+      pussy
+      money
+      weed
+      snacks
+    }
+    tour
+    showIterator
+    lastShow
+    nextShow
+    
+    showsLeft
+  }
   
   road: Scene
   tour: Scene
@@ -63,15 +96,36 @@ export default class Game extends Scene
       playing: false,
       speed: this.constants.speedNumbers.start,
       health: this.constants.healthNumbers.start,
-      money: 5, //0 - 100, .1 steps, then interpreted into a dollar amount, exponential.
       progress: 0, //0 - 100, .1 steps, interpreted into miles with tour state
+
+      resources:
+      {
+        pussy: 0,
+        money: 100,
+        weed: 3,
+        snacks: 5,
+      },
+      tour: new Tour(),
+      showIterator: 1,
+      lastShow: "",
+      nextShow: "",
+      timeLeft: 666,
+      showsLeft: 69,
+      time2Arrive: 666,
     }
+    let tour = trashTour.shows
+    this.state.tour.shows = tour
+    this.state.lastShow = tour[1].city
+    this.state.nextShow = tour[2].city
+    this.state.timeLeft = tour[2].timeTo
+    this.state.showsLeft = tour.length - this.state.showIterator
 
     this.buffer = 
     {
       lastPlaying: false,
       lastSpeed: 0,
       lastStep: 0,
+      lastTime: 666
     }
   }
 

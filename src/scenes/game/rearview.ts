@@ -24,7 +24,7 @@ export default class Rearview extends Scene
 
     preload()
     {
-        this.load.image('rearview', '../../../assets/image/marge/rearview.png')
+        this.load.image('rearview', '../../../assets/image/marge/rearview')
         this.renderSettings =
         {
           width: this.sys.game.config.width,
