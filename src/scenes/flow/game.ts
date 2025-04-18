@@ -33,7 +33,6 @@ export default class Game extends Scene
     health
     progress
     timeLeft
-    time2Arrive
 
     resources :
     {
@@ -42,6 +41,11 @@ export default class Game extends Scene
       weed
       snacks
     }
+
+    month
+    day
+    hour
+
     tour
     showIterator
     lastShow
@@ -111,8 +115,12 @@ export default class Game extends Scene
       nextShow: "",
       timeLeft: 666,
       showsLeft: 69,
-      time2Arrive: 666,
+      
+      month: 4,
+      day: 16,
+      hour: 8
     }
+
     let tour = trashTour.shows
     this.state.tour.shows = tour
     this.state.lastShow = tour[1].city
@@ -199,8 +207,70 @@ export default class Game extends Scene
     this.healthBleed()
     this.progressIncrement()
 
+    let nextTime = (this.state.step % 11 == 0)
+    if (nextTime) this.timeIncrement()
+
     this.buffer.lastStep = this.state.step
     return this.state.step
+  }
+
+  timeIncrement(): number[]
+  {
+    let hour = this.state.hour
+    let day = this.state.day
+    let month = this.state.month
+
+    hour ++
+    if (hour > 23) 
+    {
+      hour = 0
+      day ++
+      switch(month)
+      {
+        //31 days
+        case 1: case 3: case 5: case 7: case 8: case 10:
+          if (day >= 31)
+          {
+            month ++
+            day = 0
+          }
+          day ++
+        break;
+        //30 days
+        case 4: case 6: case 8: case 9: case 11:
+          if (day >= 30)
+          {
+            month ++
+            day = 0
+          }
+          day ++
+        break;
+        //28 days
+        case 2:
+          if (day >= 28)
+          {
+            month ++
+            day = 0
+          }
+          day ++
+        break;
+        //end of year
+        case 12:
+          if (day >= 31)
+          {
+            month = 1
+            day = 0
+          }
+          day ++
+        break;
+      }
+    }
+
+    this.state.month = month
+    this.state.day = day
+    this.state.hour = hour
+    
+    return [ month, day, hour ]
   }
 
   healthBleed(): number

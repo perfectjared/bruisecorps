@@ -44,8 +44,13 @@ export default class Debug extends Scene {
     playerFolder.add(gameState, 'health', 0, 100, .1)
     playerFolder.add(gameState, 'progress', 0, 100, 1)
     playerFolder.add(gameState, 'timeLeft', 0, 100, .01)
-    playerFolder.add(gameState, 'time2Arrive', "")
     playerFolder.open()
+
+    let timeFolder = playerFolder.addFolder('time')
+    timeFolder.add(gameState, 'month', 1, 12, 1)
+    timeFolder.add(gameState, 'day', 1, 31, 1)
+    timeFolder.add(gameState, 'hour', 0, 23, 1)
+    timeFolder.open()
 
     let resourcesFolder = playerFolder.addFolder('resources')
     resourcesFolder.add(gameState.resources, 'pussy', 0, 10, 1)
