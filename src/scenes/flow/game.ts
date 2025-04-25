@@ -78,7 +78,8 @@ export default class Game extends Scene
       speedMin: 60,
       speedMax: 240,
       stepMax: 256,
-      healthNumbers: { min: 0, max: 100, start: 86, step : .01 },
+      healthNumbers: { min: 0, max: 100, start: 86, step : 1 },
+      needsNumbers: { min: 0, max: 100, start: 0, step : 1 }, //tamagotchis needs
       bleedValues: [0, .1, .4, 1.6, 3.1],
       speedNumbers: { min: 60, max: 240, start: 60, step: 1 },
       stepNumbers: { min: 0, max: 256, start: 0, 

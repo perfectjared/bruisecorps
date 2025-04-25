@@ -9,6 +9,13 @@
             "events": []
         },
         {
+            "date": 0,
+            "city": "",
+            "timeTo": 0,
+            "venue": "",
+            "events": []
+        },
+        {
             "date": 419,
             "city": "dallas-tx",
             "timeTo": 0,

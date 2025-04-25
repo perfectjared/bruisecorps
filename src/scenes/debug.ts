@@ -75,6 +75,7 @@ export default class Debug extends Scene {
     let tamagotchis = rearviewScene.bandMembers
     bandFolders.forEach((folder: any) =>
     {
+      console.log(tamagotchis[iterator].state)
       folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)

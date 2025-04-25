@@ -11,10 +11,16 @@ export enum BandMember
     Stanli
 }
 
+export enum Mood
+{
+    Regular
+}
+
 export class Tamagotchi extends Scene 
 {
     constants: any
     state: any
+    bounds: any
 
     bandMember: BandMember
     key: string
@@ -22,8 +28,6 @@ export class Tamagotchi extends Scene
 
     feedButton: GameObjects.Text
     giveButton: GameObjects.Text
-
-    // stepButton: GameObjects.Text
     
     bathroomText: GameObjects.Text
     boredText: GameObjects.Text
@@ -32,7 +36,6 @@ export class Tamagotchi extends Scene
     bathroomValueText: GameObjects.Text
     boredValueText: GameObjects.Text
     hungerValueText: GameObjects.Text
-    
 
     bathroomStep: Function
 
@@ -65,7 +68,7 @@ export class Tamagotchi extends Scene
                 [60, 60, 60, 60, 60],
                 [60, 60, 60, 60, 60]
             ],
-            bathroomCurve: //validation: 5 arrays of 10 numbers
+            bathroomCurve: //validation: 5 arrays of 11 numbers
             [
                 [0, 0, 0, 0, 1, 1, 1, 1, 2, 5, 10],
                 [0, 0, 0, 0, 1, 1, 1, 1, 2, 5, 10],
@@ -73,7 +76,7 @@ export class Tamagotchi extends Scene
                 [0, 0, 0, 0, 1, 1, 1, 1, 2, 5, 10],
                 [0, 0, 0, 0, 1, 1, 1, 1, 2, 5, 10]
             ],
-            boredCurve: //validation: 5 arrays of 10 numbers
+            boredCurve: //validation: 5 arrays of 11 numbers
             [
                 [0, 0, 0, 0, 1, 2, 2, 3, 3, 5, 9],
                 [0, 0, 0, 0, 1, 2, 2, 3, 3, 5, 9],
@@ -81,7 +84,7 @@ export class Tamagotchi extends Scene
                 [0, 0, 0, 0, 1, 2, 2, 3, 3, 5, 9],
                 [0, 0, 0, 0, 1, 2, 2, 3, 3, 5, 9]
             ],
-            hungerCurve: //validation: 5 arrays of 10 numbers
+            hungerCurve: //validation: 5 arrays of 11 numbers
             [
                 [0, 1, 1, 1, 2, 2, 2, 3, 3, 5, 6],
                 [0, 1, 1, 1, 2, 2, 2, 3, 3, 5, 6],
@@ -109,18 +112,26 @@ export class Tamagotchi extends Scene
 
         this.state = 
         {
-            step: 0,
             bathroom: 0,
             bathroomCurveAt: 0,
             bored: 0,
             boredCurveAt: 0,
             hunger: 0,
-            hungerCurveAt: 0
+            hungerCurveAt: 0,
+            mood: Mood.Regular
+        }
+
+        this.bounds =
+        {
+            bathroom: {min: 0, max: 100},
+            bored: {min: 0, max: 100},
+            hunger: {min: 0, max: 100}
         }
     }
 
     preload()
     {
+
     }
 
     create()
@@ -228,7 +239,8 @@ export class Tamagotchi extends Scene
     updateBathroom(amount)
     {
         let addToBathroom = this.constants.bathroomCurve[this.bandMember][Math.round(this.state.bathroomCurveAt)]
-        this.state.bathroom += addToBathroom
+        console.log(addToBathroom)
+        this.state.bathroom = Math.min(this.bounds.bathroom.max, this.state.bathroom + addToBathroom)
         this.updateBathroomValueText()
 
         this.state.bathroomCurveAt = (this.state.bathroomCurveAt == 10) ? 10 : this.state.bathroomCurveAt + amount
