@@ -21,6 +21,14 @@ export var appState =
 }
 
 export var macroGUI = new GUI({ name: 'macro' })
+macroGUI.domElement.id = 'macroGUI'
+macroGUI.domElement.setAttribute("style", "opacity: 0.33")
+export var mesoGUI = new GUI({ name: 'meso' })
+mesoGUI.domElement.setAttribute("style", "opacity: 0.33")
+mesoGUI.domElement.id = 'mesoGUI'
+export var microGUI = new GUI({ name: 'micro' })
+microGUI.domElement.setAttribute("style", "opacity: 0.33")
+microGUI.domElement.id = 'microGUI'
 
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
@@ -44,10 +52,6 @@ export let scenes =
     ui: uiScene,
     debug: debugScene
 }
-
-// [
-//   gameScene, roadScene, margeScene, phoneScene, tourScene, uiScene, debugScene
-// ]
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
