@@ -1,6 +1,4 @@
 import { Scene } from "phaser"
-import { GameObjects } from "phaser"
-import { appState, datGui, gameScene } from "../../app"
 
 export default class UI extends Scene
 {
@@ -27,9 +25,6 @@ export default class UI extends Scene
         {
             start : false
         }
-        const uiFolder = datGui.addFolder('ui')
-        uiFolder.add(this.state, 'start' as keyof Object, false)
-        uiFolder.open()
     }
 
     update(): void
@@ -52,9 +47,7 @@ export default class UI extends Scene
     startButton(): void
     {
         //send an event or whatever
-        gameScene.startGame()
         this.state.start = false
-        datGui.updateDisplay()
     }
 
     process(): void

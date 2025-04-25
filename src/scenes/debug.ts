@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { datGui, gameScene, margeScene, rearviewScene } from '../app';
+import { macroGUI, gameScene, margeScene, rearviewScene } from '../app';
 import { GUI } from 'dat.gui';
 import { Tamagotchi } from './game/tamagotchi';
 
@@ -23,12 +23,12 @@ export default class Debug extends Scene {
   }
 
   create(): void {
-    const appFolder = datGui.addFolder('app')
-    const gameFolder = datGui.addFolder('game')
-    const playerFolder = datGui.addFolder('player')
-    const margeFolder = datGui.addFolder('marge')
-    const tourFolder = datGui.addFolder('tour')
-    const bandFolder = datGui.addFolder('band')
+    const appFolder = macroGUI.addFolder('app')
+    const gameFolder = macroGUI.addFolder('game')
+    const playerFolder = macroGUI.addFolder('player')
+    const margeFolder = macroGUI.addFolder('marge')
+    const tourFolder = macroGUI.addFolder('tour')
+    const bandFolder = macroGUI.addFolder('band')
 
     let gameState = gameScene.state
     let margeState = margeScene.state
@@ -75,7 +75,6 @@ export default class Debug extends Scene {
     let tamagotchis = rearviewScene.bandMembers
     bandFolders.forEach((folder: any) =>
     {
-      console.log(tamagotchis[iterator].state)
       folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
       folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)
@@ -92,6 +91,6 @@ export default class Debug extends Scene {
   }
 
   update(): void {
-    datGui.updateDisplay()
+    macroGUI.updateDisplay()
   }
 }

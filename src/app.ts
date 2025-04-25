@@ -20,7 +20,7 @@ export var appState =
   height: 0
 }
 
-export var datGui = new GUI({ name: 'debug' })
+export var macroGUI = new GUI({ name: 'macro' })
 
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()

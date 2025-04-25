@@ -238,21 +238,29 @@ export class Tamagotchi extends Scene
     }
     updateBathroom(amount)
     {
+        if (this.state.bathroom >= this.bounds.bathroom.max) return
         let addToBathroom = this.constants.bathroomCurve[this.bandMember][Math.round(this.state.bathroomCurveAt)]
-        console.log(addToBathroom)
         this.state.bathroom = Math.min(this.bounds.bathroom.max, this.state.bathroom + addToBathroom)
-        this.updateBathroomValueText()
-
         this.state.bathroomCurveAt = (this.state.bathroomCurveAt == 10) ? 10 : this.state.bathroomCurveAt + amount
+        this.updateBathroomValueText()
     }
 
     updateBored(amount)
     {
+        if (this.state.bored >= this.bounds.bored.max) return
         let addToBored = this.constants.boredCurve[this.bandMember][Math.round(this.state.boredCurveAt)]
-        this.state.bored += addToBored
-        this.updateBoredValueText()
-
+        this.state.bored = Math.min(this.bounds.bored.max, this.state.bored + addToBored)
         this.state.boredCurveAt = (this.state.boredCurveAt == 10) ? 10 : this.state.boredCurveAt + amount
+        this.updateBoredValueText()
+    }
+
+    updateHunger(amount)
+    {   
+        if (this.state.hunger >= this.bounds.hunger.max) return
+        let addToHunger = this.constants.hungerCurve[this.bandMember][Math.round(this.state.hungerCurveAt)]
+        this.state.hunger = Math.min(this.bounds.hunger.max, this.state.hunger + addToHunger)
+        this.state.hungerCurveAt = (this.state.hungerCurveAt == 10) ? 10 : this.state.hungerCurveAt + amount
+        this.updateHungerValueText()
     }
 
     updateBoredValueText()
@@ -271,15 +279,6 @@ export class Tamagotchi extends Scene
             (this.state.hunger > 99) ? "!!" : this.state.hunger as string : 
         "0" + this.state.hunger as string
         this.hungerValueText.text += " %"
-    }
-    
-    updateHunger(amount)
-    {
-        let addToHunger = this.constants.hungerCurve[this.bandMember][Math.round(this.state.hungerCurveAt)]
-        this.state.hunger += addToHunger
-        this.updateHungerValueText()
-
-        this.state.hungerCurveAt = (this.state.hungerCurveAt == 10) ? 10 : this.state.hungerCurveAt + amount
     }
 
     tryFeed()
