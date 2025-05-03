@@ -1,6 +1,6 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
-import { appState, gameScene } from "../../app"
+import { appState, scenes.game } from "../../../app"
 
 export default class Dash extends Scene
 {

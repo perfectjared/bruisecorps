@@ -7,8 +7,8 @@ import Boot from './scenes/flow/boot'
 import Preload from './scenes/flow/preload'
 import Game from './scenes/flow/game'
 import Marge from './scenes/game/marge'
-import Phone from './scenes/game/phone'
-import Rearview from './scenes/game/rearview'
+import Phone from './scenes/game/marge/phone'
+import Rearview from './scenes/game/marge/rearview'
 import Road from './scenes/game/road'
 import Tour from './scenes/game/tour'
 import UI from './scenes/game/ui'
@@ -20,12 +20,6 @@ export var appState =
   height: 0
 }
 
-export var macroGUI = new GUI({ name: 'macro' })
-macroGUI.domElement.id = 'macroGUI'
-macroGUI.domElement.setAttribute("style", "opacity: 0.33")
-export var mesoGUI = new GUI({ name: 'meso' })
-mesoGUI.domElement.setAttribute("style", "opacity: 0.33")
-mesoGUI.domElement.id = 'mesoGUI'
 export var microGUI = new GUI({ name: 'micro' })
 microGUI.domElement.setAttribute("style", "opacity: 0.33")
 microGUI.domElement.id = 'microGUI'
@@ -33,14 +27,14 @@ microGUI.domElement.id = 'microGUI'
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
 
-export let tourScene: Tour = new Tour()
-export let rearviewScene: Rearview = new Rearview()
-export let roadScene: Road = new Road()
-export let margeScene: Marge = new Marge()
-export let phoneScene: Phone = new Phone()
-export let uiScene: UI = new UI()
-export let gameScene: Game = new Game()
-export let debugScene: Debug = new Debug()
+let tourScene: Tour = new Tour()
+let rearviewScene: Rearview = new Rearview()
+let roadScene: Road = new Road()
+let margeScene: Marge = new Marge()
+let phoneScene: Phone = new Phone()
+let uiScene: UI = new UI()
+let gameScene: Game = new Game()
+let debugScene: Debug = new Debug()
 export let scenes =
 {
     game: gameScene,
@@ -56,7 +50,7 @@ export let scenes =
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
 
-  scene: [bootScene, preloadScene, gameScene, roadScene, margeScene, phoneScene, rearviewScene, tourScene, uiScene, debugScene],
+  scene: [bootScene, preloadScene, scenes.game, roadScene, margeScene, phoneScene, rearviewScene, tourScene, uiScene, debugScene],
   backgroundColor: '#facade',
   scale: {
     mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH, //TODO Phaser.Scale.RESIZE
@@ -76,7 +70,11 @@ window.addEventListener
   appState.height = window.innerHeight
 })
 
-export
-{
+//three debug GUIs for three levels of the game
+export var macroGUI = new GUI({ name: 'macro' })
+macroGUI.domElement.id = 'macroGUI'
+macroGUI.domElement.setAttribute("style", "opacity: 0.33")
 
-}
+export var mesoGUI = new GUI({ name: 'meso' })
+mesoGUI.domElement.setAttribute("style", "opacity: 0.33")
+mesoGUI.domElement.id = 'mesoGUI'

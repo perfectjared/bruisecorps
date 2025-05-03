@@ -1,3 +1,8 @@
+//TODO
+//
+//
+// idk what the fuck this is doing
+//
 /**
  * @author       cloakedninjas (https://github.com/cloakedninjas)
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
@@ -47,6 +52,6 @@ export default class Preload extends Scene {
   }
 
   create(): void {
-    this.scene.start('GameScene');
+    this.scene.start('scenes.game');
   }
 }

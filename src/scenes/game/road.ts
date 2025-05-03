@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
-import { MathHelpers } from '../../road-utilities';
-import { RenderHelpers } from '../../road-utilities';
-import { appState, gameScene, margeScene } from '../../app';
+import { MathHelpers } from '../../lib/road-utilities';
+import { RenderHelpers } from '../../lib/road-utilities';
+import { appState, scenes } from '../../app';
 
 //TODO: ROAD NEEDS POTHOLES YOU HAVE TO GO SLOW OVER
 //ALSO COPS
@@ -147,14 +147,14 @@ export default class Road extends Scene
 
   controller(): void
   {
-    let paused = !gameScene.state.playing
+    let paused = !scenes.game.state.playing
     if (paused)
     {
       this.state.speed = 0
       return
     }
 
-    let gear = margeScene.state.shifter.gear
+    let gear = scenes.marge.state.shifter.gear
     this.state.speed = gear
 
   }

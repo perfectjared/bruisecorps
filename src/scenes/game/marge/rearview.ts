@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import { BandMember, Tamagotchi } from './tamagotchi';
+import { BandMember, Tamagotchi } from './rearview/tamagotchi';
 
 export default class Rearview extends Scene
 {

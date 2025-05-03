@@ -1,6 +1,6 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
-import { appState, gameScene } from "../../app"
+import { appState, scenes } from "../../../app"
 
 export default class Phone extends Scene
 {
@@ -90,7 +90,7 @@ export default class Phone extends Scene
                 let minPosition: number = 0.2
                 let maxPosition: number = 1
                 
-                let scale = gameScene.state.scale
+                let scale = scenes.game.state.scale
                 scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
                 
                 let scalePosition = (scale - minScale) / (maxScale - minScale)

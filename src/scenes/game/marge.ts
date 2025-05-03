@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import Rearview from '../game/rearview'
-import { gameScene } from '../../app';
+import Rearview from '../game/marge/rearview'
+import { scenes } from '../../app';
 
 export default class Marge extends Scene 
 {
@@ -84,12 +84,12 @@ export default class Marge extends Scene
 
   control(): void
   {
-    //listen for input from GameScene
-    let nextStep = (gameScene.state.step != this.state.step)
+    //listen for input from scenes.game
+    let nextStep = (scenes.game.state.step != this.state.step)
     if (nextStep)
     {
       this.step()
-      this.state.step = gameScene.state.step
+      this.state.step = scenes.game.state.step
     }
 
     //listen for input from MenuScene

@@ -6,12 +6,6 @@ export default class Tour extends Scene
     state: any
     buffer: any
 
-    space: any
-    time: any
-    objects: any
-    actions: any
-    rules: any
-
     constructor()
     {
         super('TourScene')

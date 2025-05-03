@@ -1,20 +1,11 @@
 import { Scene } from 'phaser';
-import { debugScene, margeScene, phoneScene, rearviewScene, roadScene, tourScene } from '../../app';
+import { scenes } from '../../app';
 import Tour from '../game/tour';
+
 import * as trashTour from '../../data/trsh-tour.json'
 
 export default class Game extends Scene 
 {
-  //organize it this way VV book of lenses
-  mechanics:
-  {
-    space: any
-    time: any
-    objects: any
-    actions: any
-    rules: any
-  }
-
   //TODO actually declare things here
   buffer : any
 
@@ -24,7 +15,7 @@ export default class Game extends Scene
   state : 
   {
     started //should be app level
-    scale
+    scale // ^^
 
     playing
     step
@@ -32,48 +23,48 @@ export default class Game extends Scene
 
     health
     progress
-    timeLeft
+    monthlyListeners
 
     resources :
     {
       pussy
       money
       weed
-      snacks
+      hotdogs
+      pissjugs
     }
 
     month
     day
     hour
+    date
 
-    tour
-    showIterator
-    lastShow
-    nextShow
-    
-    showsLeft
+    tour //should be on tour
+    showIterator //
+    lastShow //
+    nextShow //
+    nextDate //
+    showsLeft //
   }
   
   road: Scene
-  tour: Scene
+  tour: any
   marge: Scene
   phone: Scene
   rearview: Scene
-
-  relationships: any[]
 
   metronomeTween: any
 
   constructor() 
   {
     super({
-      key: 'GameScene'
+      key: 'scenes.game'
     });
   }
   
   preload(): void
   {
-    this.constants = 
+    this.constants = //todo MOVE TO JSON
     {
       speedMin: 60,
       speedMax: 240,
@@ -92,41 +83,47 @@ export default class Game extends Scene
       progressValues: [0, 1, 2, 4, 8]
     }
 
-    this.state = 
+    this.state = //todo STARTING VALUES IN JSON
     {
-      step: 0,
-      scale: innerWidth / (this.sys.game.config.width as number),
-      
       started: false,
+      scale: innerWidth / (this.sys.game.config.width as number),
       playing: false,
+
       speed: this.constants.speedNumbers.start,
+      step: 0,
+
       health: this.constants.healthNumbers.start,
       progress: 0, //0 - 100, .1 steps, interpreted into miles with tour state
+      monthlyListeners: 2000,
 
       resources:
       {
         pussy: 0,
         money: 100,
         weed: 3,
-        snacks: 5,
+        hotdogs: 5,
+        pissjugs: 0,
       },
+
       tour: new Tour(),
       showIterator: 1,
       lastShow: "",
       nextShow: "",
-      timeLeft: 666,
+      nextDate: 666,
       showsLeft: 69,
       
       month: 4,
       day: 16,
-      hour: 8
+      hour: 8,
+      date: 416
     }
 
-    let tour = trashTour.shows
+
+    let tour = trashTour.shows //array
     this.state.tour.shows = tour
     this.state.lastShow = tour[1].city
     this.state.nextShow = tour[2].city
-    this.state.timeLeft = tour[2].timeTo
+    this.state.nextDate = tour[2].date
     this.state.showsLeft = tour.length - this.state.showIterator
 
     this.buffer = 
@@ -140,13 +137,13 @@ export default class Game extends Scene
 
   create(): void 
   {
-    this.road = this.scene.launch(roadScene).scene
-    this.marge = this.scene.launch(margeScene).scene
-    this.phone = this.scene.launch(phoneScene).scene
-    this.tour = this.scene.launch(tourScene).scene
-    this.rearview = this.scene.launch(rearviewScene).scene
+    this.road = this.scene.launch(scenes.road).scene
+    this.marge = this.scene.launch(scenes.marge).scene
+    this.phone = this.scene.launch(scenes.phone).scene
+    this.tour = this.scene.launch(scenes.tour).scene
+    this.rearview = this.scene.launch(scenes.rearview).scene
 
-    this.scene.launch(debugScene)
+    this.scene.launch(scenes.debug)
 
     this.metronomeTween = this.time.addEvent({
       delay: 1000,
@@ -270,13 +267,14 @@ export default class Game extends Scene
     this.state.month = month
     this.state.day = day
     this.state.hour = hour
+    this.state.date = (month * 100) + (day)
     
     return [ month, day, hour ]
   }
 
   healthBleed(): number
   {
-    let bleedAmount = this.constants.bleedValues[Math.round(Math.random() * margeScene.state.shifter.gear)]
+    let bleedAmount = this.constants.bleedValues[Math.round(Math.random() * scenes.marge.state.shifter.gear)]
     this.state.health -= bleedAmount
     console.log('bleed ' + bleedAmount + ', health ' + this.state.health)
     return this.state.health
@@ -284,7 +282,7 @@ export default class Game extends Scene
 
   progressIncrement(): number
   {
-    let progressAmount = this.constants.progressValues[margeScene.state.shifter.gear]
+    let progressAmount = this.constants.progressValues[scenes.marge.state.shifter.gear]
     this.state.progress += progressAmount
     console.log('progress ' + progressAmount)
     return this.state.progress

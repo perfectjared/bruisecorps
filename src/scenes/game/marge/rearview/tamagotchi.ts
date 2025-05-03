@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { GameObjects } from 'phaser'
-import { gameScene } from '../../app'
+import { scenes } from '../../../../app'
 
 export enum BandMember
 {
@@ -13,7 +13,13 @@ export enum BandMember
 
 export enum Mood
 {
-    Regular
+    Regular,
+    Pissed,
+    Wild,
+    Sleepy,
+    Relaxed,
+    Antsy,
+    Freaking
 }
 
 export class Tamagotchi extends Scene 
@@ -150,11 +156,11 @@ export class Tamagotchi extends Scene
 
     control()
     {
-        let nextStep = (this.state.step != gameScene.state.step)
+        let nextStep = (this.state.step != scenes.game.state.step)
         if (nextStep)
         {
             this.step()
-            this.state.step = gameScene.state.step
+            this.state.step = scenes.game.state.step
         }
     }
 
@@ -283,19 +289,19 @@ export class Tamagotchi extends Scene
 
     tryFeed()
     {
-        if (gameScene.state.playing && gameScene.state.resources.snacks > 0) 
+        if (scenes.game.state.playing && scenes.game.state.resources.hotdogs > 0) 
         {
             this.feed()
-            gameScene.state.resources.snacks--
+            scenes.game.state.resources.hotdogs-- //TODO: DON'T DO THIS!!!!!
         }
     }
 
     tryGive()
     {
-        if (gameScene.state.playing && gameScene.state.resources.weed > 0) 
+        if (scenes.game.state.playing && scenes.game.state.resources.weed > 0) 
         {
             this.give()
-            gameScene.state.resources.weed--
+            scenes.game.state.resources.weed--
         }
     }
 
