@@ -232,7 +232,7 @@ export default class Road extends Scene
     }
 
     this.trackLength = this.segments.length * this.segmentLength;
-    this.buildSprites();
+    //this.buildSprites();
   }
 
   updateRoad() 

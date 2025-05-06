@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { BandMember, Tamagotchi } from './rearview/tamagotchi';
+import { routing } from '../../../app';
 
 export default class Rearview extends Scene
 {
@@ -24,13 +25,16 @@ export default class Rearview extends Scene
 
     preload()
     {
-        this.load.image('rearview', '../../../assets/image/marge/rearview')
         this.renderSettings =
         {
           width: this.sys.game.config.width,
           height: this.sys.game.config.height
         }
+        this.load.image('rearview', './assets/image/marge/rearview.png')
+    }
 
+    create()
+    {
         this.rearviewSprite = this.add.sprite(0, 0, 'rearview')
         this.bandContainer = new GameObjects.Container(this, this.rearviewSprite.x, this.rearviewSprite.y).setSize(this.rearviewSprite.width, this.rearviewSprite.height)
         this.bandMembers = 
@@ -45,11 +49,6 @@ export default class Rearview extends Scene
         (member: Tamagotchi) => {
             this.game.scene.add(member.key as string, member, true)
         })
-    }
-
-    create()
-    {
-
     }
 
     update()

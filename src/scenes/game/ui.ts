@@ -2,8 +2,12 @@ import { Scene } from "phaser"
 
 export default class UI extends Scene
 {
-    state : any
-    uiFolder : any
+    buffer: any
+    constants: any
+    state : 
+    {
+        start
+    }
 
     constructor()
     {

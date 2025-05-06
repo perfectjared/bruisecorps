@@ -10,18 +10,15 @@ export default class Marge extends Scene
   state : any
   renderSettings: any
 
-  bandConfig: object
+  dashSprite: GameObjects.Sprite
 
-  indicator: any
-  indicatorSprite: GameObjects.Sprite
-
-  rearview: any
-  rearviewScene: Rearview
+  signal: any
+  signalSprite: GameObjects.Sprite
 
   shifter: any
   shifterSprite: GameObjects.Sprite
 
-  dash: GameObjects.Sprite
+  bandConfig: object
 
   constructor() 
   {
@@ -33,6 +30,9 @@ export default class Marge extends Scene
   //load and manage things having to do with this object only
   preload(): void 
   {
+    this.load.image('shifter', '../../../assets/image/marge/shifter.png')
+    this.load.image('signal', '../../../assets/image/marge/signal.png')
+
     this.constants =
     {
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
@@ -42,12 +42,6 @@ export default class Marge extends Scene
       {},
       startingGear: 0,
     }
-    
-    this.load.image('shifter', '../../../assets/image/marge/shifter.png')
-    this.load.image('indicator', '../../../assets/image/marge/indicator.png')
-
-    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
-    this.indicatorSprite = this.add.sprite(0, 0, 'indicator')
 
     this.renderSettings =
     {
@@ -58,8 +52,8 @@ export default class Marge extends Scene
     this.state = 
     {
       step: 0,
-      shifter: { gear: this.constants.gearValues.start },
-      indicator : { signal: false }
+      gear: this.constants.gearValues.start,
+      signal : false
     }
 
     this.buffer = 
@@ -70,7 +64,9 @@ export default class Marge extends Scene
   
   create(): void 
   {
-    //this.scene.launch('RearviewScene')
+    this.scene.launch(scenes.rearview)
+    this.shifterSprite = this.add.sprite(0, 0, 'shifter')
+    this.signalSprite = this.add.sprite(0, 0, 'signal')
   }
   
   update(): void 
@@ -113,7 +109,7 @@ export default class Marge extends Scene
   feedback(): void
   {
     this.placeShifter()
-    this.placeIndicator()
+    this.placeSignal()
   }
 
   debug(): void
@@ -123,33 +119,33 @@ export default class Marge extends Scene
 
   placeShifter(): void
   {
-    this.shifterSprite.setOrigin(.1 , .9)
-    this.shifterSprite.setScale(0.4, 0.4)
-    this.shifterSprite.setPosition
-    (
+      this.shifterSprite.setOrigin(.1 , .9)
+      this.shifterSprite.setScale(0.4, 0.4)
+      this.shifterSprite.setPosition
+      (
       this.renderSettings.width * .5, 
       this.renderSettings.height * .925
-    )
-    this.shifterSprite.angle = 
-    (
-      (this.state.shifter.gear == 0) ? 45 :
-      (this.state.shifter.gear == 1) ? 15 :
-      (this.state.shifter.gear == 2) ? 0 :
-      (this.state.shifter.gear == 3) ? -15 :
-      (this.state.shifter.gear == 4) ? -30 :
+      )
+      this.shifterSprite.angle = 
+      (
+      (this.state.gear == 0) ? 30 :
+      (this.state.gear == 1) ? 15 :
+      (this.state.gear == 2) ? 0 :
+      (this.state.gear == 3) ? -15 :
+      (this.state.gear == 4) ? -30 :
       0
-    )
+      )
   }
 
-  placeIndicator(): void
+  placeSignal(): void
   {
-    this.indicatorSprite.setOrigin(.9, .9)
-    this.indicatorSprite.setScale(0.25, 0.25)
-    this.indicatorSprite.setPosition
-    (
-      this.renderSettings.width * .28,
-      this.renderSettings.height * .95
-    )
-    this.indicatorSprite.angle = (this.state.indicator.signal == true) ? 33 : 0
+      this.signalSprite.setOrigin(.9, .9)
+      this.signalSprite.setScale(0.25, 0.25)
+      this.signalSprite.setPosition
+      (
+        this.renderSettings.width * .28,
+        this.renderSettings.height * .95
+      )
+      this.signalSprite.angle = (this.state.signal == true) ? 33 : 0
   }
 }

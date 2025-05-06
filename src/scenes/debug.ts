@@ -66,29 +66,35 @@ export default class Debug extends Scene
       tourFolder.open()
     }
 
-    {
-      const bandFolder = microGUI.addFolder('band')
-      let bandFolders : any[] = []
-      let coraFolder = bandFolder.addFolder('cora')
-      bandFolders.push(coraFolder)
-      coraFolder.open()
-      // bandFolders.push(bandFolder.addFolder('john'))
-      // bandFolders.push(bandFolder.addFolder('mike'))
-      // bandFolders.push(bandFolder.addFolder('mitch'))
-      // bandFolders.push(bandFolder.addFolder('stanli'))
-      bandFolder.open()
+    // {
+    //   const bandFolder = microGUI.addFolder('band')
+    //   let bandFolders : any[] = []
+    //   let coraFolder = bandFolder.addFolder('cora')
+    //   bandFolders.push(coraFolder)
+    //   let johnFolder = bandFolder.addFolder('john')
+    //   bandFolders.push(johnFolder)
+    //   let mikeFolder = bandFolder.addFolder('mike')
+    //   bandFolders.push(mikeFolder)
+    //   let mitchFolder = bandFolder.addFolder('mitch')
+    //   bandFolders.push(mitchFolder)
+    //   let stanliFolder = bandFolder.addFolder('stanli')
+    //   bandFolders.push(stanliFolder)
   
-      let iterator = 0
-      let tamagotchis = scenes.rearview.bandMembers
-      bandFolders.forEach((folder: any) =>
-      {
-        folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
-        folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
-        folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)
-        iterator++
-      })
-      bandFolders[0].open()
-    }
+    //   let iterator = 0
+    //   let tamagotchis = scenes.rearview.bandMembers
+    //   bandFolders.forEach((folder: any) =>
+    //     {
+    //       folder.add(tamagotchis[iterator].state, 'hunger' as keyof Object, 0, 100, 1)
+    //       folder.add(tamagotchis[iterator].state, 'bathroom' as keyof Object, 0, 100, 1)
+    //       folder.add(tamagotchis[iterator].state, 'bored' as keyof Object, 0, 100, 1)
+    //       iterator++
+    //     })
+
+    //   // bandFolder.open()
+    //   // mikeFolder.open()
+      
+    //   microGUI.close() //todo TEMP
+    // }
   }
 
   update(): void {

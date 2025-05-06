@@ -137,17 +137,16 @@ export default class Game extends Scene
 
   create(): void 
   {
-    this.road = this.scene.launch(scenes.road).scene
+    //this.road = this.scene.launch(scenes.road).scene
     this.marge = this.scene.launch(scenes.marge).scene
     this.phone = this.scene.launch(scenes.phone).scene
     this.tour = this.scene.launch(scenes.tour).scene
-    this.rearview = this.scene.launch(scenes.rearview).scene
 
-    this.scene.launch(scenes.debug)
-
-    this.metronomeTween = this.time.addEvent({
+    this.metronomeTween = this.time.addEvent(
+      {
       delay: 1000,
-      callback: () => {
+      callback: () => 
+        {
           if (this.state.playing) 
             {
               {
@@ -167,9 +166,11 @@ export default class Game extends Scene
                 }
               }
             }
-      },
+        },
       loop: true,
-  });
+      });
+
+  //this.scene.launch(scenes.debug)
   }
 
   startGame(): void
