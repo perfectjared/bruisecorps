@@ -314,6 +314,7 @@ export default class Game extends Scene
   system(): void
   {
     this.state.scale = innerWidth / (this.sys.game.config.width as number)
+    console.log(this.state.scale)
   }
 
   feedback(): void

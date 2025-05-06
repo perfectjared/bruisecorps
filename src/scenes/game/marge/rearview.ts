@@ -2,6 +2,8 @@ import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { BandMember, Tamagotchi } from './rearview/tamagotchi';
 import { routing } from '../../../app';
+import { appState } from '../../../app';
+import { placeSprite } from '../../../lib/utilities';
 
 export default class Rearview extends Scene
 {
@@ -59,10 +61,13 @@ export default class Rearview extends Scene
       //TODO trigger on window resize
     placeRearview()
     {
-        this.rearviewSprite.setOrigin(0.5, 0.5)
-        this.rearviewSprite.setScale(0.85, 0.85)
-        this.rearviewSprite.setPosition(
-        this.renderSettings.width / 2, 
-        this.renderSettings.height * 0.08);
+        this.rearviewSprite.setOrigin(0.5, 0)
+        let minScale = 0.1
+        let maxScale = 1
+        let minX = 0
+        let maxX = appState.width / 2
+        let minY = 0
+        let maxY = 0
+        placeSprite(this.rearviewSprite, minScale, maxScale, minX, maxX, minY, maxY)
     }
 }

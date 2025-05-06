@@ -9,14 +9,20 @@ export function placeSprite(sprite, minScale, maxScale, minX, maxX, minY, maxY):
     scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
 
     let scalePosition: number = (scale - minScale) / (maxScale - minScale)
+    
+    if (minX == 0) minX = 0.000000001
+    if (minY == 0) minX = 0.000000001
+    
     let newX: number = (((scalePosition - (minX * width)) / ((maxX * width) - (minX * width))))
     let newY: number = (((scalePosition + (minY * height)) / ((maxY * height) + (minY * height))))
 
-    sprite.setScale(scale * window.devicePixelRatio)
+    sprite.setScale(scale * appState.scaleRatio)
     sprite.setPosition(newX, newY)
 }
 
-export function placeSpriteRelative(sprite, ): void
+export function placeSpriteRelative(sprite, x, y, cutoff): void
 {
-    
+    let newX = x * appState.width
+    let newY = y * appState.height
+
 }
