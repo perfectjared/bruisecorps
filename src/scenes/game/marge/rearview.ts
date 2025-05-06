@@ -3,7 +3,7 @@ import { GameObjects } from 'phaser';
 import { BandMember, Tamagotchi } from './rearview/tamagotchi';
 import { routing } from '../../../app';
 import { appState } from '../../../app';
-import { placeSprite } from '../../../lib/utilities';
+import { placeSprite, placeSpriteRelative } from '../../../lib/utilities';
 
 export default class Rearview extends Scene
 {
@@ -62,12 +62,13 @@ export default class Rearview extends Scene
     placeRearview()
     {
         this.rearviewSprite.setOrigin(0.5, 0)
-        let minScale = 0.1
-        let maxScale = 1
-        let minX = 0
-        let maxX = appState.width / 2
-        let minY = 0
-        let maxY = 0
-        placeSprite(this.rearviewSprite, minScale, maxScale, minX, maxX, minY, maxY)
+        // let minScale = 0.1
+        // let maxScale = .9
+        // let minX = appState.width / 2
+        // let maxX = appState.width / 2
+        // let minY = 0
+        // let maxY = 0
+        //placeSprite(this.rearviewSprite, minScale, maxScale, minX, maxX, minY, maxY)
+        placeSpriteRelative(this.rearviewSprite, 0.5, 0)
     }
 }

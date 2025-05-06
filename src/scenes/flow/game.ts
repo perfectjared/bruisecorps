@@ -15,7 +15,6 @@ export default class Game extends Scene
   state : 
   {
     started //should be app level
-    scale // ^^
 
     playing
     step
@@ -86,7 +85,6 @@ export default class Game extends Scene
     this.state = //todo STARTING VALUES IN JSON
     {
       started: false,
-      scale: innerWidth / (this.sys.game.config.width as number),
       playing: false,
 
       speed: this.constants.speedNumbers.start,
@@ -313,8 +311,7 @@ export default class Game extends Scene
 
   system(): void
   {
-    this.state.scale = innerWidth / (this.sys.game.config.width as number)
-    console.log(this.state.scale)
+    //this.state.scale = innerWidth / (this.sys.game.config.width as number)
   }
 
   feedback(): void

@@ -60,9 +60,7 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  type: Phaser.CANVAS,
-  width: window.innerWidth * window.devicePixelRatio,
-  height: window.innerHeight * window.devicePixelRatio
+  type: Phaser.CANVAS
 };
 
 window.addEventListener('load', () => {
@@ -83,6 +81,10 @@ appState.width = window.innerWidth * window.devicePixelRatio
 appState.height = window.innerHeight * window.devicePixelRatio
 window.addEventListener
 ('resize', () => {
-  appState.width = window.innerWidth * window.devicePixelRatio
-  appState.height = window.innerHeight * window.devicePixelRatio
+  let w = window.innerWidth * window.devicePixelRatio
+  let h = window.innerHeight * window.devicePixelRatio
+  appState.width = w
+  appState.height = h
+  window['game'].config.width = w
+  window['game'].config.height = h
 })
