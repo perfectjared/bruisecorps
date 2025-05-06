@@ -1,6 +1,7 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
 import { appState, scenes } from "../../../app"
+import { placeSprite } from "../../../lib/utilities"
 
 export default class Phone extends Scene
 {
@@ -83,23 +84,18 @@ export default class Phone extends Scene
         (
             (sprite: GameObjects.Sprite) =>
             {
-                let height: number = this.sys.game.config.height as number
-                let width: number = this.sys.game.config.width as number
+                let width = appState.width as number
+                let height = appState.height as number
+
                 let minScale: number = 0.5
                 let maxScale: number = 0.9
-                let minPosition: number = width / 3
-                let maxPosition: number = width
-                
-                let scale = scenes.game.state.scale
-                scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
-                
-                let scalePosition = (scale - minScale) / (maxScale - minScale)
-                let position: number = (((scalePosition - (minPosition * width)) / ((maxPosition * width) - (minPosition * width))) + (sprite.width))
-
+                let minX: number = width / 3
+                let maxX: number = width
+                let minY: number = 0
+                let maxY : number = height
 
                 sprite.setOrigin(0.1, 0.5)
-                sprite.setPosition(position, height)
-                sprite.setScale(scale)
+                placeSprite(sprite, minScale, maxScale, minX, maxX, minY, maxY)
             },
 
         )

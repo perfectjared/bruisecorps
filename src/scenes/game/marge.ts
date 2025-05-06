@@ -2,6 +2,8 @@ import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import Rearview from '../game/marge/rearview'
 import { scenes } from '../../app';
+import { appState } from '../../app';
+import { placeSprite } from '../../lib/utilities';
 
 export default class Marge extends Scene 
 {
@@ -27,7 +29,6 @@ export default class Marge extends Scene
     });
   }
 
-  //load and manage things having to do with this object only
   preload(): void 
   {
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
@@ -119,21 +120,28 @@ export default class Marge extends Scene
 
   placeShifter(): void
   {
-      this.shifterSprite.setOrigin(.1 , .9)
-      this.shifterSprite.setScale(0.4, 0.4)
-      this.shifterSprite.setPosition
-      (
-      this.renderSettings.width * .5, 
-      this.renderSettings.height * .925
-      )
+      let height: number = appState.height as number
+      let width: number = appState.width as number
+
+      let minScale: number = 0.1
+      let maxScale: number = 0.45
+      let minX: number = width / 6
+      let maxX: number = width / 2
+      let minY: number = height
+      let maxY: number = height
+
+      this.shifterSprite.setOrigin(1, 0.5)
+
+      placeSprite(this.shifterSprite, minScale, maxScale, minX, maxX, minY, maxY)
+
       this.shifterSprite.angle = 
       (
-      (this.state.gear == 0) ? 30 :
-      (this.state.gear == 1) ? 15 :
-      (this.state.gear == 2) ? 0 :
-      (this.state.gear == 3) ? -15 :
-      (this.state.gear == 4) ? -30 :
-      0
+        (this.state.gear == 0) ? 15 :
+        (this.state.gear == 1) ? 0 :
+        (this.state.gear == 2) ? -15 :
+        (this.state.gear == 3) ? -30 :
+        (this.state.gear == 4) ? -45 :
+        0
       )
   }
 

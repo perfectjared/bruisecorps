@@ -16,7 +16,8 @@ import Debug from './scenes/debug'
 export var appState =
 {
   width: 0,
-  height: 0
+  height: 0,
+  scaleRatio: window.devicePixelRatio / 3
 }
 
 export var routing =
@@ -58,12 +59,14 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH, //TODO Phaser.Scale.RESIZE
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
-  }
+  },
+  type: Phaser.CANVAS,
+  width: window.innerWidth * window.devicePixelRatio,
+  height: window.innerHeight * window.devicePixelRatio
 };
 
 window.addEventListener('load', () => {
   window['game'] = new Phaser.Game(config);
-  appState.width = window.innerWidth
 });
 
 //three debug GUIs for three levels of the game
@@ -75,8 +78,11 @@ export var mesoGUI = new GUI({ name: 'meso' })
   mesoGUI.domElement.setAttribute("style", "opacity: 0.33")
   mesoGUI.domElement.id = 'mesoGUI'
 
+
+appState.width = window.innerWidth * window.devicePixelRatio
+appState.height = window.innerHeight * window.devicePixelRatio
 window.addEventListener
 ('resize', () => {
-  appState.width = window.innerWidth
-  appState.height = window.innerHeight
+  appState.width = window.innerWidth * window.devicePixelRatio
+  appState.height = window.innerHeight * window.devicePixelRatio
 })
