@@ -85,6 +85,10 @@ window.addEventListener
   let h = window.innerHeight * window.devicePixelRatio
   appState.width = w
   appState.height = h
-  window['game'].config.width = w
-  window['game'].config.height = h
+  if (window['game'])
+  {
+    window['game'].config.width = w
+    window['game'].config.height = h
+  }
+  scaleRatio: window.devicePixelRatio / 3
 })
