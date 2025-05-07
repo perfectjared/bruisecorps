@@ -46,8 +46,8 @@ export default class Debug extends Scene
 
     {
       const margeFolder = mesoGUI.addFolder('marge')
-      margeFolder.add(margeState.shifter, 'gear' as keyof Object, 0, 4, 1)
-      margeFolder.add(margeState.indicator, 'signal', false)
+      margeFolder.add(margeState, 'gear' as keyof Object, 0, 4, 1)
+      margeFolder.add(margeState, 'signal', false)
       margeFolder.open()
 
       let resourcesFolder = mesoGUI.addFolder('resources')

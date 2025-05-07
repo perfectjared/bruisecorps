@@ -139,7 +139,7 @@ export default class Game extends Scene
     this.marge = this.scene.launch(scenes.marge).scene
     this.phone = this.scene.launch(scenes.phone).scene
     //this.tour = this.scene.launch(scenes.tour).scene
-    //this.scene.launch(scenes.debug)
+    this.scene.launch(scenes.debug)
 
     this.metronomeTween = this.time.addEvent(
       {
