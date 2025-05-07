@@ -90,5 +90,5 @@ window.addEventListener
     window['game'].config.width = w
     window['game'].config.height = h
   }
-  scaleRatio: window.devicePixelRatio / 3
+  appState.scaleRatio =  window.devicePixelRatio / 3
 })
