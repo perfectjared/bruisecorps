@@ -6,7 +6,7 @@ export function placeSprite(sprite, minX, maxX, minY, maxY): void
     let width: number = appState.width as number
 
     sprite.setScale(sprite.scale * appState.scaleRatio)
-    sprite.setPosition(newX, newY)
+    //sprite.setPosition(newX, newY)
 }
 
 export function placeSpriteRelative(sprite: Phaser.GameObjects.Sprite, x, y, width = 0, height = 0): void

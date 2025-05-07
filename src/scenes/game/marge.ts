@@ -132,7 +132,7 @@ export default class Marge extends Scene
 
       this.shifterSprite.setOrigin(1, 0.5)
 
-      placeSprite(this.shifterSprite, minScale, maxScale, minX, maxX, minY, maxY)
+      placeSprite(this.shifterSprite, minScale, maxScale, minX, maxX)
 
       this.shifterSprite.angle = 
       (

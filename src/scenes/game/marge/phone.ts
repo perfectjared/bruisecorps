@@ -95,7 +95,7 @@ export default class Phone extends Scene
                 let maxY : number = height
 
                 sprite.setOrigin(0.1, 0.5)
-                placeSprite(sprite, minScale, maxScale, minX, maxX, minY, maxY)
+                placeSprite(sprite, minScale, maxScale, minX, maxX)
             },
 
         )
