@@ -56,7 +56,7 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [bootScene, preloadScene, scenes.game, roadScene, margeScene, phoneScene, rearviewScene, tourScene, uiScene, debugScene],
   backgroundColor: '#facade',
   scale: {
-    mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH, //TODO Phaser.Scale.RESIZE
+    mode: Phaser.Scale.RESIZE, //TODO Phaser.Scale.RESIZE
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
