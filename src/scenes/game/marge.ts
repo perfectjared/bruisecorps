@@ -1,16 +1,13 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import Rearview from '../game/marge/rearview'
 import { scenes } from '../../app';
-import { appState } from '../../app';
-import { placeSprite } from '../../lib/utilities';
+import { placeReactiveSprite } from '../../lib/utilities';
 
 export default class Marge extends Scene 
 {
   buffer: any
   constants : any
   state : any
-  renderSettings: any
 
   dashSprite: GameObjects.Sprite
 
@@ -44,12 +41,6 @@ export default class Marge extends Scene
       startingGear: 0,
     }
 
-    this.renderSettings =
-    {
-      width: this.sys.game.config.width,
-      height: this.sys.game.config.height
-    }
-
     this.state = 
     {
       step: 0,
@@ -59,7 +50,7 @@ export default class Marge extends Scene
 
     this.buffer = 
     {
-
+      lastGear: null
     }
   }
   
@@ -68,6 +59,8 @@ export default class Marge extends Scene
     this.scene.launch(scenes.rearview)
     this.shifterSprite = this.add.sprite(0, 0, 'shifter')
     this.signalSprite = this.add.sprite(0, 0, 'signal')
+    this.placeShifter()
+    this.placeSignal()
   }
   
   update(): void 
@@ -81,15 +74,12 @@ export default class Marge extends Scene
 
   control(): void
   {
-    //listen for input from scenes.game
     let nextStep = (scenes.game.state.step != this.state.step)
     if (nextStep)
     {
       this.step()
       this.state.step = scenes.game.state.step
     }
-
-    //listen for input from MenuScene
   }
   
   step(): void
@@ -109,51 +99,55 @@ export default class Marge extends Scene
 
   feedback(): void
   {
-    this.placeShifter()
-    this.placeSignal()
+    this.angleShifter()
   }
 
   debug(): void
   {
 
   }
+  
+  angleShifter(): void
+  {
+    if (this.state.gear == this.buffer.lastGear) return
+    this.shifterSprite.angle = 
+    (
+      (this.state.gear == 0) ? 15 :
+      (this.state.gear == 1) ? 0 :
+      (this.state.gear == 2) ? -15 :
+      (this.state.gear == 3) ? -30 :
+      (this.state.gear == 4) ? -45 :
+      0
+    )
+    this.buffer.lastGear = this.state.gear
+  }
 
   placeShifter(): void
   {
-      let height: number = appState.height as number
-      let width: number = appState.width as number
-
-      let minScale: number = 0.1
-      let maxScale: number = 0.45
-      let minX: number = width / 6
-      let maxX: number = width / 2
-      let minY: number = height
-      let maxY: number = height
-
-      this.shifterSprite.setOrigin(1, 0.5)
-
-      placeSprite(this.shifterSprite, minScale, maxScale, minX, maxX)
-
-      this.shifterSprite.angle = 
-      (
-        (this.state.gear == 0) ? 15 :
-        (this.state.gear == 1) ? 0 :
-        (this.state.gear == 2) ? -15 :
-        (this.state.gear == 3) ? -30 :
-        (this.state.gear == 4) ? -45 :
-        0
+      this.shifterSprite.setOrigin(0.5, 0.5)
+      placeReactiveSprite(this.shifterSprite,
+        {
+          x: 0.66,
+          y: 0.85,
+          width: 0.3,
+          maxScale: 2,
+          minScale: 0.1
+        }
       )
+
   }
 
   placeSignal(): void
   {
-      this.signalSprite.setOrigin(.9, .9)
-      this.signalSprite.setScale(0.25, 0.25)
-      this.signalSprite.setPosition
-      (
-        this.renderSettings.width * .28,
-        this.renderSettings.height * .95
-      )
-      this.signalSprite.angle = (this.state.signal == true) ? 33 : 0
+    this.signalSprite.setOrigin(0.5, 0.5)
+    placeReactiveSprite(this.signalSprite,
+      {
+        x: 0.125,
+        y: 0.85,
+        width: 0.3,
+        maxScale: 2,
+        minScale: 0.1
+      }
+    )
   }
 }

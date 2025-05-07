@@ -1,48 +1,66 @@
 import { appState, scenes } from "../app"
 
-export function placeSprite(sprite, minX, maxX, minY, maxY): void
+export function placeReactiveSprite
+(
+sprite: Phaser.GameObjects.Sprite, 
+options:
 {
-    sprite.setScale(sprite.scale * appState.scaleRatio)
+    x?: number;             // Position (0-1 percentage of screen)
+    y?: number;             // Position (0-1 percentage of screen)
+    width?: number;         // Width (0-1 percentage of screen)
+    height?: number;        // Height (0-1 percentage of screen)
+    minScale?: number;      // Minimum scale (applies to both axes)
+    maxScale?: number;      // Maximum scale (applies to both axes)
 }
-
-export function placeSpriteRelative(sprite: Phaser.GameObjects.Sprite, x, y): void
+): void
 {
-    let newX = (x * window.innerWidth)
-    let newY = (y * appState.height)
-    console.log(appState.width + " " + newX)
-    //sprite.setScale(appState.scaleRatio)
-    sprite.setPosition(newX, newY)
-}
+    let scene = scenes.game
+       // Store original dimensions
+       const origWidth = sprite.displayWidth;
+       const origHeight = sprite.displayHeight;
+   
+       const update = () => {
+           const { width: screenWidth, height: screenHeight } = scene.scale;
+   
+           // Position
+           if (options.x !== undefined) sprite.x = screenWidth * options.x;
+           if (options.y !== undefined) sprite.y = screenHeight * options.y;
+   
+           // Calculate desired scale
+           let scaleX = 1;
+           let scaleY = 1;
+   
+           if (options.width !== undefined) {
+               scaleX = (screenWidth * options.width) / origWidth;
+           }
+   
+           if (options.height !== undefined) {
+               scaleY = (screenHeight * options.height) / origHeight;
+           }
+   
+           // Maintain aspect if only one dimension specified
+           if (options.width !== undefined && options.height === undefined) {
+               scaleY = scaleX;
+           } else if (options.height !== undefined && options.width === undefined) {
+               scaleX = scaleY;
+           }
+   
+           // Apply constraints
+           if (options.minScale !== undefined) {
+               scaleX = Math.max(scaleX, options.minScale);
+               scaleY = Math.max(scaleY, options.minScale);
+           }
+   
+           if (options.maxScale !== undefined) {
+               scaleX = Math.min(scaleX, options.maxScale);
+               scaleY = Math.min(scaleY, options.maxScale);
+           }
+   
+           sprite.setScale(scaleX, scaleY);
+       };
+   
+       // Initial update
+       update();
 
-export function scaleSpriteRelative(sprite: Phaser.GameObjects.Sprite, width = null, height = null, maintainAspect = true, useOriginalSize = true): void
-{
-    let img = sprite.texture.getDataSourceImage()
-    let refWidth = img.width
-    let refHeight = img.height
-
-    let scaleX = 1
-    let scaleY = 1
-
-    if (width != null)
-    {
-        let targetWidth = window.innerWidth * width
-        scaleX = targetWidth / sprite.displayWidth
-    }
-
-    if (height != null)
-    {
-        let targetHeight = window.innerHeight * height
-        scaleY = targetHeight / sprite.displayHeight
-    }
-
-    if (maintainAspect)
-    {
-        if (width !== null && height === null) {
-            scaleY = scaleX;
-        } else if (height !== null && width === null) {
-            scaleX = scaleY;
-        }
-    }
-
-    sprite.setScale(scaleX, scaleY)
+       scenes.game.scale.on('resize', update)
 }

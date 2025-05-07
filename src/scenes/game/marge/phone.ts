@@ -1,7 +1,7 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
 import { appState, scenes } from "../../../app"
-import { placeSprite } from "../../../lib/utilities"
+import { placeReactiveSprite } from "../../../lib/utilities"
 
 export default class Phone extends Scene
 {
@@ -9,7 +9,6 @@ export default class Phone extends Scene
     phoneScreen: GameObjects.Sprite
     phoneCracks: GameObjects.Sprite
     phoneSprites: Array<GameObjects.Sprite>
-    renderSettings: any
 
     constructor()
     {
@@ -30,18 +29,11 @@ export default class Phone extends Scene
         this.phoneBase = this.add.sprite(0, 0, 'phone-base')
         this.phoneScreen = this.add.sprite(0, 0, 'phone-screen')
         this.phoneCracks = this.add.sprite(0, 0, 'phone-cracks')
-
-        this.renderSettings = 
-        {
-            width: this.sys.game.config.width,
-            height: this.sys.game.config.height,
-            resolution: null //(computed)
-        }
-
         this.phoneSprites = Array<GameObjects.Sprite>(3)
         this.phoneSprites[0] = this.phoneBase
         this.phoneSprites[1] = this.phoneScreen
         this.phoneSprites[2] = this.phoneCracks
+        this.placePhone()
     }
 
     update(): void
@@ -70,7 +62,6 @@ export default class Phone extends Scene
 
     feedback(): void
     {
-        this.placePhone()
     }
 
     debug(): void
@@ -95,7 +86,6 @@ export default class Phone extends Scene
                 let maxY : number = height
 
                 sprite.setOrigin(0.1, 0.5)
-                placeSprite(sprite, minScale, maxScale, minX, maxX)
             },
 
         )
