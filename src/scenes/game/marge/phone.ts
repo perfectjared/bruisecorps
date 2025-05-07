@@ -75,17 +75,16 @@ export default class Phone extends Scene
         (
             (sprite: GameObjects.Sprite) =>
             {
-                let width = appState.width as number
-                let height = appState.height as number
-
-                let minScale: number = 0.5
-                let maxScale: number = 0.9
-                let minX: number = width / 3
-                let maxX: number = width
-                let minY: number = 0
-                let maxY : number = height
-
                 sprite.setOrigin(0.1, 0.5)
+                placeReactiveSprite(sprite,
+                    {
+                        x: 0.6,
+                        y: 0.9,
+                        width: 0.6,
+                        maxScale: 2,
+                        minScale: 0.2
+                    }
+                )
             },
 
         )
