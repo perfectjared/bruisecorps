@@ -1,6 +1,6 @@
 import { Scene } from "phaser"
 
-export default class UI extends Scene
+export default class Menu extends Scene
 {
     buffer: any
     constants: any
@@ -13,7 +13,7 @@ export default class UI extends Scene
     {
         super(
             {
-                key: 'UIScene'
+                key: 'MenuScene'
             }
         )
     }

@@ -1,6 +1,8 @@
 //https://phaser.discourse.group/t/game-scaling-resizing-example-v3/1555
 
 import 'phaser'
+import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
+
 import { GUI } from 'dat.gui'
 import Boot from './scenes/flow/boot'
 import Preload from './scenes/flow/preload'
@@ -10,7 +12,7 @@ import Phone from './scenes/game/marge/phone'
 import Rearview from './scenes/game/marge/rearview'
 import Road from './scenes/game/road'
 import Tour from './scenes/game/tour'
-import UI from './scenes/game/ui'
+import Menu from './scenes/game/menu'
 import Debug from './scenes/debug'
 
 export var appState =
@@ -29,7 +31,7 @@ export var microGUI = new GUI({ name: 'micro' })
 microGUI.domElement.setAttribute("style", "opacity: 0.33")
 microGUI.domElement.id = 'microGUI'
 
-let uiScene: UI = new UI()
+let menuScene: Menu = new Menu()
 let debugScene: Debug = new Debug()
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
@@ -47,20 +49,31 @@ export let scenes =
     phone: phoneScene,
     rearview: rearviewScene,
     tour: tourScene,
-    ui: uiScene,
+    menu: menuScene,
     debug: debugScene
 }
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [bootScene, preloadScene, scenes.game, roadScene, margeScene, phoneScene, rearviewScene, tourScene, uiScene, debugScene],
+  scene: [bootScene, preloadScene, scenes.game, roadScene, margeScene, phoneScene, rearviewScene, tourScene, menuScene, debugScene],
   backgroundColor: '#facade',
   scale: {
     mode: Phaser.Scale.RESIZE, //TODO Phaser.Scale.RESIZE
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  type: Phaser.CANVAS
+  type: Phaser.CANVAS,
+  plugins:
+  {
+    global: 
+    [
+      {
+        key: 'rexDragRotate',
+        plugin: DragRotatePlugin,
+        start: true
+      }
+    ]
+  }
 };
 
 window.addEventListener('load', () => {
@@ -75,7 +88,6 @@ export var macroGUI = new GUI({ name: 'macro' })
 export var mesoGUI = new GUI({ name: 'meso' })
   mesoGUI.domElement.setAttribute("style", "opacity: 0.33")
   mesoGUI.domElement.id = 'mesoGUI'
-
 
 appState.width = window.innerWidth * window.devicePixelRatio
 appState.height = window.innerHeight * window.devicePixelRatio

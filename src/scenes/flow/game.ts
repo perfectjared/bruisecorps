@@ -137,7 +137,7 @@ export default class Game extends Scene
   {
     //this.road = this.scene.launch(scenes.road).scene
     this.marge = this.scene.launch(scenes.marge).scene
-    this.phone = this.scene.launch(scenes.phone).scene
+    //this.phone = this.scene.launch(scenes.phone).scene
     //this.tour = this.scene.launch(scenes.tour).scene
     this.scene.launch(scenes.debug)
 
