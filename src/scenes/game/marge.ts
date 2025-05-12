@@ -4,6 +4,22 @@ import { scenes } from '../../app';
 import { placeReactiveSprite } from '../../lib/utilities';
 import DragRotate from 'phaser3-rex-plugins/plugins/dragrotate';
 
+export interface RotateSwitch
+{
+  circle: Phaser.GameObjects.Shape
+  hitbox: Phaser.GameObjects.Shape 
+  sprite: GameObjects.Sprite
+  dragRotate: DragRotate
+  updateTransform: Function
+}
+
+function UpdateRotateSwitchTransform(rotateSwitch: RotateSwitch)
+{
+  rotateSwitch.circle.x = rotateSwitch.sprite.x
+  rotateSwitch.circle.y = rotateSwitch.sprite.y
+  rotateSwitch.circle.width = rotateSwitch.sprite.displayWidth
+}
+
 export default class Marge extends Scene 
 {
   graphics: any
@@ -15,19 +31,8 @@ export default class Marge extends Scene
 
   dashSprite: GameObjects.Sprite
 
-  signal:
-  {
-    circle: Phaser.GameObjects.Shape
-    sprite: GameObjects.Sprite | null
-    dragRotate: DragRotate
-  }
-
-  shifter: 
-  {
-    circle: Phaser.GameObjects.Shape
-    sprite: GameObjects.Sprite | null
-    dragRotate: DragRotate
-  }
+  signal: RotateSwitch
+  shifter: RotateSwitch
 
   bandConfig: object
 
@@ -49,16 +54,26 @@ export default class Marge extends Scene
     this.constants =
     {
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
-      signalConfig:
-      {},
       shifter:
       {
         startingGear: 0,
         angles:
         [
           15, 0, -15, -30, -45, -60
-        ]
+        ],
+        relativeTransform: {
+          x: 0.5,
+          y: 0.95,
+          width: 0.3,
+          maxScale: 2,
+          minScale: 0.1
+        },
+
       },
+      signal:
+      {
+
+      }
     }
 
     this.state = 
@@ -70,40 +85,47 @@ export default class Marge extends Scene
 
     this.buffer = 
     {
-      lastGear: null
+      lastGear: null,
+      lastSignal: null
     }
-
-    this.signal = 
-    {
-      circle: this.add.circle(),
-      sprite: null,
-      dragRotate: this.dragRotatePlugin.add(this, {})
-    }
-
-    this.shifter = 
-    {
-      circle: this.add.circle(),
-      sprite: null,
-      dragRotate: this.dragRotatePlugin.add(this, {})
-    }
-    this.shifter.dragRotate.on('drag', function(dragRotate)
-    {
-    this.shifter.circle.rotation += dragRotate.deltaRotation
-      console.log(this.shifter.circle.rotation)
-    })
-
   }
   
   create(): void 
   {
+    let scene = this
     this.scene.launch(scenes.rearview)
     this.graphics = this.add.graphics()
 
-    this.signal.sprite = this.add.sprite(0, 0, 'signal')
-    this.shifter.sprite = this.add.sprite(0, 0, 'shifter')
+    //this.signal.sprite = this.add.sprite(0, 0, 'signal')
+    let shifterSprite = this.add.sprite(0, 0, 'shifter')
+    this.shifter = 
+    {
+      circle: this.add.circle(),
+      hitbox: this.add.rectangle(),
+      sprite: shifterSprite,
+      dragRotate: this.dragRotatePlugin.add(this),
+      updateTransform: function() {}
+    }
+    let shifter = this.shifter
+    placeReactiveSprite(shifter.sprite, scene.constants.shifter.relativeTransform)
 
-    this.placeShifter()
-    this.placeSignal()
+    shifter.dragRotate.on('drag', function(dragRotate)
+    {
+      let newRotation = shifter.circle.rotation += dragRotate.deltaRotation
+      shifter.sprite.setRotation(newRotation)
+    })
+    shifter.updateTransform = function()
+    {
+      shifter.sprite.setOrigin(0, 1)
+      shifter.circle.x = shifter.sprite.x
+      shifter.circle.y = shifter.sprite.y
+      shifter.circle.width = shifter.sprite.displayWidth * 0.8
+      shifter.dragRotate.x = shifter.circle.x
+      shifter.dragRotate.y = shifter.circle.y
+      shifter.dragRotate.setRadius(shifter.circle.width)
+      shifter.hitbox.x = shifter.circle.x + shifter.circle.width
+      shifter.hitbox.y = shifter.circle.y - (shifter.circle.height / 2)
+    }
   }
   
   update(): void 
@@ -132,7 +154,7 @@ export default class Marge extends Scene
 
   process(): void
   {
-
+    this.shifter.updateTransform()
   }
   
   system(): void
@@ -143,17 +165,20 @@ export default class Marge extends Scene
   feedback(): void
   {
     this.graphics.clear()
-    this.angleShifter()
+    //this.angleShifter()
   }
 
   debug(): void
   {
+    
     this.drawDragRotators()
   }
   
   angleShifter(): void
   {
     if (this.state.gear == this.buffer.lastGear) return
+    if (this.shifter.sprite == null) return
+
     this.shifter.sprite.angle = 
     (
       (this.state.gear == 0) ? 15 :
@@ -168,34 +193,28 @@ export default class Marge extends Scene
 
   placeShifter(): void
   {
-      this.shifter.sprite.setOrigin(0.5, 0.5)
-      placeReactiveSprite
-      (this.shifter.sprite,
-        {
-          x: 0.66,
-          y: 0.85,
-          width: 0.3,
-          maxScale: 2,
-          minScale: 0.1
-        }
-      )
-      this.shifter.circle.x = this.shifter.sprite.x
-      this.shifter.circle.y = this.shifter.sprite.y
-      this.shifter.circle.width = this.shifter.sprite.width / 2
-      this.shifter.dragRotate.x = this.shifter.circle.x
-      this.shifter.dragRotate.y = this.shifter.circle.y
-      this.shifter.dragRotate.setRadius(this.shifter.circle.width)
+
+   
+    
+    // this.shifter.hitbox.x = this.shifter.sprite.x + (this.shifter.sprite.displayWidth * 0.2)
+    // this.shifter.hitbox.y = this.shifter.sprite.y - (this.shifter.sprite.displayHeight * 0.3)
+    // this.shifter.hitbox.width = 100
+    // this.shifter.hitbox.height = this.shifter.sprite.height * 0.1
   }
 
   placeSignal(): void
   {
-    this.signal.sprite.setOrigin(0.5, 0.5)
-    placeReactiveSprite(this.signal.sprite,
+    if (this.signal.sprite == null) return
+    if (this.shifter.dragRotate == null) return
+
+    this.signal.sprite.setOrigin(1, 1)
+    placeReactiveSprite
+    (this.signal.sprite,
       {
-        x: 0.125,
-        y: 0.85,
+        x: 0.2,
+        y: 0.915,
         width: 0.3,
-        maxScale: 2,
+        maxScale: 1,
         minScale: 0.1
       }
     )
@@ -203,8 +222,8 @@ export default class Marge extends Scene
 
   drawDragRotators(): void
   {
-    let shifterGraphics = this.graphics.lineStyle(3, 0xffffff, 1)
-    .strokeCircle(this.shifter.sprite.x, this.shifter.sprite.y, this.shifter.sprite.displayWidth / 2)
-    .lineBetween(this.shifter.sprite.x, this.shifter.sprite.y, this.shifter.sprite.x + (this.shifter.sprite.displayWidth / 2), this.shifter.sprite.y)
+    if (this.shifter.sprite == null) return
+    this.graphics.lineStyle(3, 0xffffff, 1)
+    .strokeCircle(this.shifter.circle.x, this.shifter.circle.y, this.shifter.circle.width)
   }
 }
