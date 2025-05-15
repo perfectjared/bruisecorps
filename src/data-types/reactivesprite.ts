@@ -29,7 +29,9 @@ export default class ReactiveSprite extends Phaser.GameObjects.Sprite
         
         const placeRelative = () => {
             const { width: screenWidth, height: screenHeight } = gameScene.scale;
-    
+            //origin
+            if (relativeTransform.origin) this.setOrigin(relativeTransform.origin.x, relativeTransform.origin.y)
+
             // Position
             if (relativeTransform.x !== undefined) this.x = screenWidth * relativeTransform.x;
             if (relativeTransform.y !== undefined) this.y = screenHeight * relativeTransform.y;

@@ -2,8 +2,6 @@ import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { scenes } from '../../app';
 import ReactiveSprite from '../../data-types/reactivesprite';
-import DragRotate from 'phaser3-rex-plugins/plugins/dragrotate';
-import { DragDialConfig } from '../../data-types/dragdial';
 import DragDial from '../../data-types/dragdial';
 
 export default class Marge extends Scene 
@@ -18,7 +16,7 @@ export default class Marge extends Scene
   dashSprite: GameObjects.Sprite
 
   signal: ReactiveSprite
-  shifter: ReactiveSprite
+  shifter: DragDial
 
   bandConfig: object
 
@@ -33,6 +31,7 @@ export default class Marge extends Scene
   {
     this.load.plugin('rexDragRotate')
     this.dragRotatePlugin = this.plugins.get('rexDragRotate')
+    this.graphics = this.add.graphics()
 
     this.load.image('shifter', '../../../assets/image/marge/shifter.png')
     this.load.image('signal', '../../../assets/image/marge/signal.png')
@@ -42,11 +41,20 @@ export default class Marge extends Scene
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
       shifter:
       {
-        start: 0,
-        angles:
-        [
-          15, 0, -15, -30, -45, -60
-        ],
+        dragDialConfig:
+        {
+          angles:
+          [
+            15, 0, -15, -30, -45, -60
+          ],
+          startAngle: 15,
+        },
+        handle:
+        {
+          x: .6,
+          y: 0.4,
+          radius: 0.5,
+        },
         relativeTransform: 
         {
           origin: 
@@ -76,11 +84,11 @@ export default class Marge extends Scene
             x: 1,
             y: 1
           },
-          x: 0.1,
-          y: 0.85,
-          width: 0.3,
-          maxScale: 2,
-          minScale: 0.1
+        x: 0.2,
+        y: 0.85,
+        width: 0.3,
+        maxScale: 1,
+        minScale: 0.1
         }
       }
     }
@@ -103,9 +111,8 @@ export default class Marge extends Scene
   create(): void 
   {
     this.scene.launch(scenes.rearview)
-    this.graphics = this.add.graphics()
-    this.shifter = new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform)
-    this.signal = new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform)
+    this.shifter = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform), this.constants.shifter.dragDialConfig, this.constants.shifter.handle)
+    //this.signal = new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform)
   }
   
   update(): void 
