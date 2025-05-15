@@ -1,13 +1,23 @@
 import { Scene } from 'phaser';
-import { scenes } from '../../app';
-import Tour from '../game/tour';
+import { scenes } from '../app';
+import Tour from './game/tour';
 
-import * as trashTour from '../../data/trsh-tour.json'
+import * as trashTour from '../data/trsh-tour.json'
 
 export default class Game extends Scene 
 {
   //TODO actually declare things here
-  buffer : any
+  buffer : 
+  {
+    lastPlaying: boolean,
+    lastSpeed: number,
+    lastStep: number,
+    lastTime: number,
+    input:
+    {
+      touchingObject: Phaser.GameObjects.GameObject | null
+    }
+  }
 
   //TODO actually declare things here
   constants : any
@@ -57,7 +67,7 @@ export default class Game extends Scene
   constructor() 
   {
     super({
-      key: 'scenes.game'
+      key: 'GameScene'
     });
   }
   
@@ -129,7 +139,11 @@ export default class Game extends Scene
       lastPlaying: false,
       lastSpeed: 0,
       lastStep: 0,
-      lastTime: 666
+      lastTime: 666,
+      input:
+      {
+        touchingObject: null
+      }
     }
   }
 

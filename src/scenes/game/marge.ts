@@ -64,15 +64,20 @@ export default class Marge extends Scene
           maxScale: 2,
           minScale: 0.1
         },
-
       },
       signal:
       {
         start: 0,
-        angles:
-        [
-          0, 60
-        ],
+        dragDialConfig:
+        {
+          angles:
+          [
+            0, 60
+          ],
+          startAngle: 0,
+          minAngle: 0,
+          maxAngle: 40
+        },
         relativeTransform:
         {
           origin:
@@ -108,7 +113,7 @@ export default class Marge extends Scene
   {
     this.scene.launch(scenes.rearview)
     this.shifter = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform), this.constants.shifter.dragDialConfig)
-    this.signal = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.signal.relativeTransform), this.constants.signal.dragDialConfig)
+    this.signal = new DragDial(this, new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform), this.constants.signal.dragDialConfig)
   }
   
   update(): void 

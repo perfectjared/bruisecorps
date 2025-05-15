@@ -1,6 +1,7 @@
 import DragRotate from "phaser3-rex-plugins/plugins/dragrotate"
 import ReactiveSprite from "./reactivesprite"
 import { Scene } from "phaser"
+import { scenes } from "../app"
 
 export interface DragDialConfig
 {
@@ -18,6 +19,7 @@ export default class DragDial
     graphics: Phaser.GameObjects.Graphics
     dragRotatePlugin: any
     dragRotate: DragRotate
+    dragging: boolean
 
     buffer: 
     {
@@ -32,7 +34,6 @@ export default class DragDial
     state: any
     
     sprite: ReactiveSprite
-    arc: Phaser.GameObjects.Arc
 
     constructor(scene: Scene, sprite: ReactiveSprite, config: DragDialConfig)
     {
@@ -41,7 +42,6 @@ export default class DragDial
         
         this.config = config
         this.sprite = sprite
-        this.arc = new Phaser.GameObjects.Arc(scene, sprite.x, sprite.y, sprite.displayWidth / 2, config.minAngle, config.maxAngle)
         
         this.dragRotatePlugin = plugin
         this.dragRotate = this.dragRotatePlugin.add(scene, 
@@ -56,10 +56,19 @@ export default class DragDial
                 }
             }
         )
+
         this.dragRotate.on('drag', function(dragRotate)
         {
-           let newRotation = Math.max(Math.min(sprite.rotation + dragRotate.deltaRotation, Phaser.Math.DegToRad(this.config.maxAngle)), Phaser.Math.DegToRad(this.config.minAngle))
-           sprite.rotation = newRotation
+            console.log(scenes.input.buffer.objectsTouching)
+            if (!scenes.input.buffer.objectsTouching[scene.scene.key]?.includes(this))
+            {
+                return
+            }
+            let newRotation = Math.max
+            (Math.min(sprite.rotation + dragRotate.deltaRotation, 
+                Phaser.Math.DegToRad(this.config.maxAngle)), 
+                Phaser.Math.DegToRad(this.config.minAngle))
+            sprite.rotation = newRotation
         }, this)
 
         if (config.startAngle)
@@ -76,13 +85,15 @@ export default class DragDial
         {
             graphics.clear()
         }, this)
+
+        sprite.setInteractive()
     }   
 
     placeRelative()
     {
-        this.dragRotate.x = this.arc.x = this.sprite.x
-        this.dragRotate.y = this.arc.y = this.sprite.y
-        this.dragRotate.maxRadius = this.arc.radius = this.sprite.displayWidth
+        this.dragRotate.x = this.sprite.x
+        this.dragRotate.y = this.sprite.y
+        this.dragRotate.maxRadius = this.sprite.displayWidth
     }
 
     drawHandle()

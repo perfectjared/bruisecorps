@@ -6,8 +6,9 @@ import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 import { GUI } from 'dat.gui'
 import Boot from './scenes/flow/boot'
 import Preload from './scenes/flow/preload'
-import Game from './scenes/flow/game'
+import Game from './scenes/game'
 import Marge from './scenes/game/marge'
+import InputScene from './scenes/input'
 import Phone from './scenes/game/marge/phone'
 import Rearview from './scenes/game/marge/rearview'
 import Road from './scenes/game/road'
@@ -35,6 +36,7 @@ let menuScene: Menu = new Menu()
 let debugScene: Debug = new Debug()
 let bootScene: Boot = new Boot()
 let preloadScene: Preload = new Preload()
+let inputScene: InputScene = new InputScene()
 let gameScene: Game = new Game()
   let roadScene: Road = new Road()
   let tourScene: Tour = new Tour()
@@ -50,12 +52,13 @@ export let scenes =
     rearview: rearviewScene,
     tour: tourScene,
     menu: menuScene,
-    debug: debugScene
+    debug: debugScene,
+    input: inputScene
 }
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [bootScene, preloadScene, scenes.game, roadScene, margeScene, phoneScene, rearviewScene, tourScene, menuScene, debugScene],
+  scene: [bootScene, preloadScene, gameScene, roadScene, margeScene, phoneScene, rearviewScene, tourScene, menuScene, debugScene, inputScene],
   backgroundColor: '#facade',
   scale: {
     mode: Phaser.Scale.RESIZE, //TODO Phaser.Scale.RESIZE
