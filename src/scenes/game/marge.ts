@@ -1,24 +1,10 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { scenes } from '../../app';
-import { placeReactiveSprite } from '../../lib/utilities';
+import ReactiveSprite from '../../data-types/reactivesprite';
 import DragRotate from 'phaser3-rex-plugins/plugins/dragrotate';
-
-export interface RotateSwitch
-{
-  circle: Phaser.GameObjects.Shape
-  hitbox: Phaser.GameObjects.Shape 
-  sprite: GameObjects.Sprite
-  dragRotate: DragRotate
-  updateTransform: Function
-}
-
-function UpdateRotateSwitchTransform(rotateSwitch: RotateSwitch)
-{
-  rotateSwitch.circle.x = rotateSwitch.sprite.x
-  rotateSwitch.circle.y = rotateSwitch.sprite.y
-  rotateSwitch.circle.width = rotateSwitch.sprite.displayWidth
-}
+import { DragDialConfig } from '../../data-types/dragdial';
+import DragDial from '../../data-types/dragdial';
 
 export default class Marge extends Scene 
 {
@@ -31,8 +17,8 @@ export default class Marge extends Scene
 
   dashSprite: GameObjects.Sprite
 
-  signal: RotateSwitch
-  shifter: RotateSwitch
+  signal: ReactiveSprite
+  shifter: ReactiveSprite
 
   bandConfig: object
 
@@ -56,14 +42,20 @@ export default class Marge extends Scene
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
       shifter:
       {
-        startingGear: 0,
+        start: 0,
         angles:
         [
           15, 0, -15, -30, -45, -60
         ],
-        relativeTransform: {
-          x: 0.5,
-          y: 0.95,
+        relativeTransform: 
+        {
+          origin: 
+          {
+            x: 0,
+            y: 1
+          },
+          x: 0.6,
+          y: 0.82,
           width: 0.3,
           maxScale: 2,
           minScale: 0.1
@@ -72,7 +64,24 @@ export default class Marge extends Scene
       },
       signal:
       {
-
+        start: 0,
+        angles:
+        [
+          0, 60
+        ],
+        relativeTransform:
+        {
+          origin:
+          {
+            x: 1,
+            y: 1
+          },
+          x: 0.1,
+          y: 0.85,
+          width: 0.3,
+          maxScale: 2,
+          minScale: 0.1
+        }
       }
     }
 
@@ -85,6 +94,7 @@ export default class Marge extends Scene
 
     this.buffer = 
     {
+      dragging: false,
       lastGear: null,
       lastSignal: null
     }
@@ -92,44 +102,21 @@ export default class Marge extends Scene
   
   create(): void 
   {
-    let scene = this
     this.scene.launch(scenes.rearview)
     this.graphics = this.add.graphics()
-
-    //this.signal.sprite = this.add.sprite(0, 0, 'signal')
-    let shifterSprite = this.add.sprite(0, 0, 'shifter')
-    this.shifter = 
-    {
-      circle: this.add.circle(),
-      hitbox: this.add.rectangle(),
-      sprite: shifterSprite,
-      dragRotate: this.dragRotatePlugin.add(this),
-      updateTransform: function() {}
-    }
-    let shifter = this.shifter
-    placeReactiveSprite(shifter.sprite, scene.constants.shifter.relativeTransform)
-
-    shifter.dragRotate.on('drag', function(dragRotate)
-    {
-      let newRotation = shifter.circle.rotation += dragRotate.deltaRotation
-      shifter.sprite.setRotation(newRotation)
-    })
-    shifter.updateTransform = function()
-    {
-      shifter.sprite.setOrigin(0, 1)
-      shifter.circle.x = shifter.sprite.x
-      shifter.circle.y = shifter.sprite.y
-      shifter.circle.width = shifter.sprite.displayWidth * 0.8
-      shifter.dragRotate.x = shifter.circle.x
-      shifter.dragRotate.y = shifter.circle.y
-      shifter.dragRotate.setRadius(shifter.circle.width)
-      shifter.hitbox.x = shifter.circle.x + shifter.circle.width
-      shifter.hitbox.y = shifter.circle.y - (shifter.circle.height / 2)
-    }
+    this.shifter = new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform)
+    this.signal = new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform)
   }
   
   update(): void 
   {
+    let nextStep = (scenes.game.state.step != this.state.step)
+    if (nextStep)
+    {
+      this.step()
+      this.state.step = scenes.game.state.step
+    }
+
     this.control()
     this.process()
     this.system()
@@ -139,12 +126,7 @@ export default class Marge extends Scene
 
   control(): void
   {
-    let nextStep = (scenes.game.state.step != this.state.step)
-    if (nextStep)
-    {
-      this.step()
-      this.state.step = scenes.game.state.step
-    }
+
   }
   
   step(): void
@@ -154,7 +136,7 @@ export default class Marge extends Scene
 
   process(): void
   {
-    this.shifter.updateTransform()
+    // this.shifter.updateTransform()
   }
   
   system(): void
@@ -165,65 +147,25 @@ export default class Marge extends Scene
   feedback(): void
   {
     this.graphics.clear()
-    //this.angleShifter()
   }
 
   debug(): void
   {
-    
-    this.drawDragRotators()
-  }
-  
-  angleShifter(): void
-  {
-    if (this.state.gear == this.buffer.lastGear) return
-    if (this.shifter.sprite == null) return
-
-    this.shifter.sprite.angle = 
-    (
-      (this.state.gear == 0) ? 15 :
-      (this.state.gear == 1) ? 0 :
-      (this.state.gear == 2) ? -15 :
-      (this.state.gear == 3) ? -30 :
-      (this.state.gear == 4) ? -45 :
-      0
-    )
-    this.buffer.lastGear = this.state.gear
+    // this.drawDragRotators()
   }
 
-  placeShifter(): void
-  {
-
-   
-    
-    // this.shifter.hitbox.x = this.shifter.sprite.x + (this.shifter.sprite.displayWidth * 0.2)
-    // this.shifter.hitbox.y = this.shifter.sprite.y - (this.shifter.sprite.displayHeight * 0.3)
-    // this.shifter.hitbox.width = 100
-    // this.shifter.hitbox.height = this.shifter.sprite.height * 0.1
-  }
-
-  placeSignal(): void
-  {
-    if (this.signal.sprite == null) return
-    if (this.shifter.dragRotate == null) return
-
-    this.signal.sprite.setOrigin(1, 1)
-    placeReactiveSprite
-    (this.signal.sprite,
-      {
-        x: 0.2,
-        y: 0.915,
-        width: 0.3,
-        maxScale: 1,
-        minScale: 0.1
-      }
-    )
-  }
-
-  drawDragRotators(): void
-  {
-    if (this.shifter.sprite == null) return
-    this.graphics.lineStyle(3, 0xffffff, 1)
-    .strokeCircle(this.shifter.circle.x, this.shifter.circle.y, this.shifter.circle.width)
-  }
+  // placeSignal(): void
+  // {
+  //   this.signal.sprite.setOrigin(1, 1)
+  //   placeReactiveSprite
+  //   (this.signal.sprite,
+  //     {
+  //       x: 0.2,
+  //       y: 0.915,
+  //       width: 0.3,
+  //       maxScale: 1,
+  //       minScale: 0.1
+  //     }
+  //   )
+  // }
 }

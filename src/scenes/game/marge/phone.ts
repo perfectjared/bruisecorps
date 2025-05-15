@@ -1,7 +1,7 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
 import { appState, scenes } from "../../../app"
-import { placeReactiveSprite } from "../../../lib/utilities"
+import ReactiveSprite from "../../../data-types/reactivesprite"
 
 export default class Phone extends Scene
 {
@@ -76,15 +76,15 @@ export default class Phone extends Scene
             (sprite: GameObjects.Sprite) =>
             {
                 sprite.setOrigin(0.1, 0.5)
-                placeReactiveSprite(sprite,
-                    {
-                        x: 0.6,
-                        y: 0.9,
-                        width: 0.6,
-                        maxScale: 2,
-                        minScale: 0.2
-                    }
-                )
+                // placeReactiveSprite(sprite,
+                //     {
+                //         x: 0.6,
+                //         y: 0.9,
+                //         width: 0.6,
+                //         maxScale: 2,
+                //         minScale: 0.2
+                //     }
+                // )
             },
 
         )
