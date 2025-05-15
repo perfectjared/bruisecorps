@@ -15,7 +15,7 @@ export default class Marge extends Scene
 
   dashSprite: GameObjects.Sprite
 
-  signal: ReactiveSprite
+  signal: DragDial
   shifter: DragDial
 
   bandConfig: object
@@ -48,12 +48,8 @@ export default class Marge extends Scene
             15, 0, -15, -30, -45, -60
           ],
           startAngle: 15,
-        },
-        handle:
-        {
-          x: .6,
-          y: 0.4,
-          radius: 0.5,
+          minAngle: -40,
+          maxAngle: 60
         },
         relativeTransform: 
         {
@@ -62,7 +58,7 @@ export default class Marge extends Scene
             x: 0,
             y: 1
           },
-          x: 0.6,
+          x: 0.45,
           y: 0.82,
           width: 0.3,
           maxScale: 2,
@@ -111,8 +107,8 @@ export default class Marge extends Scene
   create(): void 
   {
     this.scene.launch(scenes.rearview)
-    this.shifter = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform), this.constants.shifter.dragDialConfig, this.constants.shifter.handle)
-    //this.signal = new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform)
+    this.shifter = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform), this.constants.shifter.dragDialConfig)
+    this.signal = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.signal.relativeTransform), this.constants.signal.dragDialConfig)
   }
   
   update(): void 
