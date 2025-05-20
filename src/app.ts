@@ -1,73 +1,139 @@
 //https://phaser.discourse.group/t/game-scaling-resizing-example-v3/1555
 
+//imports
 import 'phaser'
+
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 
 import { GUI } from 'dat.gui'
-import * as NovelJS from 'novel-js'
-import * as AnimeJS from 'animejs'
-import * as HydraSynth from 'hydra-synth'
-
-
-import * as Tone from 'tone'
-export const synth = new Tone.Synth().toDestination()
+//import * as Tone from 'tone'
 
 import Boot from './scenes/flow/boot'
-//import Preload from './scenes/flow/preload'
-import Game from './scenes/game'
-  import Marge from './scenes/game/marge'
-    //import Rearview from './scenes/game/marge/rearview'
-  import Novel from './scenes/game/novel'
-  import Synth from './scenes/game/synth'
-  //import Phone from './scenes/game/marge/phone'
-  //import Road from './scenes/game/road'
-//import Tour from './scenes/game/tour'
-import Menu from './scenes/game/menu'
 import Debug from './scenes/debug'
-
-export var appState =
-{
-  width: 0,
-  height: 0,
-  scaleRatio: window.devicePixelRatio / 3,
-  audioStarted: false
-}
-
-export var microGUI = new GUI({ name: 'micro' })
-microGUI.domElement.setAttribute('style', 'opacity: 0.33')
-microGUI.domElement.id = 'microGUI'
-
-let menuScene: Menu = new Menu()
-let debugScene: Debug = new Debug()
+import Game from './scenes/game'
+import Marge from './scenes/game/marge'
+import Menu from './scenes/game/menu'
 let bootScene: Boot = new Boot()
-//let preloadScene: Preload = new Preload()
+let debugScene: Debug = new Debug()
 let gameScene: Game = new Game()
-  // let tourScene: Tour = new Tour()
-  let margeScene: Marge = new Marge()
-  let synthScene: Synth = new Synth()
-  //   let roadScene: Road = new Road()
-  //   let rearviewScene: Rearview = new Rearview()
-  let novelScene: Novel = new Novel()
-  //   let phoneScene: Phone = new Phone()
+let margeScene: Marge = new Marge()
+let menuScene: Menu = new Menu()
 export let scenes =
 {
     game: gameScene,
-    // road: roadScene,
     marge: margeScene,
-    // phone: phoneScene,
-    // rearview: rearviewScene,
-    // tour: tourScene,
     menu: menuScene,
     debug: debugScene
 }
 
-const config: Phaser.Types.Core.GameConfig = 
+export interface AppData
+{
+  width: number,
+  height: number,
+  scaleRatio: number,
+  audioStarted: boolean,
+  hasFocus: boolean
+}
+var _startData: AppData =
+{
+  width: 0,
+  height: 0,
+  scaleRatio: window.devicePixelRatio / 3,
+  audioStarted: false,
+  hasFocus: false
+}
+
+export class Command
+{
+  source: any
+  target: any
+  change: { key: string, value: any }
+  dataManager: Phaser.Data.DataManager
+  original: { key: string, value: any}
+  time: number
+  step: number
+
+  constructor
+  (
+    source: any, 
+    target: any, 
+    change: { key: string, value: any }, 
+    dataManager = game.registry
+  )
+  {
+    this.Set(source, target, {key: change.key, value: change.value}, dataManager)
+  }
+
+  Set(source, target, change: {key: string, value: any }, dataManager)
+  {
+    let data = dataManager.get(change.key)
+    if (data == undefined) 
+    {
+      console.log('undefined data ' + change.key)
+      return
+    }
+
+    this.source = source
+    this.target = target
+    this.change = change
+    this.dataManager = dataManager
+    this.original = { key: change.key, value: data }
+    this.time = 0 //TODO
+    this.step = scenes.game.state.step //TODO
+    
+    let newData = { key: change.key, value: change.value }
+    dataManager.set(newData.key, newData.value)
+    commandList.push(this)
+    console.log("command: " + commandList[Math.min(0, commandList.length - 1)].change.key + " from " + commandList[commandList.length - 1].original.value + " to " + commandList[commandList.length - 1].change.value)
+  }
+}
+export var commandList: Command[]
+commandList = []
+
+export let game: Phaser.Game
+window.addEventListener('load', () => {
+  game = new Phaser.Game(gameConfig)
+  window['game'] = game
+
+  let registry = game.registry
+  registry.merge(_startData)
+
+  let loseFocus = function()
+  {
+    new Command(this, this, { key: 'hasFocus', value: false })
+  }
+
+  let gainFocus = function()
+  {
+    new Command(this, this, { key: 'hasFocus', value: true })
+  }
+
+  game.events.on('pause', () => 
+    {
+      console.log('game event: pause')
+    })
+  game.events.on('resume', () => 
+    {
+      console.log('game event: resume')
+    })
+  game.events.on('focus', () => 
+    {
+      console.log('game event: focus')
+      gainFocus()
+  })
+  game.events.on('blur', () => 
+    {
+      console.log('game event: blur')
+      loseFocus()
+  })
+}, this);
+export const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [bootScene, /*preloadScene,*/ gameScene, /*roadScene,*/ margeScene, novelScene, synthScene, /*phoneScene, rearviewScene, tourScene,*/ menuScene, debugScene],
+  scene: [bootScene, gameScene, margeScene, menuScene, debugScene],
   backgroundColor: '#facade',
   scale: {
-    mode: Phaser.Scale.RESIZE, //TODO Phaser.Scale.RESIZE
+    mode: Phaser.Scale.RESIZE,
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
@@ -80,6 +146,9 @@ const config: Phaser.Types.Core.GameConfig =
         key: 'rexDragRotate',
         plugin: DragRotatePlugin,
         start: true
+      },
+      {
+
       }
     ]
   },
@@ -94,50 +163,48 @@ const config: Phaser.Types.Core.GameConfig =
       {
 
       },
-      setBounds:
-      {
-
-      },
-      debug: 
-      {
-        
-      },
+      debug: true,
     }
   }
 };
 
-window.addEventListener('load', () => {
-  window['game'] = new Phaser.Game(config);
-});
+export var gui = 
+{
+  macro: new GUI({name: 'macro'}),
+  meso: new GUI({name: 'meso'}),
+  micro: new GUI({name: 'micro'})
+}
 
-//three debug GUIs for three levels of the game
-export var macroGUI = new GUI({ name: 'macro' })
-  macroGUI.domElement.id = 'macroGUI'
-  macroGUI.domElement.setAttribute('style', 'opacity: 0.33')
-
-export var mesoGUI = new GUI({ name: 'meso' })
-  mesoGUI.domElement.setAttribute('style', 'opacity: 0.33')
-  mesoGUI.domElement.id = 'mesoGUI'
-
-appState.width = window.innerWidth * window.devicePixelRatio
-appState.height = window.innerHeight * window.devicePixelRatio
 window.addEventListener
 ('resize', () => {
   let w = window.innerWidth * window.devicePixelRatio
   let h = window.innerHeight * window.devicePixelRatio
-  appState.width = w
-  appState.height = h
-  if (window['game'])
+  _startData.width = w
+  _startData.height = h
+  game = window['game']
+  if (game)
   {
-    window['game'].config.width = w
-    window['game'].config.height = h
+    gameConfig.width = w
+    gameConfig.height = h
   }
-  appState.scaleRatio =  window.devicePixelRatio / 3
+  _startData.scaleRatio =  window.devicePixelRatio / 3
 })
 
 document.querySelector('body')?.addEventListener('click', async() =>
 {
-  await Tone.start()
-  appState.audioStarted = true
+  //await Tone.start()
+  _startData.audioStarted = true
   console.log('audio ready')
 })
+
+// export const synth = new Tone.Synth().toDestination()
+
+_startData.width = window.innerWidth * window.devicePixelRatio
+_startData.height = window.innerHeight * window.devicePixelRatio
+
+gui.macro.domElement.id = 'macroGUI'
+gui.macro.domElement.setAttribute('style', 'opacity: 0.33')
+gui.meso.domElement.id = 'mesoGUI'
+gui.meso.domElement.setAttribute('style', 'opacity: 0.33')
+gui.micro.domElement.id = 'microGUI'
+gui.micro.domElement.setAttribute('style', 'opacity: 0.33')

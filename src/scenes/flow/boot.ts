@@ -13,6 +13,7 @@ export default class Boot extends Scene {
 
   create(): void {
     //this.scene.start('PreloadScene')
-    this.scene.start('GameScene')
+    this.scene.launch('GameScene')
+    this.scene.start('MenuScene')
   }
 }

@@ -13,6 +13,7 @@ export default class Game extends Scene
     lastSpeed: number,
     lastStep: number,
     lastTime: number,
+    //matter: MatterJS.World
     input:
     {
       touchingObject: Phaser.GameObjects.GameObject | null
@@ -140,7 +141,7 @@ export default class Game extends Scene
       lastSpeed: 0,
       lastStep: 0,
       lastTime: 666,
-      input:
+      input: 
       {
         touchingObject: null
       }
@@ -155,33 +156,33 @@ export default class Game extends Scene
     //this.tour = this.scene.launch(scenes.tour).scene
     this.scene.launch(scenes.debug)
 
-    this.metronomeTween = this.time.addEvent(
-      {
-      delay: 1000,
-      callback: () => 
-        {
-          if (this.state.playing) 
-            {
-              {
-                let speedChanged = this.state.speed != this.buffer.lastSpeed
-                if (speedChanged)
-                {
-                  let constrainedSpeed = Math.min(Math.max(this.state.speed, this.constants.speedMin), this.constants.speedMax)
-                  this.metronomeTween.delay = 60000 / constrainedSpeed
-                  this.buffer.lastSpeed = this.state.speed
-                  console.log("mtrnm bpm @ " + this.metronomeTween.delay)
-                }
-                else
-                {
-                  let stepMax = this.state.step == this.constants.stepNumbers.max
-                  this.state.step = (stepMax == true) ? 0 : this.state.step + 1
-                  console.log("mtrnm step @ " + this.state.step)
-                }
-              }
-            }
-        },
-      loop: true,
-      });
+    // this.metronomeTween = this.time.addEvent(
+    //   {
+    //   delay: 1000,
+    //   callback: () => 
+    //     {
+    //       if (this.state.playing) 
+    //         {
+    //           {
+    //             let speedChanged = this.state.speed != this.buffer.lastSpeed
+    //             if (speedChanged)
+    //             {
+    //               let constrainedSpeed = Math.min(Math.max(this.state.speed, this.constants.speedMin), this.constants.speedMax)
+    //               this.metronomeTween.delay = 60000 / constrainedSpeed
+    //               this.buffer.lastSpeed = this.state.speed
+    //               console.log("mtrnm bpm @ " + this.metronomeTween.delay)
+    //             }
+    //             else
+    //             {
+    //               let stepMax = this.state.step == this.constants.stepNumbers.max
+    //               this.state.step = (stepMax == true) ? 0 : this.state.step + 1
+    //               console.log("mtrnm step @ " + this.state.step)
+    //             }
+    //           }
+    //         }
+    //     },
+    //   loop: true,
+    //   });
   }
 
   startGame(): void
@@ -189,7 +190,7 @@ export default class Game extends Scene
     console.log("game start")
     this.state.started = true
     this.state.playing = true
-    this.metronomeTween.play
+    // this.metronomeTween.play
   }
 
   update(): void 
