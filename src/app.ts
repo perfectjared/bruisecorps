@@ -27,7 +27,7 @@ export var appData =
   width: 0,
   height: 0,
   scaleRatio: window.devicePixelRatio / 3,
-  audioStarted: false,
+  audioStarted: false, //TODO: SET BY SYNTH.TS
   hasFocus: true,
 }
 
@@ -39,19 +39,18 @@ export let dataManagers =
 import Boot from './scenes/flow/boot'
 import Debug from './scenes/debug'
 import Game from './scenes/game'
+
 import Marge from './scenes/game/marge'
 import Menu from './scenes/game/menu'
-let bootScene: Boot = new Boot()
-let debugScene: Debug = new Debug()
-let gameScene: Game = new Game()
-let margeScene: Marge = new Marge()
-let menuScene: Menu = new Menu()
+import Synth from './scenes/game/synth'
 export let scenes =
 {
-    game: gameScene,
-    marge: margeScene,
-    menu: menuScene,
-    debug: debugScene
+  boot: new Boot(),
+  debug: new Debug(),
+  game: new Game(),
+  marge: new Marge(),
+  menu: new Menu(),
+  synth: new Synth()
 }
 
 var game: Phaser.Game
@@ -84,7 +83,7 @@ window.addEventListener('load', () => {
 export const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [bootScene, gameScene, margeScene, menuScene, debugScene],
+  scene: [scenes.boot, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.synth],
   backgroundColor: '#facade',
   scale: {
     mode: Phaser.Scale.RESIZE,
@@ -131,13 +130,6 @@ window.addEventListener
   appData.scaleRatio =  window.devicePixelRatio / 3
 })
 
-document.querySelector('body')?.addEventListener('click', async() =>
-{
-  //await Tone.start()
-  appData.audioStarted = true
-  console.log('audio ready')
-})
-
 appData.width = window.innerWidth * window.devicePixelRatio
 appData.height = window.innerHeight * window.devicePixelRatio
 
@@ -147,3 +139,5 @@ gui.meso.domElement.id = 'mesoGUI'
 gui.meso.domElement.setAttribute('style', 'opacity: 0.33')
 gui.micro.domElement.id = 'microGUI'
 gui.micro.domElement.setAttribute('style', 'opacity: 0.33')
+
+export var app = this

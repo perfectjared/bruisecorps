@@ -150,39 +150,13 @@ export default class Game extends Scene
 
   create(): void 
   {
+    
     //this.road = this.scene.launch(scenes.road).scene
     this.marge = this.scene.launch(scenes.marge).scene
+    this.scene.launch(scenes.synth).scene
     //this.phone = this.scene.launch(scenes.phone).scene
     //this.tour = this.scene.launch(scenes.tour).scene
     this.scene.launch(scenes.debug)
-
-    // this.metronomeTween = this.time.addEvent(
-    //   {
-    //   delay: 1000,
-    //   callback: () => 
-    //     {
-    //       if (this.state.playing) 
-    //         {
-    //           {
-    //             let speedChanged = this.state.speed != this.buffer.lastSpeed
-    //             if (speedChanged)
-    //             {
-    //               let constrainedSpeed = Math.min(Math.max(this.state.speed, this.constants.speedMin), this.constants.speedMax)
-    //               this.metronomeTween.delay = 60000 / constrainedSpeed
-    //               this.buffer.lastSpeed = this.state.speed
-    //               console.log("mtrnm bpm @ " + this.metronomeTween.delay)
-    //             }
-    //             else
-    //             {
-    //               let stepMax = this.state.step == this.constants.stepNumbers.max
-    //               this.state.step = (stepMax == true) ? 0 : this.state.step + 1
-    //               console.log("mtrnm step @ " + this.state.step)
-    //             }
-    //           }
-    //         }
-    //     },
-    //   loop: true,
-    //   });
   }
 
   startGame(): void
@@ -190,7 +164,6 @@ export default class Game extends Scene
     console.log("game start")
     this.state.started = true
     this.state.playing = true
-    // this.metronomeTween.play
   }
 
   update(): void 
@@ -206,11 +179,6 @@ export default class Game extends Scene
   {
     let nextStep = (this.buffer.lastStep != this.state.step)
     if (nextStep) this.step()
-    //listen for input from RoadScene
-    //listen for input from MargeScene
-    //listen for input from UIScene
-    //listen for input from MenuScene
-    //listen for player input
   }
 
   step(): number

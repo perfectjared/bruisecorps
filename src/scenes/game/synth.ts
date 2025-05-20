@@ -1,4 +1,6 @@
+import { app, appData } from '../../app'
 import { Scene } from 'phaser'
+import * as Tone from 'tone'
 
 export default class Synth extends Scene
 {
@@ -22,7 +24,12 @@ export default class Synth extends Scene
 
     create()
     {
-
+        document.querySelector('body')?.addEventListener('click', async() =>
+        {
+            await Tone.start()
+            appData.audioStarted = true
+            console.log('audio ready')
+        })
     }
 
     update()
