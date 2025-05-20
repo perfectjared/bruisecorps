@@ -4,7 +4,7 @@ import 'phaser'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 
 import { GUI } from 'dat.gui'
-export var gui = 
+var datGui = 
 {
   macro: new GUI({name: 'macro'}),
   meso: new GUI({name: 'meso'}),
@@ -12,15 +12,9 @@ export var gui =
 }
 
 import * as Tone from 'tone'
-export const synth = new Tone.Synth().toDestination()
+const synth = new Tone.Synth().toDestination()
 
-import Command from '../src/data-types/command'
-export interface GameData
-{
-  commandList?: Command[]
-}
-
-export var appData = 
+var appData = 
 {
   width: 0,
   height: 0,
@@ -29,7 +23,7 @@ export var appData =
   hasFocus: true,
 }
 
-export let dataManagers =
+var dataManagers =
 {
   game: null,
 }
@@ -41,7 +35,7 @@ import Game from './scenes/game'
 import Marge from './scenes/game/marge'
 import Menu from './scenes/game/menu'
 import Synth from './scenes/game/synth'
-export let scenes =
+let scenes =
 {
   boot: new Boot(),
   debug: new Debug(),
@@ -78,7 +72,7 @@ window.addEventListener('load', () => {
   })
 }, this);
 
-export const gameConfig: Phaser.Types.Core.GameConfig = 
+const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
   scene: [scenes.boot, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.synth],
@@ -98,9 +92,6 @@ export const gameConfig: Phaser.Types.Core.GameConfig =
         plugin: DragRotatePlugin,
         start: true
       },
-      {
-
-      }
     ]
   },
   physics:
@@ -119,6 +110,21 @@ export const gameConfig: Phaser.Types.Core.GameConfig =
   }
 };
 
+import Command from '../src/data-types/command'
+var commandList = new Array<Command>
+
+export
+{
+  appData,
+  commandList,
+  dataManagers,
+  datGui,
+  game,
+  gameConfig,
+  scenes,
+  synth,
+}
+
 window.addEventListener
 ('resize', () => {
   let w = window.innerWidth * window.devicePixelRatio
@@ -127,15 +133,12 @@ window.addEventListener
   appData.height = h
   appData.scaleRatio =  window.devicePixelRatio / 3
 })
-
 appData.width = window.innerWidth * window.devicePixelRatio
 appData.height = window.innerHeight * window.devicePixelRatio
 
-gui.macro.domElement.id = 'macroGUI'
-gui.macro.domElement.setAttribute('style', 'opacity: 0.33')
-gui.meso.domElement.id = 'mesoGUI'
-gui.meso.domElement.setAttribute('style', 'opacity: 0.33')
-gui.micro.domElement.id = 'microGUI'
-gui.micro.domElement.setAttribute('style', 'opacity: 0.33')
-
-export var app = this
+datGui.macro.domElement.id = 'macroGUI'
+datGui.macro.domElement.setAttribute('style', 'opacity: 0.33')
+datGui.meso.domElement.id = 'mesoGUI'
+datGui.meso.domElement.setAttribute('style', 'opacity: 0.33')
+datGui.micro.domElement.id = 'microGUI'
+datGui.micro.domElement.setAttribute('style', 'opacity: 0.33')

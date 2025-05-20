@@ -1,12 +1,12 @@
+import { appData } from '../app';
 import { Scene } from 'phaser';
 import { scenes } from '../app';
-import Tour from './game/tour';
 
+import Tour from './game/tour';
 import * as trashTour from '../data/trsh-tour.json'
 
 export default class Game extends Scene 
 {
-  //TODO actually declare things here
   buffer : 
   {
     lastPlaying: boolean,
@@ -20,13 +20,10 @@ export default class Game extends Scene
     }
   }
 
-  //TODO actually declare things here
   constants : any
 
   state : 
   {
-    started //should be app level
-
     playing
     step
     speed
@@ -95,7 +92,6 @@ export default class Game extends Scene
 
     this.state = //todo STARTING VALUES IN JSON
     {
-      started: false,
       playing: false,
 
       speed: this.constants.speedNumbers.start,
@@ -162,7 +158,6 @@ export default class Game extends Scene
   startGame(): void
   {
     console.log("game start")
-    this.state.started = true
     this.state.playing = true
   }
 
@@ -271,7 +266,7 @@ export default class Game extends Scene
 
   process(): void
   {
-    if (!this.state.started) 
+    if (!appData.audioStarted) 
     {
       this.state.playing = false
       return

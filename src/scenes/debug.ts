@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { gui, scenes } from '../app';
+import { appData, datGui, scenes } from '../app';
 import { Tamagotchi } from './game/marge/rearview/tamagotchi';
 
 export default class Debug extends Scene 
@@ -21,11 +21,11 @@ export default class Debug extends Scene
     let margeState = scenes.marge.state
 
     {
-      const appFolder = gui.macro.addFolder('app')
-      const gameFolder = gui.macro.addFolder('game')
-      const playerFolder = gui.macro.addFolder('player')
+      const appFolder = datGui.macro.addFolder('app')
+      const gameFolder = datGui.macro.addFolder('game')
+      const playerFolder = datGui.macro.addFolder('player')
 
-      appFolder.add(gameState, 'started', false)
+      appFolder.add(appData, 'audioStarted', false)
       appFolder.open()
 
       gameFolder.add(gameState, 'playing', false)
@@ -45,19 +45,19 @@ export default class Debug extends Scene
     }
 
     {
-      const margeFolder = gui.meso.addFolder('marge')
+      const margeFolder = datGui.meso.addFolder('marge')
       margeFolder.add(margeState, 'gear' as keyof Object, 0, 4, 1)
       margeFolder.add(margeState, 'signal', false)
       margeFolder.open()
 
-      let resourcesFolder = gui.meso.addFolder('resources')
+      let resourcesFolder = datGui.meso.addFolder('resources')
       resourcesFolder.add(gameState.resources, 'pussy', 0, 10, 1)
       resourcesFolder.add(gameState.resources, 'money', 0, 99999, 1)
       resourcesFolder.add(gameState.resources, 'weed', 0, 10, 1)
       resourcesFolder.add(gameState.resources, 'hotdogs', 0, 10, 1)
       resourcesFolder.open()
 
-      const tourFolder = gui.meso.addFolder('tour')
+      const tourFolder = datGui.meso.addFolder('tour')
       tourFolder.add(gameState, 'lastShow')
       tourFolder.add(gameState, 'nextShow')
       tourFolder.add(gameState, 'nextDate', 0, 1231, 1)
@@ -67,7 +67,7 @@ export default class Debug extends Scene
     }
 
     // {
-    //   const bandFolder = gui.micro.addFolder('band')
+    //   const bandFolder = datGui.micro.addFolder('band')
     //   let bandFolders : any[] = []
     //   let coraFolder = bandFolder.addFolder('cora')
     //   bandFolders.push(coraFolder)
@@ -93,11 +93,11 @@ export default class Debug extends Scene
     //   // bandFolder.open()
     //   // mikeFolder.open()
       
-    //   gui.micro.close() //todo TEMP
+    //   datGui.micro.close() //todo TEMP
     // }
   }
 
   update(): void {
-    gui.macro.updateDisplay()
+    datGui.macro.updateDisplay()
   }
 }

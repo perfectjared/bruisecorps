@@ -40,7 +40,6 @@ export default class Command
     
     let newData = { key: change.key, value: change.value }
     dataManager.set(newData.key, newData.value)
-    let commandList = window['game'].registry.get("gameData")
-    //console.log("command: " + commandList[Math.min(0, commandList.length - 1)].change.key + " from " + commandList[commandList.length - 1].original.value + " to " + commandList[commandList.length - 1].change.value)
+    console.log("command: " + change.key + " to " + newData.value)
   }
 }

@@ -33,8 +33,8 @@ export default class Marge extends Scene
     this.dragRotatePlugin = this.plugins.get('rexDragRotate')
     this.graphics = this.add.graphics()
 
-    this.load.image('shifter', '../../../assets/image/marge/shifter.png')
-    this.load.image('signal', '../../../assets/image/marge/signal.png')
+    //this.load.image('shifter', '../../../assets/image/marge/shifter.png')
+    //this.load.image('signal', '../../../assets/image/marge/signal.png')
 
     this.constants =
     {

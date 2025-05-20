@@ -1,5 +1,4 @@
 import Slider from 'phaser3-rex-plugins/plugins/slider.js'
-// import ReactiveSprite from "./reactivesprite"
 import { Scene } from "phaser"
 
 export interface DragSliderConfig
