@@ -6,7 +6,35 @@ import 'phaser'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 
 import { GUI } from 'dat.gui'
-//import * as Tone from 'tone'
+export var gui = 
+{
+  macro: new GUI({name: 'macro'}),
+  meso: new GUI({name: 'meso'}),
+  micro: new GUI({name: 'micro'})
+}
+
+import * as Tone from 'tone'
+export const synth = new Tone.Synth().toDestination()
+
+import Command from '../src/data-types/command'
+export interface GameData
+{
+  commandList?: Command[]
+}
+
+export var appData = 
+{
+  width: 0,
+  height: 0,
+  scaleRatio: window.devicePixelRatio / 3,
+  audioStarted: false,
+  hasFocus: true,
+}
+
+export let dataManagers =
+{
+  game: null,
+}
 
 import Boot from './scenes/flow/boot'
 import Debug from './scenes/debug'
@@ -26,87 +54,12 @@ export let scenes =
     debug: debugScene
 }
 
-export interface AppData
-{
-  width: number,
-  height: number,
-  scaleRatio: number,
-  audioStarted: boolean,
-  hasFocus: boolean
-}
-var _startData: AppData =
-{
-  width: 0,
-  height: 0,
-  scaleRatio: window.devicePixelRatio / 3,
-  audioStarted: false,
-  hasFocus: false
-}
-
-export class Command
-{
-  source: any
-  target: any
-  change: { key: string, value: any }
-  dataManager: Phaser.Data.DataManager
-  original: { key: string, value: any}
-  time: number
-  step: number
-
-  constructor
-  (
-    source: any, 
-    target: any, 
-    change: { key: string, value: any }, 
-    dataManager = game.registry
-  )
-  {
-    this.Set(source, target, {key: change.key, value: change.value}, dataManager)
-  }
-
-  Set(source, target, change: {key: string, value: any }, dataManager)
-  {
-    let data = dataManager.get(change.key)
-    if (data == undefined) 
-    {
-      console.log('undefined data ' + change.key)
-      return
-    }
-
-    this.source = source
-    this.target = target
-    this.change = change
-    this.dataManager = dataManager
-    this.original = { key: change.key, value: data }
-    this.time = 0 //TODO
-    this.step = scenes.game.state.step //TODO
-    
-    let newData = { key: change.key, value: change.value }
-    dataManager.set(newData.key, newData.value)
-    commandList.push(this)
-    console.log("command: " + commandList[Math.min(0, commandList.length - 1)].change.key + " from " + commandList[commandList.length - 1].original.value + " to " + commandList[commandList.length - 1].change.value)
-  }
-}
-export var commandList: Command[]
-commandList = []
-
-export let game: Phaser.Game
+var game: Phaser.Game
 window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
   window['game'] = game
-
-  let registry = game.registry
-  registry.merge(_startData)
-
-  let loseFocus = function()
-  {
-    new Command(this, this, { key: 'hasFocus', value: false })
-  }
-
-  let gainFocus = function()
-  {
-    new Command(this, this, { key: 'hasFocus', value: true })
-  }
+  dataManagers.game = game.registry
+  dataManagers.game.merge([])
 
   game.events.on('pause', () => 
     {
@@ -119,14 +72,15 @@ window.addEventListener('load', () => {
   game.events.on('focus', () => 
     {
       console.log('game event: focus')
-      gainFocus()
+      appData.hasFocus = true
   })
   game.events.on('blur', () => 
     {
       console.log('game event: blur')
-      loseFocus()
+      appData.hasFocus = false
   })
 }, this);
+
 export const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
@@ -168,39 +122,24 @@ export const gameConfig: Phaser.Types.Core.GameConfig =
   }
 };
 
-export var gui = 
-{
-  macro: new GUI({name: 'macro'}),
-  meso: new GUI({name: 'meso'}),
-  micro: new GUI({name: 'micro'})
-}
-
 window.addEventListener
 ('resize', () => {
   let w = window.innerWidth * window.devicePixelRatio
   let h = window.innerHeight * window.devicePixelRatio
-  _startData.width = w
-  _startData.height = h
-  game = window['game']
-  if (game)
-  {
-    gameConfig.width = w
-    gameConfig.height = h
-  }
-  _startData.scaleRatio =  window.devicePixelRatio / 3
+  appData.width = w
+  appData.height = h
+  appData.scaleRatio =  window.devicePixelRatio / 3
 })
 
 document.querySelector('body')?.addEventListener('click', async() =>
 {
   //await Tone.start()
-  _startData.audioStarted = true
+  appData.audioStarted = true
   console.log('audio ready')
 })
 
-// export const synth = new Tone.Synth().toDestination()
-
-_startData.width = window.innerWidth * window.devicePixelRatio
-_startData.height = window.innerHeight * window.devicePixelRatio
+appData.width = window.innerWidth * window.devicePixelRatio
+appData.height = window.innerHeight * window.devicePixelRatio
 
 gui.macro.domElement.id = 'macroGUI'
 gui.macro.domElement.setAttribute('style', 'opacity: 0.33')

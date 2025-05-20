@@ -1,7 +1,10 @@
 import { Scene } from "phaser"
+import { appData } from "../../app"
+
 
 export default class Menu extends Scene
 {
+    app: any
     graphics: any
     graphicsConfig: any
     appState: Phaser.Data.DataManager
@@ -18,12 +21,6 @@ export default class Menu extends Scene
             alpha: number
         }
     }
-    state : 
-    {
-        start
-    }
-
-    noFocusForeground: any
 
     constructor()
     {
@@ -50,10 +47,7 @@ export default class Menu extends Scene
 
     create(): void
     {
-        this.state = 
-        {
-            start : false
-        }
+
     }
 
     update(): void
@@ -66,11 +60,6 @@ export default class Menu extends Scene
     }
 
     control(): void
-    {
-
-    }
-
-    startButton(): void
     {
     }
 
@@ -87,11 +76,11 @@ export default class Menu extends Scene
     feedback(): void
     {
         this.graphics.clear()
-        // if (!_appState.audioStarted || !_appState.hasFocus)
-        // {
-        //     this.graphics.fillStyle(this.constants.noFocusFillStyle.color, this.constants.noFocusFillStyle.alpha)
-        //     this.graphics.fillRect(0, 0, _appState.width, _appState.height)
-        // }
+        if (!appData.audioStarted || !appData.hasFocus)
+        {
+            this.graphics.fillStyle(this.constants.noFocusFillStyle.color, this.constants.noFocusFillStyle.alpha)
+            this.graphics.fillRect(0, 0, appData.width, appData.height)
+        }
     }
 
     debug(): void
