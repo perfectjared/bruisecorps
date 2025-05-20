@@ -1,7 +1,6 @@
 import DragRotate from "phaser3-rex-plugins/plugins/dragrotate"
-import ReactiveSprite from "./reactivesprite"
+import { RelativeTransform } from "./reactivesprite"
 import { Scene } from "phaser"
-import { scenes } from "../app"
 
 export interface DragDialConfig
 {
@@ -21,6 +20,8 @@ export default class DragDial
     dragRotate: DragRotate
     dragging: boolean
 
+    debugArc: Phaser.GameObjects.Arc
+
     buffer: 
     {
         lastDimensions:
@@ -28,22 +29,22 @@ export default class DragDial
             x: number,
             y: number,
             width: number
-        }
+        },
+        last
     }
     constants: any
     state: any
     
-    sprite: ReactiveSprite
+    sprite: Phaser.GameObjects.Sprite
 
-    constructor(scene: Scene, sprite: ReactiveSprite, config: DragDialConfig)
+    constructor(scene: Scene, sprite: Phaser.GameObjects.Sprite, config: DragDialConfig)
     {
-        let graphics = scene.add.graphics()
-        let plugin = scene.plugins.get('rexDragRotate')
+        this.graphics = scene.add.graphics()
         
         this.config = config
         this.sprite = sprite
         
-        this.dragRotatePlugin = plugin
+        this.dragRotatePlugin = scene.plugins.get('rexDragRotate')
         this.dragRotate = this.dragRotatePlugin.add(scene, 
             {
                 x: sprite.x,
@@ -59,21 +60,29 @@ export default class DragDial
 
         this.dragRotate.on('drag', function(dragRotate)
         {
-            console.log(scenes.input.buffer.objectsTouching)
-            if (!scenes.input.buffer.objectsTouching[scene.scene.key]?.includes(this))
-            {
-                return
-            }
+            // console.log(scenes.input.buffer.objectsPointing)
+            // if (!scenes.input.buffer.objectsPointing[scene.scene.key]?.includes(this))
+            // {
+            //     return
+            // }
             let newRotation = Math.max
             (Math.min(sprite.rotation + dragRotate.deltaRotation, 
                 Phaser.Math.DegToRad(this.config.maxAngle)), 
                 Phaser.Math.DegToRad(this.config.minAngle))
+            //this.snap(newRotation)
             sprite.rotation = newRotation
         }, this)
 
         if (config.startAngle)
         {
             sprite.setRotation(Phaser.Math.DegToRad(config.startAngle))
+        }
+
+        this.debugArc = new Phaser.GameObjects.Arc(scene, this.dragRotate.x, this.dragRotate.y, this.dragRotate.maxRadius)
+        if (config.minAngle && config.maxAngle)
+        {
+            this.debugArc.setStartAngle(Phaser.Math.DegToRad(config.minAngle))
+            this.debugArc.setEndAngle(Phaser.Math.DegToRad(config.maxAngle))
         }
         
         scene.events.on('update', function()
@@ -83,7 +92,7 @@ export default class DragDial
 
         scene.events.on('render', function()
         {
-            graphics.clear()
+            this.graphics.clear()
         }, this)
 
         sprite.setInteractive()
@@ -96,16 +105,6 @@ export default class DragDial
         this.dragRotate.maxRadius = this.sprite.displayWidth
     }
 
-    drawHandle()
-    {
-        
-    }
-
-    drawDragRotate()
-    {
-
-    }
-
     preload()
     {
 
@@ -113,6 +112,7 @@ export default class DragDial
 
     create()
     {
+
     }
 
     update()

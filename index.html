@@ -12,7 +12,7 @@
         html,
         body {
             margin: 0;
-            background: #333;
+            background: #facade;
         }
     </style>
 </head>
@@ -21,5 +21,42 @@
     <div id="game-container"></div>
     <script src="app.js"></script>
 </body>
+
+<div id="novel-area" style="visibility:hidden; content-visibility:hidden;">
+	<div id="novel-style-area">
+		<div id="novel-notification-wrapper">
+			<div id="novel-save-notification" class="novel-notification">
+				<p class="novel-save-text"></p>
+				<p><textarea name="save-text" readonly></textarea></p>
+				<p><button type="button" class="novel-close-button" onclick="UI.closeSaveNotification()"></button><button type="button" class="novel-copy-button" onclick="UI.copyText()"></button></p>
+			</div>
+			<div id="novel-load-notification" class="novel-notification">
+				<p class="novel-load-text"></p>
+				<p><textarea name="load-text"></textarea></p>
+				<p><button type="button" class="novel-close-button" onclick="UI.closeLoadNotification(false)"></button><button type="button" class="novel-load-button" onclick="UI.closeLoadNotification(true)"></button></p>
+			</div>
+		</div>
+		<div id="novel-text-area">
+			<div id="novel-text"></div>
+			<button type="button" class="novel-skip-button" onclick="TextPrinter.complete()"></button>
+			<button type="button" class="novel-continue-button" onclick="TextPrinter.unpause()"></button>
+		</div>
+		<div id="novel-choices-area">
+			<ul id="novel-choice-list"></ul>
+		</div>
+		<div id="novel-inventory-area">
+			<h5 class="novel-inventory-title"></h5>
+			<ul id="novel-inventory"></ul>
+		</div>
+		<div id="novel-hidden-inventory-area">
+			<h5 class="novel-hidden-inventory-title"></h5>
+			<ul id="novel-hidden-inventory"></ul>
+		</div>
+		<div id="novel-save-area">
+			<button type="button" class="novel-save-button" onclick="NovelManager.saveData()"></button>
+			<button type="button" class="novel-load-button" onclick="UI.showLoadNotification()"></button>
+		</div>
+	</div>
+</div>
 
 </html>

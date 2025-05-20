@@ -1,15 +1,20 @@
 import { Scene } from "phaser"
-import { GameObjects } from "phaser"
-import { appState, scenes } from "../../../app"
-import ReactiveSprite from "../../../data-types/reactivesprite"
+import { RelativeTransform } from "../../../data-types/reactivesprite"
+
+            // placeReactiveSprite(sprite,
+            //     {
+            //         x: 0.6,
+            //         y: 0.9,
+            //         width: 0.6,
+            //         maxScale: 2,
+            //         minScale: 0.2
+            //     }
+            // )
 
 export default class Phone extends Scene
 {
-    phoneBase: GameObjects.Sprite
-    phoneScreen: GameObjects.Sprite
-    phoneCracks: GameObjects.Sprite
-    phoneSprites: Array<GameObjects.Sprite>
-
+    relativeTransform: RelativeTransform
+    
     constructor()
     {
         super({
@@ -26,14 +31,19 @@ export default class Phone extends Scene
  
     create(): void
     {
-        this.phoneBase = this.add.sprite(0, 0, 'phone-base')
-        this.phoneScreen = this.add.sprite(0, 0, 'phone-screen')
-        this.phoneCracks = this.add.sprite(0, 0, 'phone-cracks')
-        this.phoneSprites = Array<GameObjects.Sprite>(3)
-        this.phoneSprites[0] = this.phoneBase
-        this.phoneSprites[1] = this.phoneScreen
-        this.phoneSprites[2] = this.phoneCracks
-        this.placePhone()
+        // this.relativeTransform = 
+        // {
+        //     origin:
+        //     {
+        //         x: 0,
+        //         y: 0
+        //     },
+        //     x: 0.6,
+        //     y: 0.9,
+        //     width: 0.6,
+        //     minScale: 0.2,
+        //     maxScale: 2
+        // }
     }
 
     update(): void
@@ -67,26 +77,5 @@ export default class Phone extends Scene
     debug(): void
     {
 
-    }
-
-    placePhone(): void
-    {
-        this.phoneSprites.forEach
-        (
-            (sprite: GameObjects.Sprite) =>
-            {
-                sprite.setOrigin(0.1, 0.5)
-                // placeReactiveSprite(sprite,
-                //     {
-                //         x: 0.6,
-                //         y: 0.9,
-                //         width: 0.6,
-                //         maxScale: 2,
-                //         minScale: 0.2
-                //     }
-                // )
-            },
-
-        )
     }
 }

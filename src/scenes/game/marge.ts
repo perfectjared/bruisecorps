@@ -1,7 +1,6 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
 import { scenes } from '../../app';
-import ReactiveSprite from '../../data-types/reactivesprite';
 import DragDial from '../../data-types/dragdial';
 
 export default class Marge extends Scene 
@@ -22,7 +21,8 @@ export default class Marge extends Scene
 
   constructor() 
   {
-    super({
+    super(
+    {
       key: 'MargeScene'
     });
   }
@@ -59,7 +59,7 @@ export default class Marge extends Scene
             y: 1
           },
           x: 0.45,
-          y: 0.82,
+          y: 0.95,
           width: 0.3,
           maxScale: 2,
           minScale: 0.1
@@ -72,11 +72,11 @@ export default class Marge extends Scene
         {
           angles:
           [
-            0, 60
+            0, 50
           ],
           startAngle: 0,
           minAngle: 0,
-          maxAngle: 40
+          maxAngle: 50
         },
         relativeTransform:
         {
@@ -86,7 +86,7 @@ export default class Marge extends Scene
             y: 1
           },
         x: 0.2,
-        y: 0.85,
+        y: 0.97,
         width: 0.3,
         maxScale: 1,
         minScale: 0.1
@@ -111,9 +111,8 @@ export default class Marge extends Scene
   
   create(): void 
   {
-    this.scene.launch(scenes.rearview)
-    this.shifter = new DragDial(this, new ReactiveSprite(this, 'shifter', this.constants.shifter.relativeTransform), this.constants.shifter.dragDialConfig)
-    this.signal = new DragDial(this, new ReactiveSprite(this, 'signal', this.constants.signal.relativeTransform), this.constants.signal.dragDialConfig)
+    //this.scene.launch(scenes.rearview)
+
   }
   
   update(): void 
