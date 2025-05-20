@@ -9,6 +9,9 @@ export default class Synth extends Scene
     state: any
     buffer: any
 
+    domElement: HTMLBodyElement
+    audioStartEvent: () => Promise<void>
+
     constructor()
     {
         super(
@@ -19,17 +22,24 @@ export default class Synth extends Scene
 
     preload()
     {
-
+        this.domElement = document.querySelector('body')
     }
 
     create()
     {
-        document.querySelector('body')?.addEventListener('click', async() =>
+        this.audioStartEvent = (async() =>
         {
             await Tone.start()
-            appData.audioStarted = true
+            appData.audioStarted = true //DON'T DO THIS!!!
             console.log('audio ready')
+            this.removeAudioStartEvent()
         })
+        this.domElement?.addEventListener('click', this.audioStartEvent)
+    }
+
+    removeAudioStartEvent()
+    {
+        this.domElement?.removeEventListener('click', this.audioStartEvent)
     }
 
     update()

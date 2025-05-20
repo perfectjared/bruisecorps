@@ -1,6 +1,4 @@
 //https://phaser.discourse.group/t/game-scaling-resizing-example-v3/1555
-
-//imports
 import 'phaser'
 
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
