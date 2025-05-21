@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { GameObjects } from 'phaser'
-import { scenes } from '../../../../app'
+import { scenes } from '../../app'
 
 export enum BandMember
 {

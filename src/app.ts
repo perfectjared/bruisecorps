@@ -1,7 +1,9 @@
 //https://phaser.discourse.group/t/game-scaling-resizing-example-v3/1555
 import 'phaser'
 
-import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
+import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin'
+
+import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
 
 import { GUI } from 'dat.gui'
 var datGui = 
@@ -85,12 +87,19 @@ const gameConfig: Phaser.Types.Core.GameConfig =
   type: Phaser.CANVAS,
   plugins:
   {
+    scene: 
+    [{
+        key: 'rexUI',
+        plugin: UIPlugin,
+        mapping: 'rexUI'
+    }],
     global: 
     [
       {
-        key: 'rexDragRotate',
+        key: 'dragRotate',
         plugin: DragRotatePlugin,
-        start: true
+        start: true,
+        mapping: 'dragRotate'
       },
     ]
   },
@@ -113,9 +122,12 @@ const gameConfig: Phaser.Types.Core.GameConfig =
 import Command from '../src/data-types/command'
 var commandList = new Array<Command>
 
+import colors from './data/colors'
+
 export
 {
   appData,
+  colors,
   commandList,
   dataManagers,
   datGui,

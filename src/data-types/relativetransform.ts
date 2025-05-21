@@ -1,6 +1,6 @@
 import { scenes } from "../app";
 
-export interface RelativeTransform
+export default interface RelativeTransform
 {
     sprite?: Phaser.GameObjects.Sprite
     update?: Phaser.Events.EventEmitter
@@ -26,7 +26,7 @@ export interface RelativeTransform
     maxScale?: number;      // Maximum scale (applies to both axes)
 }
 
-export function InitializeRelativeTransform(scene: Phaser.Scene, sprite: Phaser.GameObjects.Sprite, relativeTransform: RelativeTransform)
+export function InitializeRelativeTransform(scene: Phaser.Scene, sprite: Phaser.GameObjects.Sprite, relativeTransform: RelativeTransform = {})
 {
     relativeTransform.sprite = sprite
     relativeTransform.update = scene.events.on('update', this.PlaceRelativeTransform(relativeTransform), this)

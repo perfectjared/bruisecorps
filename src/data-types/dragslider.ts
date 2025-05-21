@@ -1,5 +1,5 @@
 import Slider from 'phaser3-rex-plugins/plugins/slider.js'
-import { Scene } from "phaser"
+import { Scene } from 'phaser'
 
 export interface DragSliderConfig
 {
@@ -21,11 +21,6 @@ export default class DragSlider
 
     constructor(scene, config: DragSliderConfig = this.defaultConfig)
     {
-        this.sliderPlugin = scene.plugins.get('rexDragRotate')
-        this.slider = this.sliderPlugin.add(scene,
-            {
 
-            }
-        )
     }
 }

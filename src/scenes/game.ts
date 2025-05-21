@@ -7,21 +7,7 @@ import * as trashTour from '../data/trsh-tour.json'
 
 export default class Game extends Scene 
 {
-  buffer : 
-  {
-    lastPlaying: boolean,
-    lastSpeed: number,
-    lastStep: number,
-    lastTime: number,
-    //matter: MatterJS.World
-    input:
-    {
-      touchingObject: Phaser.GameObjects.GameObject | null
-    }
-  }
-
   constants : any
-
   state : 
   {
     playing
@@ -52,6 +38,18 @@ export default class Game extends Scene
     nextShow //
     nextDate //
     showsLeft //
+  }
+  buffer : 
+  {
+    lastPlaying: boolean,
+    lastSpeed: number,
+    lastStep: number,
+    lastTime: number,
+    //matter: MatterJS.World
+    input:
+    {
+      touchingObject: Phaser.GameObjects.GameObject | null
+    }
   }
   
   road: Scene

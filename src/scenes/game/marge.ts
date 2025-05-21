@@ -29,8 +29,8 @@ export default class Marge extends Scene
 
   preload(): void 
   {
-    this.load.plugin('rexDragRotate')
-    this.dragRotatePlugin = this.plugins.get('rexDragRotate')
+    // this.load.plugin('rexDragRotate')
+    // this.dragRotatePlugin = this.plugins.get('rexDragRotate')
     this.graphics = this.add.graphics()
 
     //this.load.image('shifter', '../../../assets/image/marge/shifter.png')
