@@ -1,82 +1,42 @@
-import { appData, colors, game, scenes } from "../app";
-
-export interface RelativeTransform
-{
-    texture?: string
-
-    position: //relative
-    {
-        x: number,
-        y: number
-    }
-    origin?: //relative
-    {
-        x: number,
-        y: number
-    }
-    scale?: //relative
-    {
-        x: number,
-        y?
-        : number,
-        min?: number,
-        max?: number
-    }
-    _originalDimensions?: //pixel, = sprite.width || 64
-    {
-        x: number,
-        y: number
-    }
-}
-
+import Anchor from "phaser3-rex-plugins/plugins/anchor";
+import { appData } from "../app";
 
 export default class DynamicSprite
 {
     scene: Phaser.Scene
     sprite: Phaser.GameObjects.Sprite
-    relTransform: RelativeTransform
-    viewportCoordinatePlugin: any
-    viewport: Phaser.Geom.Rectangle
+    graphics: Phaser.GameObjects.Graphics
+    anchor: Anchor
+    anchorPlugin: any
 
-    constructor(sprite: Phaser.GameObjects.Sprite, relTransform: RelativeTransform)
+    constructor
+    (scene: Phaser.Scene, 
+    anchor: any = {}, 
+    sprite: Phaser.GameObjects.Sprite = new Phaser.GameObjects.Sprite(scene, 0, 0, 'x'))
     {
-        this.scene = sprite.scene
+        this.scene = scene
         this.sprite = sprite
-        this.relTransform = relTransform
-
-        this.viewportCoordinatePlugin = this.scene.plugins.get('rexViewportCoordinate')
-        this.viewport = new Phaser.Geom.Rectangle(0, 0, appData.width, appData.height)
-
         this.scene.add.existing(sprite)
-        this.viewportCoordinatePlugin.add(sprite, this.viewport, relTransform.position.x, relTransform.position.y)
-        this.scale()
-        this.place()
-        this.scene.scale.on('resize', () =>
-        {
-            this.scale()
-            this.place()
-        }, this)
+
+        this.anchorPlugin = this.scene.plugins.get('rexAnchor')
+        this.anchor = this.anchorPlugin.add(this.sprite, anchor)
+
+        sprite.setVisible(false)
+        this.graphics = this.scene.add.graphics()
+        
+        this.scene.events.on('update', this.update, this)
     }
 
-    scale()
+    update()
     {
-        if (this.relTransform.scale)
-        {
-            let scaleX = (this.viewport.width * this.relTransform.scale.x) / this.sprite.width
-            if (this.relTransform.scale.y)
-            {
-                let scaleY  = (this.viewport.height * this.relTransform.scale.y) / this.sprite.height
-                this.sprite.setScale(scaleX, scaleY)
-            } 
-            else
-            {
-                this.sprite.setScale(scaleX)
-            }
-        }
+        this.draw()
     }
 
-    place()
+    draw()
     {
-        this.viewport.setTo(0, 0, appData.width, appData.height)
+        if (!this.graphics) return
+        this.graphics.clear()
+        this.graphics.lineStyle(1, 0xFFFFFF, 1)
+        this.graphics.strokeRectShape(this.sprite.getBounds())
     }
 }

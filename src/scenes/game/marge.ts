@@ -1,6 +1,6 @@
-import { GameObjects, Scene } from 'phaser';
+import { Scene } from 'phaser';
 import { scenes } from '../../app';
-import DragDial from '../../data-types/dragdial';
+import DynamicSprite from '../../data-types/dynamicsprite';
 
 export default class Marge extends Scene 
 {
@@ -11,10 +11,8 @@ export default class Marge extends Scene
   constants : any
   state : any
 
-  dashSprite: GameObjects.Sprite
-
-  signal: DragDial
-  shifter: DragDial
+  dashSprite: DynamicSprite
+  rearviewSprite: DynamicSprite
 
   bandConfig: object
 
@@ -29,7 +27,22 @@ export default class Marge extends Scene
   preload(): void 
   {
     this.graphics = this.add.graphics()
-
+    this.dashSprite = new DynamicSprite(this,
+      {
+        x: '46%',
+        y: '80%',
+        width: '90%',
+        height: '40%'
+      }
+    )
+    this.rearviewSprite = new DynamicSprite(this,
+      {
+        x: '50%',
+        y: '14%',
+        width: '85%',
+        height: '27%'
+      }
+    )
     this.constants =
     {
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
@@ -45,7 +58,7 @@ export default class Marge extends Scene
           minAngle: -40,
           maxAngle: 60
         },
-        relativeTransformConfig: 
+        relativeTransformConfig:
         {
           origin: 
           {

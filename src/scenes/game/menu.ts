@@ -1,8 +1,9 @@
-import { Scene } from "phaser"
-import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin"
+import { Scene } from 'phaser'
+import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
+import { ConfirmAction } from 'phaser3-rex-plugins/templates/ui/ui-components'
 
-import { appData, colors } from "../../app"
-import DynamicSprite, { RelativeTransform } from '../../data-types/dynamicsprite'
+import { appData, colors } from '../../app'
+import DynamicSprite from '../../data-types/dynamicsprite'
 
 export default class Menu extends Scene
 {
@@ -14,9 +15,16 @@ export default class Menu extends Scene
     uiPlugin: any
     uiShapes: any
 
+    startDialogAnchor: any
+    startDialogStyle: any
     startDialog: any
+    startDialogContent =
+    {
+        title: 'welcome to bruisecorps',
+        content: 'heres an explanation of the game OR an overview of the players save',
+        buttonA: 'key turning animation'
+    }
     startDialogSprite: DynamicSprite
-    startDialogTransform: RelativeTransform
 
     constants: 
     {
@@ -43,25 +51,61 @@ export default class Menu extends Scene
 
     preload(): void
     {
-        this.uiPlugin = this.sys.plugins.install('rexUI', UIPlugin)
+        this.uiPlugin = (this['rexUI'])
 
-        this.constants = 
+        this.startDialogAnchor =
         {
-
+            x: '50%',
+            y: '50%',
+            width: '60%',
+            height: '80%'
         }
-
-        this.startDialogTransform =
+        this.startDialogStyle =
         {
-            position:
+            anchor: this.startDialogAnchor,
+            background: 
             {
-                x: 0.5,
-                y: 0.5
+                color: colors[0]
             },
-            scale:
+            title:
             {
-                x: 0.5,
+                text:
+                {
+                    fontSize: 24,
+                },
+                background:
+                {
+                    color: colors[1]
+                }
+            },
+            content:
+            {
+                space:
+                {
+                    left: 5, right: 5, top: 5, bottom: 5
+                },
+                text:
+                {
+                    fontSize: 20
+                },
+            },
+            buttonMode: 1,
+            button:
+            {
+                space: { left: 10, right: 10, top: 10, bottom: 10 },
+                background:
+                {
+                    color: colors[2],
+                    'hover.strokeColor': colors[5]
+                }
+            },
+            align: 
+            {
+                actions: 'right'
             }
         }
+
+        this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent)
     }
 
     create(): void
@@ -71,11 +115,7 @@ export default class Menu extends Scene
 
     initiateStartDialog()
     {
-        this.startDialogSprite = 
-        new DynamicSprite (
-            new Phaser.GameObjects.Sprite(this, 0, 0, 'x')
-            , this.startDialogTransform
-        )
+        this.startDialogSprite = new DynamicSprite(this, this.startDialogAnchor)
     }
 
     update(): void
@@ -89,6 +129,7 @@ export default class Menu extends Scene
 
     control(): void
     {
+
     }
 
     process(): void

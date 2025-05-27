@@ -1,5 +1,6 @@
 import { appData, scenes } from '../app';
 import { Scene, Physics } from 'phaser';
+import DynamicSprite from '../data-types/dynamicsprite';
 
 import Tour from './game/tour';
 import * as trashTour from '../data/trsh-tour.json'
@@ -9,9 +10,9 @@ export interface GameState
 
 }
 
-export interface GameBuffer
+export interface GameBuffer //NOT IN USE
 {
-
+  dynamicSprites: DynamicSprite[] 
 }
 
 export default class Game extends Scene 
@@ -50,6 +51,7 @@ export default class Game extends Scene
   }
   buffer : 
   {
+    dynamicSprites: DynamicSprite[]
     lastPlaying: boolean,
     lastSpeed: number,
     lastStep: number,
@@ -142,6 +144,7 @@ export default class Game extends Scene
 
     this.buffer = 
     {
+      dynamicSprites: [],
       lastPlaying: false,
       lastSpeed: 0,
       lastStep: 0,

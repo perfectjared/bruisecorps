@@ -2,7 +2,8 @@
 import 'phaser'
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
-import ViewportCoordinatePlugin from 'phaser3-rex-plugins/plugins/viewportcoordinate-plugin'
+import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin'
+import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin'
 
 import Debug from './scenes/debug'
 import Game from './scenes/game'
@@ -48,7 +49,7 @@ class App extends Phaser.Scene
 
   render()
   {
-    
+
   }
 }
 
@@ -70,7 +71,8 @@ interface AppData
   height: number,
   scaleRatio: number,
   audioStarted: boolean,
-  hasFocus: boolean
+  hasFocus: boolean,
+  viewport: Phaser.Geom.Rectangle
 }
 
 var appData: AppData = 
@@ -82,13 +84,14 @@ var appData: AppData =
   scaleRatio: window.devicePixelRatio / 3,
   audioStarted: false, //TODO: SET BY SYNTH.TS
   hasFocus: true,
+  viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight)
 }
 
 const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
   scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.synth],
-  backgroundColor: '#facade',
+  backgroundColor: colors[3],
   scale: {
     mode: Phaser.Scale.RESIZE,
     parent: 'game-container',
@@ -112,10 +115,16 @@ const gameConfig: Phaser.Types.Core.GameConfig =
         mapping: 'dragRotate'
       },
       {
-        key: 'rexViewportCoordinate',
-        plugin: ViewportCoordinatePlugin,
+        key: 'rexAnchor',
+        plugin: AnchorPlugin,
         start: true,
-        mapping: 'rexViewportCoordinate'
+        mapping: 'rexAnchor'
+      },
+      {
+        key: 'rexRoundRectanglePlugin',
+        plugin: RoundRectanglePlugin,
+        start: true,
+        mapping: 'rexRoundRectanglePlugin'
       }
     ]
   },
@@ -192,7 +201,9 @@ export
 window.addEventListener
 ('resize', () => {
   appData.width = window.innerWidth
+  appData.viewport.width = appData.width
   appData.height = window.innerHeight
+  appData.viewport.height = appData.height
   appData.scaleRatio =  window.devicePixelRatio / 3
 })
 appData.width = window.innerWidth
