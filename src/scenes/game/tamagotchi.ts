@@ -156,11 +156,11 @@ export class Tamagotchi extends Scene
 
     control()
     {
-        let nextStep = (this.state.step != scenes.game.state.step)
+        let nextStep = (this.state.step != scenes.synth.state.step)
         if (nextStep)
         {
             this.step()
-            this.state.step = scenes.game.state.step
+            this.state.step = scenes.synth.state.step
         }
     }
 

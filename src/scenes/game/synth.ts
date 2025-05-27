@@ -6,11 +6,11 @@ export default class Synth extends Scene
 {
     graphics: any
     constants: any
-    state: any
-    buffer: 
+    state: 
     {
-        player: Tone.Player
+        step: number
     }
+    player: Tone.Player
 
     domElement: HTMLBodyElement
     audioStartEvent: () => Promise<void>
@@ -36,11 +36,12 @@ export default class Synth extends Scene
                 140
             ]
         }
-        this.buffer =
+        this.state =
         {
-            player: new Tone.Player()
+            step: 0
         }
-        this.buffer.player.toDestination()
+        this.player = new Tone.Player()
+        this.player.toDestination()
         Tone.getTransport().bpm.value = this.constants.bpms[0]
     }
 
@@ -66,7 +67,8 @@ export default class Synth extends Scene
     {
         Tone.getTransport().scheduleRepeat((time) =>
         {
-            console.log("metronome")
+            this.state.step ++
+            if (this.state.step > 256) this.state.step = 0
         }, "4n")
         Tone.getTransport().start()
     }
@@ -80,7 +82,7 @@ export default class Synth extends Scene
 
     }
 
-    step()
+    beat()
     {
 
     }

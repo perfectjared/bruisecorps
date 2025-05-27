@@ -1,5 +1,6 @@
-import Anchor from "phaser3-rex-plugins/plugins/anchor";
-import { appData } from "../app";
+import Anchor from "phaser3-rex-plugins/plugins/anchor"
+import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components"
+import { appData, scenes, UIPlugin } from "../app"
 
 export default class DynamicSprite
 {
@@ -8,6 +9,8 @@ export default class DynamicSprite
     graphics: Phaser.GameObjects.Graphics
     anchor: Anchor
     anchorPlugin: any
+    sizer: Sizer
+    uiPlugin: any
 
     constructor
     (scene: Phaser.Scene, 
@@ -16,20 +19,32 @@ export default class DynamicSprite
     {
         this.scene = scene
         this.sprite = sprite
-        this.scene.add.existing(sprite)
+        this.anchor = anchor
+        this.scene.events.on('update', this.update, this)
+    }
+
+    create()
+    {
+        this.scene.add.existing(this.sprite)
 
         this.anchorPlugin = this.scene.plugins.get('rexAnchor')
-        this.anchor = this.anchorPlugin.add(this.sprite, anchor)
+        this.anchor = this.anchorPlugin.add(this.sprite, this.anchor)
 
-        sprite.setVisible(false)
-        this.graphics = this.scene.add.graphics()
-        
-        this.scene.events.on('update', this.update, this)
+        console.log(this.uiPlugin)
+        this.sizer = this.uiPlugin.add.sizer(new Sizer(this.scene))
+
+        // this.sprite.setVisible(false)
+        // this.graphics = this.scene.add.graphics()
     }
 
     update()
     {
         this.draw()
+        if (!this.uiPlugin)
+        {
+            this.uiPlugin = scenes.menu['rexUI']
+            if (this.uiPlugin) this.create()
+        }
     }
 
     draw()

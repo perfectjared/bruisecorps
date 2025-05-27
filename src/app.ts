@@ -96,6 +96,10 @@ const gameConfig: Phaser.Types.Core.GameConfig =
     mode: Phaser.Scale.RESIZE,
     parent: 'game-container',
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    min:
+    {
+      width: 320
+    }
   },
   type: Phaser.CANVAS,
   plugins:
@@ -188,6 +192,9 @@ const synth = new Tone.Synth().toDestination()
 
 export
 {
+
+  UIPlugin,
+  AnchorPlugin,
   AppData,
   appData,
   colors,
@@ -195,7 +202,7 @@ export
   game,
   gameConfig,
   scenes,
-  synth,
+  synth
 }
 
 window.addEventListener

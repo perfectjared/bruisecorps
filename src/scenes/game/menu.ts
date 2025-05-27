@@ -1,8 +1,9 @@
 import { Scene } from 'phaser'
+import Anchor from 'phaser3-rex-plugins/templates/ui/ui-components'
 import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
 import { ConfirmAction } from 'phaser3-rex-plugins/templates/ui/ui-components'
 
-import { appData, colors, scenes } from '../../app'
+import { appData, colors, scenes, UIPlugin } from '../../app'
 import DynamicSprite from '../../data-types/dynamicsprite'
 
 export default class Menu extends Scene
@@ -46,14 +47,15 @@ export default class Menu extends Scene
 
     preload(): void
     {
-        this.uiPlugin = (this['rexUI'])
+        this.uiPlugin = this['rexUI']
 
         this.startDialogAnchor =
         {
-            x: '50%',
-            y: '50%',
-            width: '60%',
-            height: '80%'
+            centerX: 'center',
+            centerY: 'center',
+            width: '50%',
+            height: '80%',
+            enable: true
         }
         this.startDialogContent = 
         {
@@ -64,16 +66,29 @@ export default class Menu extends Scene
         this.startDialogStyle =
         {
             anchor: this.startDialogAnchor,
+            space:
+            {
+                left: 10,
+                right: 10,
+                top: 10,
+                bottom: 10
+            },
+            expand:
+            {
+                title: true,
+                content: true,
+                action: true
+            },
             background: 
             {
                 color: colors[0]
             },
+            align:
+            {
+                actions: 'right'
+            },
             title:
             {
-                space:
-                {
-                    left: 5
-                },
                 text:
                 {
                     fontSize: 24,
@@ -86,10 +101,6 @@ export default class Menu extends Scene
             },
             content:
             {
-                space:
-                {
-                    left: 5, right: 5, top: 5, bottom: 5
-                },
                 text:
                 {
                     fontSize: 20,
@@ -99,20 +110,16 @@ export default class Menu extends Scene
             buttonMode: 1,
             button:
             {
-                space:
+                text:
                 {
-                    right: 200,
-                    top: 200
+                    fontSize: 20,
+                    color: '#facade'
                 },
                 background:
                 {
                     color: colors[2],
                     'hover.color': colors[5]
                 }
-            },
-            align: 
-            {
-                actions: 'right'
             }
         }
 
@@ -130,6 +137,7 @@ export default class Menu extends Scene
     initiateStartDialog()
     {
         this.startDialogSprite = new DynamicSprite(this, this.startDialogAnchor)
+        this.startDialog.scene = this
     }
 
     update(): void

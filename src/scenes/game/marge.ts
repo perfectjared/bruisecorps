@@ -123,11 +123,11 @@ export default class Marge extends Scene
   
   update(): void 
   {
-    let nextStep = (scenes.game.state.step != this.state.step)
+    let nextStep = (scenes.synth.state.step != this.state.step)
     if (nextStep)
     {
       this.step()
-      this.state.step = scenes.game.state.step
+      this.state.step = scenes.synth.state.step
     }
 
     this.control()

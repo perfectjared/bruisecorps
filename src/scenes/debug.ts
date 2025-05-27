@@ -28,19 +28,23 @@ export default class Debug extends Scene
   create(): void {
     let gameState = scenes.game.state
     let margeState = scenes.marge.state
+    let synthState = scenes.synth.state
 
     {
       const appFolder = datGui.macro.addFolder('app')
       const gameFolder = datGui.macro.addFolder('game')
+      const synthFolder = datGui.macro.addFolder('synth')
       const playerFolder = datGui.macro.addFolder('player')
 
       appFolder.add(appData, 'audioStarted', false)
       appFolder.open()
 
       gameFolder.add(gameState, 'playing', false)
-      gameFolder.add(gameState, 'step', 0, 256, 1)
       gameFolder.add(gameState, 'speed', 60, 240, 1)
       gameFolder.open()
+
+      synthFolder.add(synthState, 'step', 0, 256, 1)
+      synthFolder.open()
 
       playerFolder.add(gameState, 'health', 0, 100, .1)
       playerFolder.add(gameState, 'progress', 0, 100, 1)

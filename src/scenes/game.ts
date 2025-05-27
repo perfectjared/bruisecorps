@@ -21,7 +21,6 @@ export default class Game extends Scene
   state : 
   {
     playing
-    step
     speed
 
     health
@@ -71,8 +70,6 @@ export default class Game extends Scene
   phone: Scene
   novel: any
 
-  metronomeTween: any
-
   constructor() 
   {
     super({
@@ -106,7 +103,6 @@ export default class Game extends Scene
       playing: false,
 
       speed: this.constants.speedNumbers.start,
-      step: 0,
 
       health: this.constants.healthNumbers.start,
       progress: 0, //0 - 100, .1 steps, interpreted into miles with tour state
@@ -181,20 +177,20 @@ export default class Game extends Scene
 
   control(): void
   {
-    let nextStep = (this.buffer.lastStep != this.state.step)
+    let nextStep = (this.buffer.lastStep != scenes.synth.state.step)
     if (nextStep) this.step()
   }
 
   step(): number
   {
-    this.healthBleed()
-    this.progressIncrement()
+    //this.healthBleed()
+    //this.progressIncrement()
 
-    let nextTime = (this.state.step % 11 == 0)
+    let nextTime = (scenes.synth.state.step % 11 == 0)
     if (nextTime) this.timeIncrement()
 
-    this.buffer.lastStep = this.state.step
-    return this.state.step
+    this.buffer.lastStep = scenes.synth.state.step
+    return scenes.synth.state.step
   }
 
   timeIncrement(): number[]
