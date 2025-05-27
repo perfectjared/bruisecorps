@@ -1,9 +1,18 @@
-import { appData } from '../app';
-import { Scene } from 'phaser';
-import { scenes } from '../app';
+import { appData, scenes } from '../app';
+import { Scene, Physics } from 'phaser';
 
 import Tour from './game/tour';
 import * as trashTour from '../data/trsh-tour.json'
+
+export interface GameState
+{
+
+}
+
+export interface GameBuffer
+{
+
+}
 
 export default class Game extends Scene 
 {
@@ -51,12 +60,14 @@ export default class Game extends Scene
       touchingObject: Phaser.GameObjects.GameObject | null
     }
   }
+
+  world: Physics.Matter.World
   
   road: Scene
   tour: any
   marge: Scene
   phone: Scene
-  rearview: Scene
+  novel: any
 
   metronomeTween: any
 
@@ -140,22 +151,19 @@ export default class Game extends Scene
         touchingObject: null
       }
     }
+
+    this.scene.launch(scenes.marge).scene
+    this.scene.launch(scenes.debug).scene
   }
 
   create(): void 
   {
-    
-    //this.road = this.scene.launch(scenes.road).scene
-    this.marge = this.scene.launch(scenes.marge).scene
-    this.scene.launch(scenes.synth).scene
-    //this.phone = this.scene.launch(scenes.phone).scene
-    //this.tour = this.scene.launch(scenes.tour).scene
-    this.scene.launch(scenes.debug)
+
   }
 
   startGame(): void
   {
-    console.log("game start")
+    console.log("game: game playing")
     this.state.playing = true
   }
 

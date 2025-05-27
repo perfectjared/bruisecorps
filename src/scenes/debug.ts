@@ -5,6 +5,7 @@ import { Tamagotchi } from './game/tamagotchi';
 export default class Debug extends Scene 
 {
   margeState : any
+  fpsText: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -13,7 +14,7 @@ export default class Debug extends Scene
   }
 
   preload(): void {
-    
+    this.fpsText = this.add.text(10, 10, '', { fontFamily: 'Basic-Sans', color: '#ffffff'}).setText(`${this.game.loop.actualFps.toFixed()}`)
   }
 
   create(): void {

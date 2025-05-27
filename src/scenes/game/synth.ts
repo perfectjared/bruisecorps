@@ -44,7 +44,6 @@ export default class Synth extends Scene
 
     update()
     {
-
     }
 
     control()

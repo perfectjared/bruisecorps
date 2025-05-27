@@ -1,5 +1,4 @@
 import DragRotate from "phaser3-rex-plugins/plugins/dragrotate"
-import RelativeTransform from "./relativetransform"
 import { Scene } from "phaser"
 
 export interface DragDialConfig

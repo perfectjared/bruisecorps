@@ -1,12 +1,11 @@
-import { Scene } from 'phaser';
-import { GameObjects } from 'phaser';
+import { GameObjects, Scene } from 'phaser';
 import { scenes } from '../../app';
 import DragDial from '../../data-types/dragdial';
 
 export default class Marge extends Scene 
 {
   graphics: any
-  dragRotatePlugin: any
+  world: MatterJS.World
 
   buffer: any
   constants : any
@@ -29,12 +28,7 @@ export default class Marge extends Scene
 
   preload(): void 
   {
-    // this.load.plugin('rexDragRotate')
-    // this.dragRotatePlugin = this.plugins.get('rexDragRotate')
     this.graphics = this.add.graphics()
-
-    //this.load.image('shifter', '../../../assets/image/marge/shifter.png')
-    //this.load.image('signal', '../../../assets/image/marge/signal.png')
 
     this.constants =
     {
@@ -51,7 +45,7 @@ export default class Marge extends Scene
           minAngle: -40,
           maxAngle: 60
         },
-        relativeTransform: 
+        relativeTransformConfig: 
         {
           origin: 
           {
@@ -111,7 +105,6 @@ export default class Marge extends Scene
   
   create(): void 
   {
-    //this.scene.launch(scenes.rearview)
 
   }
   
@@ -143,7 +136,7 @@ export default class Marge extends Scene
 
   process(): void
   {
-    // this.shifter.updateTransform()
+
   }
   
   system(): void
@@ -158,21 +151,6 @@ export default class Marge extends Scene
 
   debug(): void
   {
-    // this.drawDragRotators()
-  }
 
-  // placeSignal(): void
-  // {
-  //   this.signal.sprite.setOrigin(1, 1)
-  //   placeReactiveSprite
-  //   (this.signal.sprite,
-  //     {
-  //       x: 0.2,
-  //       y: 0.915,
-  //       width: 0.3,
-  //       maxScale: 1,
-  //       minScale: 0.1
-  //     }
-  //   )
-  // }
+  }
 }

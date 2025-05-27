@@ -1,5 +1,5 @@
 import { Scene } from "phaser"
-import RelativeTransform from "../../data-types/relativetransform"
+import RelativeTransform from "../../data-types/dynamicsprite"
 
             // placeReactiveSprite(sprite,
             //     {
