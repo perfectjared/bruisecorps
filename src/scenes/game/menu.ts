@@ -70,6 +70,10 @@ export default class Menu extends Scene
             },
             title:
             {
+                space:
+                {
+                    left: 5
+                },
                 text:
                 {
                     fontSize: 24,
@@ -95,10 +99,15 @@ export default class Menu extends Scene
             buttonMode: 1,
             button:
             {
+                space:
+                {
+                    right: 200,
+                    top: 200
+                },
                 background:
                 {
                     color: colors[2],
-                    'hover.strokeColor': colors[5]
+                    'hover.color': colors[5]
                 }
             },
             align: 
@@ -109,7 +118,7 @@ export default class Menu extends Scene
 
         this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
         {
-            scenes.game.state.playing = true
+            scenes.game.state.playing = true //DON'T DO THIS!!!
         }, this)
     }
 
