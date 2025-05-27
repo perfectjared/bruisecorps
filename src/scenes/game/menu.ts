@@ -2,7 +2,7 @@ import { Scene } from 'phaser'
 import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
 import { ConfirmAction } from 'phaser3-rex-plugins/templates/ui/ui-components'
 
-import { appData, colors } from '../../app'
+import { appData, colors, scenes } from '../../app'
 import DynamicSprite from '../../data-types/dynamicsprite'
 
 export default class Menu extends Scene
@@ -18,12 +18,7 @@ export default class Menu extends Scene
     startDialogAnchor: any
     startDialogStyle: any
     startDialog: any
-    startDialogContent =
-    {
-        title: 'welcome to bruisecorps',
-        content: 'heres an explanation of the game OR an overview of the players save',
-        buttonA: 'key turning animation'
-    }
+    startDialogContent: any
     startDialogSprite: DynamicSprite
 
     constants: 
@@ -60,6 +55,12 @@ export default class Menu extends Scene
             width: '60%',
             height: '80%'
         }
+        this.startDialogContent = 
+        {
+            title: 'welcome to bruisecorps',
+            content: 'heres an explanation of the game OR an overview of the players save',
+            buttonA: 'key turning animation'
+        }   
         this.startDialogStyle =
         {
             anchor: this.startDialogAnchor,
@@ -72,6 +73,7 @@ export default class Menu extends Scene
                 text:
                 {
                     fontSize: 24,
+                    color: colors[4]
                 },
                 background:
                 {
@@ -86,13 +88,13 @@ export default class Menu extends Scene
                 },
                 text:
                 {
-                    fontSize: 20
+                    fontSize: 20,
+                    color: colors[4]
                 },
             },
             buttonMode: 1,
             button:
             {
-                space: { left: 10, right: 10, top: 10, bottom: 10 },
                 background:
                 {
                     color: colors[2],
@@ -105,7 +107,10 @@ export default class Menu extends Scene
             }
         }
 
-        this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent)
+        this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
+        {
+            scenes.game.state.playing = true
+        }, this)
     }
 
     create(): void
