@@ -7,19 +7,72 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="ie-edge" />
     <title>bruisecorps summer-tour: margemaster</title>
-
+	<link rel="preload" as="font" href="./assets/fonts/basic-sans/Basic-Sans.otf" type="font/otf" />
     <style>
         html,
         body {
             margin: 0;
-            background: #333;
+            background: black;
         }
+		@font-face {
+			font-family: Basic-Sans;
+			src: url('./assets/fonts/basic-sans/Basic-Sans.otf');
+			font-weight: normal;
+			font-style: normal;
+			font-display: block;
+		}
+		.font-preloader {
+			font-family: 'Basic-Sans';
+			position: absolute;
+			opacity: 0;
+			height: 0;
+			width: 0;
+			overflow: hidden;
+		}
     </style>
 </head>
 
 <body>
     <div id="game-container"></div>
+	<div class="font-preloader"></div>
     <script src="app.js"></script>
 </body>
+
+<div id="novel-area" style="visibility: none; content-visibility: none; opacity: 0; transform: scale(0);">
+	<div id="novel-style-area">
+		<div id="novel-notification-wrapper">
+			<div id="novel-save-notification" class="novel-notification">
+				<p class="novel-save-text"></p>
+				<p><textarea name="save-text" readonly></textarea></p>
+				<p><button type="button" class="novel-close-button" onclick="UI.closeSaveNotification()"></button><button type="button" class="novel-copy-button" onclick="UI.copyText()"></button></p>
+			</div>
+			<div id="novel-load-notification" class="novel-notification">
+				<p class="novel-load-text"></p>
+				<p><textarea name="load-text"></textarea></p>
+				<p><button type="button" class="novel-close-button" onclick="UI.closeLoadNotification(false)"></button><button type="button" class="novel-load-button" onclick="UI.closeLoadNotification(true)"></button></p>
+			</div>
+		</div>
+		<div id="novel-text-area">
+			<div id="novel-text"></div>
+			<button type="button" class="novel-skip-button" onclick="TextPrinter.complete()"></button>
+			<button type="button" class="novel-continue-button" onclick="TextPrinter.unpause()"></button>
+		</div>
+		<div id="novel-choices-area">
+			<ul id="novel-choice-list"></ul>
+		</div>
+		<div id="novel-inventory-area">
+			<h5 class="novel-inventory-title"></h5>
+			<ul id="novel-inventory"></ul>
+		</div>
+		<div id="novel-hidden-inventory-area">
+			<h5 class="novel-hidden-inventory-title"></h5>
+			<ul id="novel-hidden-inventory"></ul>
+		</div>
+		<div id="novel-save-area">
+			<button type="button" class="novel-save-button" onclick="NovelManager.saveData()"></button>
+			<button type="button" class="novel-load-button" onclick="UI.showLoadNotification()"></button>
+		</div>
+	</div>
+</div>
 
 </html>
