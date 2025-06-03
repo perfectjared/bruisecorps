@@ -18,6 +18,12 @@ export class DeckManager
         return iframe
     }
 
+    private getDeckHTML(): string
+    {
+        
+        return ""
+    }
+
     private setupEventListeners(): void
     {
 
