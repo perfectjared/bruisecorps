@@ -30,11 +30,7 @@ export default class DynamicSprite
         this.anchorPlugin = this.scene.plugins.get('rexAnchor')
         this.anchor = this.anchorPlugin.add(this.sprite, this.anchor)
 
-        console.log(this.uiPlugin)
         this.sizer = this.uiPlugin.add.sizer(new Sizer(this.scene))
-
-        // this.sprite.setVisible(false)
-        // this.graphics = this.scene.add.graphics()
     }
 
     update()

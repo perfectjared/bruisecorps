@@ -29,11 +29,25 @@
 			width: 0;
 			overflow: hidden;
 		}
+		#game-container {
+			position: relative;
+			width: 100vw;
+			height: 100vh;
+		}
+		#deck-container {
+			position: absolute;
+			top: 0;
+			pointer-events: none;
+			z-index: 10;
+			width: 100vw;
+			height: 100vh;
+		}
     </style>
 </head>
 
 <body>
-    <div id="game-container"></div>
+	<iframe src="./src/lib/decker.html" title="decker" id="deck-container"></iframe>
+	<div id="game-container"></div>
 	<div class="font-preloader"></div>
     <script src="app.js"></script>
 </body>

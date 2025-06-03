@@ -123,15 +123,15 @@ export default class Menu extends Scene
             }
         }
 
-        this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
-        {
-            scenes.game.state.playing = true //DON'T DO THIS!!!
-        }, this)
+        // this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
+        // {
+        //     scenes.game.state.playing = true //DON'T DO THIS!!!
+        // }, this)
     }
 
     create(): void
     {
-        this.initiateStartDialog()
+        //this.initiateStartDialog()
     }
 
     initiateStartDialog()
