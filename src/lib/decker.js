@@ -1,4 +1,3 @@
-
 VERSION="1.55"
 
 DANGEROUS=1
@@ -2866,7 +2865,7 @@ deck_read=x=>{
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(window.screen.width/devicePixelRatio,window.screen.height/devicePixelRatio)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
@@ -3693,6 +3692,7 @@ sample_to_byte=s=>0xFF&clamp(-127,s*128,127)
 // Menus
 
 const menu={heads:[],items:[],x:0,active:-1,stick:-1,lw:-1,sz:rect()}
+menu_label=_=>rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
 no_menu=_=>menu.active==-1&&menu.stick==-1
 in_layer=_=>no_menu()&&(ms.type?ms.in_modal:1)&&((!running()&&!msg.overshoot)||ms.type!=null)
 in_widgets=_=>ms.type!=null?ms.in_modal:1
@@ -4820,12 +4820,12 @@ modals=_=>{
 			if(ui_button(rect(b.x+b.w-60,b.y+b.h-20,60,20),'OK',1)||ev.exit){modal_exit(0)}
 			if(ui_button(rect(b.x,b.y+b.h-45,60,20),'New...',1)){modal_exit(1),con_set(deck_add(deck,lms('contraption'))),mark_dirty()}
 			if(ui_button(rect(b.x,b.y+b.h-20,60,20),'Edit...',ms.grid.row>=0)||choose){modal_exit(2),con_set(deck.contraptions.v[ms.grid.row])}
-			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)||choose){
+			if(ui_button(rect(b.x+65,b.y+b.h-45,60,20),'Clone',ms.grid.row>=0)){
 				const s=ifield(deck,'contraptions').v[ms.grid.row]
 				deck_add(deck,s,lms(ls(ifield(s,'name'))+'_clone'))
 				ms.grid=gridtab(contraptions_enumerate())
 			}
-			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0||choose)){
+			if(ui_button(rect(b.x+65,b.y+b.h-20,60,20),'Delete',ms.grid.row>=0)){
 				deck_remove(deck,ifield(deck,'contraptions').v[ms.grid.row])
 				ms.grid=gridtab(contraptions_enumerate())
 			}
@@ -5172,8 +5172,8 @@ modals=_=>{
 		draw_textc(rect(b.x,b.y-5,b.w,20),'Card Properties',FONT_MENU,1)
 		draw_text(rect(b.x,b.y+22,42,20),'Name',FONT_MENU,1),ui_field(rect(b.x+42,b.y+20,b.w-42,18),ms.name)
 		const c=rect(b.x,b.y+b.h-20)
-		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
 		if(ui_button(rect(b.x+b.w-60,c.y,60,20),'OK',1)||ev.exit)modal_exit(1)
+		if(ui_button(rect(c.x,c.y,60,20),'Script...',1))setscript(card),modal_exit(0)
 	}
 	else if(ms.type=='button_props'){
 		const b=draw_modalbox(rect(220,170)),button=ob.sel[0]
@@ -6117,7 +6117,97 @@ prototype_size_editor=_=>{
 
 
 // Toolbars
-const tcellw=22, tcellh=19, tgap=1, toolsize=rect(22/*w*/*2+1,19/*h*/*18+1/*gap*/+1), tfb=image_make(toolsize), tid=new ImageData(toolsize.x,toolsize.y)
+
+let toolbars_enable=0, tzoom=1 // should be off by default?
+const tcellw=22, tcellh=19, tgap=1, toolsize=rect(tcellw*2+1,tcellh*18+tgap+1), tfb=image_make(toolsize), tid=new ImageData(toolsize.x,toolsize.y)
+const tooltypes=['select','pencil','lasso','line','fill','poly','rect','fillrect','ellipse','fillellipse']
+const patorder=[0,1,4,5,8,9,16,17,12,13,18,19,20,21,22,23,24,25,26,27,2,6,3,7,10,11,14,15,28,29,30,31] // pleasing visual ramps for 2 columns
+
+toolbars=_=>{
+	if(!toolbars_enable||kc.on)return
+	if(ms.type||uimode=='script'){
+		clr=x=>{const c=q(x);c.getContext('2d').clearRect(0,0,c.width,c.height);}
+		clr('#ltools'),clr('#rtools');return
+	}
+	const toolbar=(element,render,behavior)=>{
+		const c=element.getBoundingClientRect()
+		const pos =rint(rect((ev.rawpos .x-c.x)/tzoom,(ev.rawpos .y-c.y)/tzoom))
+		const dpos=rint(rect((ev.rawdpos.x-c.x)/tzoom,(ev.rawdpos.y-c.y)/tzoom))
+		tfb.pix.fill(0),frame=draw_frame(tfb),draw_box(rpair(rect(),toolsize),0,1),behavior(pos,dpos)
+		const anim=deck.patterns.anim, pal=deck.patterns.pal.pix
+		const animated=rin(rect(c.x,c.y,c.width,c.height),ev.rawpos)&&dr.show_anim?(0|(frame_count/4)):0
+		const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][animated%max(1,anim[pix-28].length)]
+		const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
+		const draw_color  =(pix,x,y)=>pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
+		const data=tid.data;for(let z=0,d=0,y=0;y<tid.height;y++)for(let x=0;x<tid.width;x++,z++){
+			const pix=tfb.pix[z], a=anim_pattern(pix,x,y), c=draw_color(a,x,y), cv=COLORS[c]
+			data[d++]=0xFF&(cv>>16),data[d++]=0xFF&(cv>>8),data[d++]=0xFF&(cv),data[d++]=0xFF
+		}
+		render.getContext('2d').putImageData(tid,0,0)
+		const g=element.getContext('2d');g.imageSmoothingEnabled=tzoom!=(0|tzoom),g.save(),g.scale(tzoom,tzoom),g.drawImage(render,0,0),g.restore()
+	}
+	const toolbtn=(pos,dn,b,icon,active)=>{
+		const i=rcenter(b,rect(16,16))
+		draw_box(b,0,1);if(active)draw_rect(b,1);draw_icon(i,TOOLS[icon],active?0:1)
+		if(rin(b,pos))uicursor=cursor.point;return rin(b,pos)&&rin(b,dn)&&ev.mu
+	}
+	const modebtn=(pos,dn,b,text,active)=>{
+		draw_box(b,0,1);if(active)draw_rect(inset(b,2),1);draw_textc(b,text,FONT_BODY,active?0:1)
+		if(rin(b,pos))uicursor=cursor.point;return rin(b,pos)&&rin(b,dn)&&ev.mu
+	}
+	const scrollbtn=(pos,dn,b,icon)=>{
+		const i=rcenter(b,rect(12,12)),active=rin(b,dn)&&(ev.mu||ev.drag)
+		draw_box(b,0,1);if(active)draw_rect(b,1);draw_icon(i,ARROWS[icon],active?0:1)
+		if(rin(b,pos))uicursor=cursor.point;return rin(b,pos)&&active&&ev.mu
+	}
+	const brushbtn=(pos,dn,b,brush)=>{
+		const i=rint(rect(b.x+(b.w/2),b.y+(b.h/2)))
+		draw_box(b,0,1),draw_line(rect(i.x,i.y,i.x,i.y),brush,1,deck)
+		if(dr.brush==brush)draw_box(inset(b,2),0,1)
+		if(!rin(b,pos))return;uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
+		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
+	}
+	const cbrushbtn=(pos,dn,b,brush,bt)=>{
+		const icon=bt.v[brush-24],oc=frame.clip;frame.clip=b
+		image_paste(rcenter(b,icon.size),b,icon,frame.image,1),frame.clip=oc,draw_box(b,0,1)
+		if(dr.brush==brush)draw_box(inset(b,2),0,1)
+		if(!rin(b,pos))return;uicursor=cursor.point;if(!ev.mu||!rin(b,dn))return
+		setmode('draw');if(dr.tool=='select'||dr.tool=='lasso'||dr.tool=='fill')settool('pencil');dr.brush=brush
+	}
+	const palbtn=(pos,dn,b,pattern)=>{
+		if((dr.pickfill?dr.fill:dr.pattern)==pattern){draw_rect(inset(b,3),pattern),draw_box(inset(b,3),0,1)}else{draw_rect(b,pattern)}
+		if(rin(b,pos)){uicursor=cursor.point;if(ev.mu&&rin(b,dn)){if(dr.pickfill){dr.fill=pattern}else{dr.pattern=pattern}}}draw_box(b,0,1)
+	}
+	toolbar(q('#ltools'),q('#lrender'),(pos,dn)=>{
+		const bs=deck.brushes,bt=deck.brusht,th=count(bs)?17:tcellh;toolbar_scroll=clamp(0,toolbar_scroll,count(bs))
+		draw_rect(rect(0,6*tcellh,toolsize.x,tgap),1)
+		if(toolbtn(pos,dn,rect(0     ,0,tcellw+1,tcellh+1),0,uimode=='interact'))setmode('interact'),ev.mu=ev.md=0
+		if(toolbtn(pos,dn,rect(tcellw,0,tcellw+1,tcellh+1),1,uimode=='object'  ))setmode('object'  ),ev.mu=ev.md=0
+		for(let z=0;z<10;z++){
+			if(toolbtn(pos,dn,rect((z%2)*tcellw,(1+(0|(z/2)))*tcellh,tcellw+1,tcellh+1),z+2,uimode=='draw'&&dr.tool==tooltypes[z])){
+				settool(tooltypes[z]),ev.mu=ev.md=0
+			}
+		}
+		let cy=(6*tcellh)+tgap,brow=0;for(let z=0;z<12-toolbar_scroll;z++){
+			brushbtn(pos,dn,rect(0     ,cy,tcellw+1,th+1),z   +toolbar_scroll)
+			brushbtn(pos,dn,rect(tcellw,cy,tcellw+1,th+1),z+12+toolbar_scroll)
+			cy+=th,brow++
+		}
+		if(count(bs)){
+			for(let bi=0;brow<12;bi++,cy+=th,brow++)cbrushbtn(pos,dn,rect(0,cy,toolsize.x,th+1),24+bi+max(toolbar_scroll-12,0),bt)
+			draw_rect(rect(0,cy+1,toolsize.x,tgap),1),cy+=tgap
+			if(toolbar_scroll>0        )if(scrollbtn(pos,dn,rect(0     ,cy,tcellw+1,toolsize.y-cy),0))toolbar_scroll--
+			if(toolbar_scroll<count(bs))if(scrollbtn(pos,dn,rect(tcellw,cy,tcellw+1,toolsize.y-cy),1))toolbar_scroll++
+		}
+	})
+	toolbar(q('#rtools'),q('#rrender'),(pos,dn)=>{
+		draw_rect(rect(0,16*tcellh,toolsize.x,tgap),1)
+		if(modebtn(pos,dn,rect(0,0     ,tcellw*2+1,tcellh+1),'Stroke',dr.pickfill==0))dr.pickfill=0
+		if(modebtn(pos,dn,rect(0,tcellh,tcellw*2+1,tcellh+1),'Fill'  ,dr.pickfill==1))dr.pickfill=1
+		if(dr.color){for(let z=0;z<16 ;z++)palbtn(pos,dn,rect(0,(2*tcellh)+z*tcellh,2*tcellw+1,tcellh+1),(z>=2?31:0)+z)}
+		else        {for(let z=0;z<4*8;z++)palbtn(pos,dn,rect((z%2)*tcellw,(2*tcellh)+(0|(z/2))*tcellh+(z>=28?tgap:0),tcellw+1,tcellh+1),patorder[z])}
+	})
+}
 
 // Script Editor
 
@@ -6258,6 +6348,7 @@ all_menus=_=>{
 	menu_check('Fullscreen',1,is_fullscreen(),null,toggle_fullscreen)
 	if(menu_check('Touch Input',1,enable_touch)){enable_touch^=1,set_touch=1;if(!enable_touch)kc.on=0}
 	if(menu_check('Script Profiler',1,profiler))profiler^=1
+	if(menu_check('Toolbars',tzoom>0,toolbars_enable))toolbars_enable^=1,resize()
 	if(blocked){
 		menu_bar('Script',1)
 		if(menu_item('Stop',1)){msg.pending_halt=1;if(ms.type!='query'&&ms.type!='listen'){if(ms.type!=null){modal_exit(0)}setmode('object')}}
@@ -6654,7 +6745,7 @@ load_deck=d=>{
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
 }
 tick=_=>{
-	pointer.up=ev.mu,pointer.down=ev.md,
+	pointer.up=ev.mu,pointer.down=ev.md,toolbars()
 	msg.pending_drag=0,msg.pending_halt=0,frame=context,uicursor=0,fb.pix.fill(0)
 	menu_setup(),all_menus(),widget_setup()
 	const ev_stash=ev;kc.heading=null;if(kc.on)ev=event_state()
@@ -6668,7 +6759,6 @@ tick=_=>{
 		const c=ob.sel[0].card, off=(contraption_is(c)||prototype_is(c))?getpair(ifield(c,'pos')):rect(0,0)
 		iwrite(ob.sel[0],lms('pos'),lmpair(rsub(rsub(ev.pos,ob.prev),off))),mark_dirty()
 	}
-	q('#display').style.cursor=uicursor||'default'
 	document.title=ls(ifield(deck,'name')) || 'Untitled Deck'
 	for(let x=0;x<=1;x++)for(let y=0;y<=1;y++)draw_icon(rect(x*(context.size.x-5),y*(context.size.y-5)),CORNERS[x+y*2],1)
 	const used=interpret()
@@ -6681,9 +6771,14 @@ tick=_=>{
 		}profiler_hist[profiler_ix]=(r.h-2)*used/FRAME_QUOTA,profiler_ix=(profiler_ix+1)%profiler_hist.length
 	}
 	if((uimode=='object'||(uimode=='draw'&&!dr.fatbits))&&!ev.hidemenu){
-		const b=rect(menu.x,1,context.size.x-menu.x-2,1+font_h(FONT_MENU))
-		draw_textr(b,ls(ifield(con(),"name")),FONT_BODY,1)
+		const b=menu_label()
+		draw_textr(b,ls(ifield(con(),'name')),FONT_BODY,1)
+		if(ms.type==null){
+			if(over(b))uicursor=cursor.point
+			if(ev.mu&&over(b)&&dover(b))modal_enter(card_is(con())?'card_props':'prototype_props')
+		}
 	}
+	q('#display').style.cursor=uicursor||'default'
 	if(msg.pending_loop)sfx_doloop()
 	if(ui_container&&ui_container.dead)ui_container=null
 	ev.shortcuts={}
@@ -6739,11 +6834,21 @@ loop=stamp=>{
 	if(do_panic)setmode('object');do_panic=0
 }
 resize=_=>{
-	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
-	zoom=max(1,is_fullscreen()?fs:(0|fs))
-    console.log(zoom)
-	const c =q('#display');c .width=fb.size .x*zoom,c.height =fb.size .y*zoom
+	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/window.innerWidth,screen.y/window.innerHeight)
+
+	zoom=max(1,is_fullscreen()?fs:(0|fs)) 
+	let vertical = window.innerHeight > window.innerWidth
+	zoom = (window.innerHeight / fb.size.y)
+ 	console.log(vertical)
+
+	// tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
+	// const tz=tzoom*toolbars_enable
+	const c =q('#display');c .width=window.innerWidth,c.height =window.innerHeight
+	// const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
+	// const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
 	const r =q('#render' );r .width=fb.size .x     ,r .height=fb.size .y
+	// const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
+	//const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
 }
 window.onresize=_=>{resize(),sync()}
 q('body').addEventListener('mousedown'  ,e=>mouse(e,down))
@@ -6882,7 +6987,17 @@ menucut=_=>{const r=docut();if(r)setclipboard(r)}
 menucopy=_=>{const r=docopy();if(r)setclipboard(r)}
 menucopyrich=_=>{setclipboard(rtext_encode(rtext_span(wid.fv.table,wid.cursor)))}
 menupaste=_=>getclipboard(t=>{if(t.length)dopaste(t)})
-
+document.oncut=e=>{const r=docut();if(r)e.clipboardData.setData('text/plain',r),local_clipboard=r;e.preventDefault()}
+document.oncopy=e=>{const r=docopy();if(r)e.clipboardData.setData('text/plain',r),local_clipboard=r;e.preventDefault()}
+document.onpaste=e=>{
+	const src=e.clipboardData||e.originalEvent.clipboardData
+	if(src.items[0]){
+		const file=src.items[0].getAsFile()
+		if(file&&/^image\//.test(file.type)){load_image(file);return}
+		if(file&&/^audio\//.test(file.type)){load_sound(file);return}
+	}
+	dopaste(src.getData('text/plain')),e.preventDefault()
+}
 q('body').ondragover=e=>e.preventDefault()
 q('body').ondrop=e=>{
 	e.preventDefault();const file=e.dataTransfer.files.item(0);if((!file)||lb(ifield(deck,'locked')))return
