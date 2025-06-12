@@ -2786,7 +2786,7 @@ widget_purge=x=>{
 }
 deck_purge=x=>{x.cards.v.map(c=>c.widgets.v.map(w=>widget_purge(w)))}
 deck_read=x=>{
-	const deck={},scripts=new Map(),cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
+	var deck={},scripts=new Map(),cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
 	Object.keys(FONTS).map(k=>dset(fonts,lms(k),font_read(FONTS[k])))
 	const match=k=>x.startsWith(k,i)?(i+=k.length,1):0
 	const end=_=>i>=x.length||x.startsWith('<\/script>',i)
@@ -2865,7 +2865,14 @@ deck_read=x=>{
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(window.screen.width/devicePixelRatio,window.screen.height/devicePixelRatio)
+	let scrunched = (window.screen.width / window.screen.height < 0.5 || window.screen.height / window.screen.width < 0.5)
+	let size = rect((window.screen.width*.33)/(scrunched?1:devicePixelRatio), (window.screen.height*.33)/(scrunched?1:devicePixelRatio))
+	if(scrunched)console.log(scrunched)
+	window.screen.orientation.addEventListener('change', () =>
+	{
+		
+	})
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):size
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
@@ -6836,11 +6843,6 @@ loop=stamp=>{
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/window.innerWidth,screen.y/window.innerHeight)
 
-	zoom=max(1,is_fullscreen()?fs:(0|fs)) 
-	let vertical = window.innerHeight > window.innerWidth
-	zoom = (window.innerHeight / fb.size.y)
- 	console.log(vertical)
-
 	// tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
 	// const tz=tzoom*toolbars_enable
 	const c =q('#display');c .width=window.innerWidth,c.height =window.innerHeight
@@ -6849,6 +6851,9 @@ resize=_=>{
 	const r =q('#render' );r .width=fb.size .x     ,r .height=fb.size .y
 	// const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
 	//const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
+
+	let horizontal = window.innerWidth > window.innerHeight
+	zoom = (window.innerHeight / fb.size.y)
 }
 window.onresize=_=>{resize(),sync()}
 q('body').addEventListener('mousedown'  ,e=>mouse(e,down))
