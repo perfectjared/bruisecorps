@@ -1040,7 +1040,7 @@ FONTS={
 }
 
 COLORS=[
-	0xFFFFFFFF,0xFFFFFF00,0xFFFF6500,0xFFDC0000,0xFFFF0097,0xFF360097,0xFF0000CA,0xFF0097FF,
+	0x00000000,0xFFFFFF00,0xFFFF6500,0xFFDC0000,0xFFFF0097,0xFF360097,0xFF0000CA,0xFF0097FF,
 	0xFF00A800,0xFF006500,0xFF653600,0xFF976536,0xFFB9B9B9,0xFF868686,0xFF454545,0xFF000000,
 ]
 DEFAULT_COLORS=COLORS.slice(0)
@@ -6805,14 +6805,23 @@ sync=_=>{
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][fc%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
-	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)}
+	if(!id||id.width!=fb.size.x||id.height!=fb.size.y)
+		{
+			id=new ImageData(fb.size.x,fb.size.y)
+			console.assert(id.data[3] === 0, 'imagedata should initialize transparent')
+		}
 	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
-		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
+		const pix=fb.pix[z]
+		a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
 		id.data[d  ]=0xFF&(cv>>16)
 		id.data[d+1]=0xFF&(cv>> 8)
 		id.data[d+2]=0xFF&(cv    )
+		id.data[d+3]= (pix === 0 || a === 0) ? 0 : 0xFF
 	}
-	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
+	const r=q('#render')
+	ctx = r.getContext('2d')
+	ctx.globalCompositeOperation = 'copy'
+	ctx.putImageData(id,0,0)
 	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
 }
 
