@@ -1,6 +1,6 @@
-VERSION="1.55"
+VERSION="1.56"
 
-DANGEROUS=1
+DANGEROUS=0
 
 // lil: Learning in Layers
 
@@ -1040,7 +1040,7 @@ FONTS={
 }
 
 COLORS=[
-	0x00000000,0xFFFFFF00,0xFFFF6500,0xFFDC0000,0xFFFF0097,0xFF360097,0xFF0000CA,0xFF0097FF,
+	0xFFFFFFFF,0xFFFFFF00,0xFFFF6500,0xFFDC0000,0xFFFF0097,0xFF360097,0xFF0000CA,0xFF0097FF,
 	0xFF00A800,0xFF006500,0xFF653600,0xFF976536,0xFFB9B9B9,0xFF868686,0xFF454545,0xFF000000,
 ]
 DEFAULT_COLORS=COLORS.slice(0)
@@ -1821,7 +1821,7 @@ patterns_read=x=>{
 		let r=null, t=i&&ln(i)?ln(i):0
 		if(x){
 			if(t>= 2&&t<=27&&image_is(x)){for(let a=0;a<8;a++)for(let b=0;b<8;b++)set(self.pal.pix,t,b,a,lb(iwrite(x,lmpair(rect(b,a)))))}
-			if(t>=28&&t<=31){r=ll(x);if(r.length>8)r=r.slice(0,8);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f});r=lml(r)}
+			if(t>=28&&t<=31){r=ll(x);if(r.length>256)r=r.slice(0,256);self.anim[t-28]=r.map(x=>{const f=clamp(0,ln(x),47);return f>=28&&f<=31?0:f});r=lml(r)}
 			if(t>=32&&t<=47){pal_col_set(self.pal.pix,t-32,0xFF000000|ln(x));r=x}
 		}else{
 			if(t>= 0&&t<=27){r=image_copy(self.pal,rect(0,t*8,8,8))}
@@ -2510,7 +2510,7 @@ find_fonts=(deck,target,widgets)=>{
 			wid.widgets.v.map(w=>ifield(w,'font')).map(f=>dset(fonts,dkey(deck.fonts,f),f))
 		}
 		if(field_is(wid)&&match(ifield(wid,'style'),lms('rich'))){ // inside rtext field values
-			tab_get(ifield(wid,'value'),'font').filter(n=>count(n)&&!dget(fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
+			tab_get(ifield(wid,'value'),'font').filter(n=>count(n)&&!dget(fonts,n)&&dget(deck.fonts,n)).map(n=>dset(fonts,n,dget(deck.fonts,n)))
 		}
 	})
 	fonts=dyad.drop(lml(['body','menu','mono'].map(lms)),fonts),fonts.v.map((x,i)=>{fonts.v[i]=lms(font_write(x))})
@@ -2786,7 +2786,7 @@ widget_purge=x=>{
 }
 deck_purge=x=>{x.cards.v.map(c=>c.widgets.v.map(w=>widget_purge(w)))}
 deck_read=x=>{
-	var deck={},scripts=new Map(),cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
+	const deck={},scripts=new Map(),cards={},modules={},defs={}, fonts=lmd(),sounds=lmd(); let i=0,m=0,md=0,lc=0
 	Object.keys(FONTS).map(k=>dset(fonts,lms(k),font_read(FONTS[k])))
 	const match=k=>x.startsWith(k,i)?(i+=k.length,1):0
 	const end=_=>i>=x.length||x.startsWith('<\/script>',i)
@@ -2865,14 +2865,7 @@ deck_read=x=>{
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	let scrunched = (window.screen.width / window.screen.height < 0.5 || window.screen.height / window.screen.width < 0.5)
-	let size = rect((window.screen.width*.33)/(scrunched?1:devicePixelRatio), (window.screen.height*.33)/(scrunched?1:devicePixelRatio))
-	if(scrunched)console.log(scrunched)
-	window.screen.orientation.addEventListener('change', () =>
-	{
-		
-	})
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):size
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
@@ -5784,7 +5777,7 @@ bg_tools=_=>{
 }
 bg_end_lasso=_=>{
 	if(uimode!='draw'||dr.tool!='lasso')return
-	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||dr.omask.pix.length!=dr.mask.pix.length;
+	const data=dr.mask&&dr.limbo, diffrect=!requ(dr.sel_here,dr.sel_start);let diffmask=dr.omask==null||(dr.mask&&dr.omask.pix.length!=dr.mask.pix.length);
 	if(dr.omask&&!diffmask)for(let z=0;data&&z<dr.mask.pix.length;z++)if((dr.mask.pix[z]>0)!=(dr.omask.pix[z]>0)){diffmask=1;break}
 	if(data&&(diffrect||diffmask||dr.lasso_dirty)){
 		bg_scratch();const t=frame;frame=draw_frame(dr.scratch),bg_draw_lasso(dr.sel_here,dr.sel_start,0,dr.fill),frame=t,bg_edit(),bg_scratch_clear()
@@ -6805,23 +6798,14 @@ sync=_=>{
 	const anim_pattern=(pix,x,y)=>pix<28||pix>31?pix: anim[pix-28][fc%max(1,anim[pix-28].length)]
 	const draw_pattern=(pix,x,y)=>pix<2?(pix?1:0): pix>31?(pix==32?0:1): pal_pat(pal,pix,x,y)&1
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
-	if(!id||id.width!=fb.size.x||id.height!=fb.size.y)
-		{
-			id=new ImageData(fb.size.x,fb.size.y)
-			console.assert(id.data[3] === 0, 'imagedata should initialize transparent')
-		}
+	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0xFF)}
 	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
-		const pix=fb.pix[z]
-		a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
+		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
 		id.data[d  ]=0xFF&(cv>>16)
 		id.data[d+1]=0xFF&(cv>> 8)
 		id.data[d+2]=0xFF&(cv    )
-		id.data[d+3]= (pix === 0 || a === 0) ? 0 : 0xFF
 	}
-	const r=q('#render')
-	ctx = r.getContext('2d')
-	ctx.globalCompositeOperation = 'copy'
-	ctx.putImageData(id,0,0)
+	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
 	const g=q('#display').getContext('2d');g.imageSmoothingEnabled=zoom!=(0|zoom),g.save(),g.scale(zoom,zoom),g.drawImage(r,0,0),g.restore()
 }
 
@@ -6850,19 +6834,16 @@ loop=stamp=>{
 	if(do_panic)setmode('object');do_panic=0
 }
 resize=_=>{
-	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/window.innerWidth,screen.y/window.innerHeight)
-
-	// tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
-	// const tz=tzoom*toolbars_enable
-	const c =q('#display');c .width=window.innerWidth,c.height =window.innerHeight
-	// const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
-	// const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
+	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
+	zoom=max(1,is_fullscreen()?fs:(0|fs))
+	tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
+	const tz=tzoom*toolbars_enable
+	const c =q('#display');c .width=fb.size .x*zoom,c.height =fb.size .y*zoom
+	const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
+	const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
 	const r =q('#render' );r .width=fb.size .x     ,r .height=fb.size .y
-	// const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
-	//const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
-
-	let horizontal = window.innerWidth > window.innerHeight
-	zoom = (window.innerHeight / fb.size.y)
+	const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
+	const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
 }
 window.onresize=_=>{resize(),sync()}
 q('body').addEventListener('mousedown'  ,e=>mouse(e,down))

@@ -1,26 +1,17 @@
 <html>
-	<body>
-	<script language="decker">
-	</script>
-	<canvas id="render" style="display:none">
-	</canvas>
-	<canvas id="lrender" style="display:none">
-	</canvas>
-	<canvas id="rrender" style="display:none">
-	</canvas>
-	<canvas id="display" style="cursor: default;">
-	</canvas>
-
-	<style>
-	html,body{width:100vw;height:100vh;}
-	body{background:transparent;margin:0;display:contents;align-items:normal;justify-content:center;-webkit-user-select:none;user-select:none;}
-	body{overflow:hidden;}
-	#render,#display{
-		background: transparent !important
-	}
-	</style>
-
-	<script src="./decker.js">
+<img id="loader" style="display:none">
+<input id="source" type="file" style="display:none" accept=".html,.deck">
+<canvas id="render" style="display:none" width="320" height="530"></canvas>
+<canvas id="lrender" style="display:none" width="45" height="344"></canvas>
+<canvas id="rrender" style="display:none" width="45" height="344"></canvas>
+<canvas width="90" height="688" id="ltools"></canvas>
+<canvas id="display" width="320" height="530" style="cursor: default;"></canvas>
+<canvas width="90" height="688" id="rtools"></canvas>
+<style>
+html,body{height:100%;}
+body{background:#facade;margin:0;display:flex;align-items:center;justify-content:space-between;-webkit-user-select:none;user-select:none;}
+body{touch-action:none;overflow:hidden;}
+</style>
 	</script>
 	</body>
 </html>
