@@ -2865,7 +2865,7 @@ deck_read=x=>{
 	ri.author      =deck.hasOwnProperty('author' )?ls(deck.author ):''
 	ri.script      =deck.hasOwnProperty('script' )?scripts.get(ls(deck.script)):''
 	ri.card        =deck.hasOwnProperty('card'   )?clamp(0,ln(deck.card),Object.keys(cards).length-1):0
-	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(512,342)
+	ri.size        =deck.hasOwnProperty('size'   )?rclamp(rect(8,8),getpair(deck.size),rect(4096,4096)):rect(window.screen.width/devicePixelRatio,window.screen.height/devicePixelRatio)
 	if(Object.keys(cards).length==0)cards.home=lmd(['name'].map(lms),[lms('home')])
 	const root=lmenv();constants(root),primitives(root,ri)
 	pushstate(root),issue(root,parse(DEFAULT_TRANSITIONS));while(running())runop();popstate()
@@ -6834,16 +6834,21 @@ loop=stamp=>{
 	if(do_panic)setmode('object');do_panic=0
 }
 resize=_=>{
-	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/fb.size.x,screen.y/fb.size.y)
-	zoom=max(1,is_fullscreen()?fs:(0|fs))
-	tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
-	const tz=tzoom*toolbars_enable
-	const c =q('#display');c .width=fb.size .x*zoom,c.height =fb.size .y*zoom
-	const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
-	const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
+	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight), fs=min(screen.x/window.innerWidth,screen.y/window.innerHeight)
+
+	zoom=max(1,is_fullscreen()?fs:(0|fs)) 
+	let vertical = window.innerHeight > window.innerWidth
+	zoom = (window.innerHeight / fb.size.y)
+ 	console.log(vertical)
+
+	// tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
+	// const tz=tzoom*toolbars_enable
+	const c =q('#display');c .width=window.innerWidth,c.height =window.innerHeight
+	// const tl=q('#ltools' );tl.width=toolsize.x*tz  ,tl.height=toolsize.y*tz
+	// const tr=q('#rtools' );tr.width=toolsize.x*tz  ,tr.height=toolsize.y*tz
 	const r =q('#render' );r .width=fb.size .x     ,r .height=fb.size .y
-	const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
-	const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
+	// const rl=q('#lrender');rl.width=toolsize.x     ,rl.height=toolsize.y
+	//const rr=q('#rrender');rr.width=toolsize.x     ,rr.height=toolsize.y
 }
 window.onresize=_=>{resize(),sync()}
 q('body').addEventListener('mousedown'  ,e=>mouse(e,down))

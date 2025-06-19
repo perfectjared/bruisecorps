@@ -215,4 +215,3 @@ window.addEventListener
 })
 appData.width = window.innerWidth
 appData.height = window.innerHeight
-
