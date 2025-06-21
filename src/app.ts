@@ -5,11 +5,11 @@ import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin'
 
-import Debug from './scenes/debug'
-import Game from './scenes/game'
-import Marge from './scenes/game/marge'
-import Menu from './scenes/game/menu'
-import Synth from './scenes/game/synth'
+import Debug from './debug'
+import Game from './game/game'
+import Marge from './game/marge/marge'
+import Menu from './game/menu/menu'
+import Synth from './game/synth'
 
 import colors from './data/colors'
 
@@ -26,7 +26,7 @@ class App extends Phaser.Scene
 
   preload()
   {
-    this.load.image('x', '../../../assets/prototype/x.png')
+    this.load.image('x', './assets/image/x.png')
     this.graphics = this.add.graphics()
   }
 

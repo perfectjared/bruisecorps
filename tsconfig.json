@@ -13,5 +13,5 @@
   ],
   "include": [
     "src/*.ts"
-  ]
+, "src/game/game.ts", "src/game/space.ts", "src/data-types/data-types.ts"  ]
 }

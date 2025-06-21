@@ -1,7 +1,8 @@
 import { Scene } from 'phaser';
 import { GameObjects } from 'phaser';
-import { BandMember, Tamagotchi } from './rearview/tamagotchi';
-import ReactiveSprite from '../../../data-types/reactivesprite';
+import { BandMember, Tamagotchi } from '../tamagotchi';
+import ReactiveSprite from '../../../data-types/dynamicsprite';
+import DynamicSprite from '../../../data-types/dynamicsprite';
 
 export default class Rearview extends Scene
 {
@@ -35,7 +36,7 @@ export default class Rearview extends Scene
 
     create()
     {
-        this.rearviewSprite = new ReactiveSprite(this, 'rearview', 
+        this.rearviewSprite = new DynamicSprite(this, 'rearview', 
             {
                 origin:
                 {

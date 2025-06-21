@@ -1,20 +1,8 @@
-import { appData, scenes } from '../app';
+import { appData, scenes } from '../app'
 import { Scene, Physics } from 'phaser';
 import DynamicSprite from '../data-types/dynamicsprite';
 
-import Tour from './game/tour';
 import * as trashTour from '../data/trsh-tour.json'
-
-export interface GameState
-{
-
-}
-
-export interface GameBuffer //NOT IN USE
-{
-  dynamicSprites: DynamicSprite[] 
-}
-
 export default class Game extends Scene 
 {
   constants : any
@@ -55,7 +43,6 @@ export default class Game extends Scene
     lastSpeed: number,
     lastStep: number,
     lastTime: number,
-    //matter: MatterJS.World
     input:
     {
       touchingObject: Phaser.GameObjects.GameObject | null
@@ -68,7 +55,6 @@ export default class Game extends Scene
   tour: any
   marge: Scene
   phone: Scene
-  novel: any
 
   constructor() 
   {
@@ -83,7 +69,6 @@ export default class Game extends Scene
     {
       speedMin: 60,
       speedMax: 240,
-      stepMax: 256,
       healthNumbers: { min: 0, max: 100, start: 86, step : 1 },
       needsNumbers: { min: 0, max: 100, start: 0, step : 1 }, //tamagotchis needs
       bleedValues: [0, .1, .4, 1.6, 3.1],
@@ -117,7 +102,7 @@ export default class Game extends Scene
         pissjugs: 0,
       },
 
-      tour: new Tour(),
+      tour: {},
       showIterator: 1,
       lastShow: "",
       nextShow: "",

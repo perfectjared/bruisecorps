@@ -1,4 +1,4 @@
-import { appData } from '../../app'
+import { appData } from '../app'
 import { Scene } from 'phaser'
 import * as Tone from 'tone'
 
@@ -12,7 +12,7 @@ export default class Synth extends Scene
     }
     player: Tone.Player
 
-    domElement: HTMLBodyElement
+    domElement: HTMLBodyElement | null
     audioStartEvent: () => Promise<void>
 
     constructor()

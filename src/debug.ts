@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
-import { appData, datGui, scenes } from '../app';
-import { Tamagotchi } from './game/tamagotchi';
+import { appData, datGui, scenes } from './app';
+import { Tamagotchi } from './game/tamagotchi/tamagotchi'
 
 export var debugFlags
 {

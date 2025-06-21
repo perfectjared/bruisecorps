@@ -16,8 +16,8 @@ export enum Mood
     Regular,
     Pissed,
     Wild,
-    Sleepy,
-    Relaxed,
+    Dozed,
+    Chillen,
     Antsy,
     Freaking
 }
