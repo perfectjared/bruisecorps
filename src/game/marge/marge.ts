@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 import { scenes } from '../../app';
 import DynamicSprite from '../../data-types/dynamicsprite';
+import DragDial from '../../data-types/dragdial'
+import DragSlider from '../../data-types/dragslider'
 
 export default class Marge extends Scene 
 {
@@ -13,6 +15,9 @@ export default class Marge extends Scene
 
   dashSprite: DynamicSprite
   rearviewSprite: DynamicSprite
+  wheel: DragDial
+  signal: DragSlider
+  shifter: DragSlider
 
   bandConfig: object
 
@@ -29,9 +34,9 @@ export default class Marge extends Scene
     this.graphics = this.add.graphics()
     this.dashSprite = new DynamicSprite(this,
       {
-        x: '46%',
+        x: '50%',
         y: '80%',
-        width: '90%',
+        width: '100%',
         height: '40%'
       }
     )
@@ -43,6 +48,31 @@ export default class Marge extends Scene
         height: '27%'
       }
     )
+    this.wheel = new DragDial(this, new DynamicSprite(this, 
+      {
+        x: '50%',
+        y: '85%',
+        width: '60%',
+        height: '40%'
+      }
+    ))
+    this.signal = new DragSlider(this, new DynamicSprite(this,
+      {
+        x: '10%',
+        y: '90%',
+        width: '20%',
+        height: '20%'
+      }
+    ))
+    this.shifter = new DragSlider(this, new DynamicSprite(this,
+      {
+        x: '90%',
+        y: '90%',
+        width: '20%',
+        height: '20%'
+      }
+    ))
+
     this.constants =
     {
       gearValues: { min: 0, max: 4, step: 1 , start: 0},

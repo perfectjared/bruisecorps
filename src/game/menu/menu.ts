@@ -16,7 +16,7 @@ export default class Menu extends Scene
     uiPlugin: any
     uiShapes: any
 
-    startDialogAnchor: any
+    fullScreenAnchor: any
     startDialogStyle: any
     startDialog: any
     startDialogContent: any
@@ -49,11 +49,11 @@ export default class Menu extends Scene
     {
         this.uiPlugin = this['rexUI']
 
-        this.startDialogAnchor =
+        this.fullScreenAnchor =
         {
             centerX: 'center',
             centerY: 'center',
-            width: '50%',
+            width: '80%',
             height: '80%',
             enable: true
         }
@@ -65,7 +65,7 @@ export default class Menu extends Scene
         }   
         this.startDialogStyle =
         {
-            anchor: this.startDialogAnchor,
+            anchor: this.fullScreenAnchor,
             space:
             {
                 left: 10,
@@ -123,20 +123,20 @@ export default class Menu extends Scene
             }
         }
 
-        this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
-        {
-            scenes.game.state.playing = true //DON'T DO THIS!!!
-        }, this)
+        // this.startDialog = this.uiPlugin.add.confirmDialog(this.startDialogStyle).resetDisplayContent(this.startDialogContent).layout().modalPromise().then(() =>
+        // {
+        //     scenes.game.state.playing = true //DON'T DO THIS!!!
+        // }, this)
     }
 
     create(): void
     {
-        this.initiateStartDialog()
+        //this.initiateStartDialog()
     }
 
     initiateStartDialog()
     {
-        this.startDialogSprite = new DynamicSprite(this, this.startDialogAnchor)
+        this.startDialogSprite = new DynamicSprite(this, this.fullScreenAnchor)
         this.startDialog.scene = this
     }
 

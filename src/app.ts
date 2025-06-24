@@ -4,12 +4,14 @@ import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin'
+import SliderPlugin from 'phaser3-rex-plugins/plugins/slider-plugin'
 
 import Debug from './debug'
 import Game from './game/game'
 import Marge from './game/marge/marge'
 import Menu from './game/menu/menu'
 import Synth from './game/synth'
+import Road from './game/marge/road'
 
 import colors from './data/colors'
 
@@ -60,6 +62,7 @@ let scenes =
   game: new Game(),
   marge: new Marge(),
   menu: new Menu(),
+  road: new Road(),
   synth: new Synth()
 }
 
@@ -90,7 +93,7 @@ var appData: AppData =
 const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.synth],
+  scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.road, scenes.synth],
   backgroundColor: colors[3],
   scale: {
     mode: Phaser.Scale.RESIZE,
@@ -113,10 +116,9 @@ const gameConfig: Phaser.Types.Core.GameConfig =
     global: 
     [
       {
-        key: 'dragRotate',
+        key: 'rexDragRotate',
         plugin: DragRotatePlugin,
         start: true,
-        mapping: 'dragRotate'
       },
       {
         key: 'rexAnchor',
@@ -129,6 +131,11 @@ const gameConfig: Phaser.Types.Core.GameConfig =
         plugin: RoundRectanglePlugin,
         start: true,
         mapping: 'rexRoundRectanglePlugin'
+      },
+      {
+          key: 'rexSlider',
+          plugin: SliderPlugin,
+          start: true
       }
     ]
   },

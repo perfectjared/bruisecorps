@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
-import { MathHelpers } from '../../../lib/road-utilities';
-import { RenderHelpers } from '../../../lib/road-utilities';
-import { appData, scenes } from '../../../app';
+import { MathHelpers } from '../../lib/road-utilities';
+import { RenderHelpers } from '../../lib/road-utilities';
+import { appData, scenes } from '../../app';
 
 //TODO: ROAD NEEDS POTHOLES YOU HAVE TO GO SLOW OVER
 //ALSO COPS
@@ -93,7 +93,7 @@ export default class Road extends Scene
     this.playerY = 0;
     this.playerZ = 0; // player relative z distance from camera (computed)
 
-    this.background = this.add.sprite(appState.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
+    this.background = this.add.sprite(appData.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
     //this.camera = this.cameras3d.add(90).setPosition(0, -40, 100).setPixelScale(64);
 
     this.mathHelper = new MathHelpers(this);
@@ -154,7 +154,7 @@ export default class Road extends Scene
       return
     }
 
-    let gear = scenes.marge.state.shifter.gear
+    let gear = scenes.marge.state.gear
     this.state.speed = gear
 
   }
