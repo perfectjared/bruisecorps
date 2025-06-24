@@ -3,10 +3,6 @@ import { MathHelpers } from '../../lib/road-utilities';
 import { RenderHelpers } from '../../lib/road-utilities';
 import { appData, scenes } from '../../app';
 
-//TODO: ROAD NEEDS POTHOLES YOU HAVE TO GO SLOW OVER
-//ALSO COPS
-//ALSO PSYCHO TRUCKS
-
 export default class Road extends Scene 
 {
   renderSettings
@@ -89,11 +85,11 @@ export default class Road extends Scene
     this.trackLength = null; // z length of entire track (computed)
     this.lanes = 2; // number of lanes
 
-    this.playerX = .33; // player x offset from center of road (-1 to 1 to stay independent of roadWidth)
+    this.playerX = 0; // player x offset from center of road (-1 to 1 to stay independent of roadWidth)
     this.playerY = 0;
     this.playerZ = 0; // player relative z distance from camera (computed)
 
-    this.background = this.add.sprite(appData.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
+    //this.background = this.add.sprite(appData.width / 2, (this.renderSettings.height / 2) - 60, 'bg');
     //this.camera = this.cameras3d.add(90).setPosition(0, -40, 100).setPixelScale(64);
 
     this.mathHelper = new MathHelpers(this);
@@ -105,6 +101,7 @@ export default class Road extends Scene
         -1,
         11,
         22,
+        33,
         66,
         133
       ]
@@ -124,8 +121,8 @@ export default class Road extends Scene
       x: 0,
       y: 0
     });
-    this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
-
+    //this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
+    
     this.build();
   }
 

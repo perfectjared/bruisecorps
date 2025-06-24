@@ -34,6 +34,7 @@ export default class Marge extends Scene
   preload(): void 
   {
     this.graphics = this.add.graphics()
+
     this.dashSprite = new DynamicSprite(this,
       {
         x: '50%',
@@ -45,11 +46,12 @@ export default class Marge extends Scene
     this.rearviewSprite = new DynamicSprite(this,
       {
         x: '50%',
-        y: '14%',
+        y: '10%',
         width: '85%',
         height: '27%'
       }
     )
+
     this.wheel = new DragDial(this, new DynamicSprite(this, 
       {
         x: '50%',
@@ -57,23 +59,32 @@ export default class Marge extends Scene
         width: '50%',
         height: '40%'
       }
-    ))
+    ),
+    {
+      startAngle: 3,
+      return: true
+    })
     this.ignition = new DragDial(this, new DynamicSprite(this,
       {
-        x: '80%',
+        x: '85%',
         y: '90%',
-        width: '20%',
-        height: '20%'
+        width: '15%',
+        height: '15%'
       }
-    ))
+    ),
+    {
+      startAngle: 0,
+      return: true
+    })
     this.airCon = new DragDial(this, new DynamicSprite(this,
       {
-        x: '20%',
+        x: '15%',
         y: '90%',
-        width: '20%',
-        height: '20%'
+        width: '15%',
+        height: '15%'
       }
     ))
+
     this.signal = new DragSlider(this, new DynamicSprite(this,
       {
         x: '10%',

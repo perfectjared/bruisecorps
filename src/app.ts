@@ -75,6 +75,7 @@ interface AppData
   scaleRatio: number,
   audioStarted: boolean,
   hasFocus: boolean,
+  playing: boolean,
   viewport: Phaser.Geom.Rectangle
 }
 
@@ -87,6 +88,7 @@ var appData: AppData =
   scaleRatio: window.devicePixelRatio / 3,
   audioStarted: false, //TODO: SET BY SYNTH.TS
   hasFocus: true,
+  playing: false,
   viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight)
 }
 

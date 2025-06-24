@@ -137,7 +137,7 @@ export default class Game extends Scene
 
     //this.scene.launch(scenes.road).scene
     this.scene.launch(scenes.marge).scene
-    //this.scene.launch(scenes.debug).scene
+    this.scene.launch(scenes.debug).scene
   }
 
   create(): void 

@@ -6,11 +6,13 @@ import { scenes } from "../app"
 
 export interface IDragDialConfig
 {
-    angles?: number[]
+    snaps?: number[]
     startAngle?: number
     minAngle?: number
     maxAngle?: number
-    stickiness?: number
+    return?: boolean
+    cw?: boolean
+    ccw?: boolean
 }
 
 export default class DragDial
@@ -39,7 +41,7 @@ export default class DragDial
     dSprite: DynamicSprite
     sprite: Phaser.GameObjects.Sprite
 
-    constructor(scene: Scene, dSprite: DynamicSprite)
+    constructor(scene: Scene, dSprite: DynamicSprite, config: IDragDialConfig = {})
     {
         this.scene = scene
         this.graphics = scene.add.graphics()
@@ -62,6 +64,9 @@ export default class DragDial
         )
         this.dragging = false
 
+        this.config = config
+        if (config.startAngle) this.sprite.setRotation(Phaser.Math.DegToRad(config.startAngle))
+
         this.dragRotate.on('dragstart', function()
         {
             this.dragging = true
@@ -80,7 +85,7 @@ export default class DragDial
         scene.events.on('update', function()
         {
             this.placeRelative()
-            this.returnToCenter()
+            if (this.config.return) this.returnToCenter()
         }, this)
 
         scene.events.on('render', function()
@@ -88,6 +93,7 @@ export default class DragDial
             this.graphics.clear()
             this.graphics.strokeCircle(this.sprite.x, this.sprite.y, this.dragRotate.maxRadius)
         }, this)
+
 
         this.sprite.setInteractive()
     }   
@@ -99,12 +105,21 @@ export default class DragDial
         this.dragRotate.maxRadius = this.sprite.displayWidth / 2
     }
 
-    returnToCenter()
+    returnToCenter(speed = .1)
     {
-        if (!this.dragging /*&& scenes.game.state.playing*/) //TODO
-        {
-            this.sprite.rotation = this.sprite.rotation / 1.1
+        if (this.dragging) return
+
+        let center = Phaser.Math.DegToRad(this.config.startAngle)
+        let rotation = this.sprite.rotation
+        
+        let diff = Phaser.Math.Angle.ShortestBetween(rotation, center)
+
+        if (Math.abs(diff) < .001) {
+            this.sprite.rotation = center
+            return
         }
+
+        this.sprite.rotation = rotation + (diff * speed)
     }
 
     preload()
