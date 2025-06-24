@@ -16,6 +16,8 @@ export default class Marge extends Scene
   dashSprite: DynamicSprite
   rearviewSprite: DynamicSprite
   wheel: DragDial
+  ignition: DragDial
+  airCon: DragDial
   signal: DragSlider
   shifter: DragSlider
 
@@ -51,27 +53,47 @@ export default class Marge extends Scene
     this.wheel = new DragDial(this, new DynamicSprite(this, 
       {
         x: '50%',
-        y: '85%',
-        width: '60%',
+        y: '75%',
+        width: '50%',
         height: '40%'
+      }
+    ))
+    this.ignition = new DragDial(this, new DynamicSprite(this,
+      {
+        x: '80%',
+        y: '90%',
+        width: '20%',
+        height: '20%'
+      }
+    ))
+    this.airCon = new DragDial(this, new DynamicSprite(this,
+      {
+        x: '20%',
+        y: '90%',
+        width: '20%',
+        height: '20%'
       }
     ))
     this.signal = new DragSlider(this, new DynamicSprite(this,
       {
         x: '10%',
-        y: '90%',
+        y: '70%',
         width: '20%',
         height: '20%'
-      }
-    ))
-    this.shifter = new DragSlider(this, new DynamicSprite(this,
+      }),
+      [0, 1]
+    )
+    this.shifter = new DragSlider(this, new DynamicSprite
+      (this,
       {
         x: '90%',
-        y: '90%',
+        y: '70%',
         width: '20%',
         height: '20%'
-      }
-    ))
+      }),
+      [0, .3, .4, .6, .8, 1],
+      0.4
+    )
 
     this.constants =
     {

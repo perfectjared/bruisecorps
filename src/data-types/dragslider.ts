@@ -18,13 +18,7 @@ export default class DragSlider
 
     buffer:
     {
-        lastDimensions:
-        {
-            x: number,
-            y: number,
-            width: number
-        },
-        last
+        lastDragging: boolean
     }
 
     sliderPlugin: any
@@ -39,13 +33,24 @@ export default class DragSlider
 
     relEndPoints: {x: number, y: number}[]
 
-    constructor(scene, dSprite: DynamicSprite)
+    snaps: number[] | null
+    percent: number
+
+    constructor(scene, dSprite: DynamicSprite, snaps: number[] = null, percent: number = 0.66)
     {
+        this.buffer =
+        {
+            lastDragging: false
+        }
+
         this.scene = scene
         this.graphics = scene.add.graphics
 
         this.dSprite = dSprite
         this.sprite = dSprite.sprite
+
+        this.snaps = snaps
+        this.percent = percent
 
         this.sliderPlugin = scene.plugins.get('rexSlider')
         this.slider = this.sliderPlugin.add(this.sprite,
@@ -61,13 +66,18 @@ export default class DragSlider
         )
         this.slider.on('valuechange', function(newValue, prevValue)
         {
-            console.log(this.slider.endPoints)
+
         }, this)
 
         this.relEndPoints = [ {x: 0, y:0}, {x: 0, y:0}]
         scene.events.on('update', function()
         {
-            if (this.relEndPoints[0].x == 0 && this.dSprite.sprite.x != 0 && this.dSprite.sprite.x != undefined)
+            if (!this.slider.isDragging && this.buffer.lastDragging)
+            {
+                if (this.snaps != null) this.snap(this.slider, this.snaps)
+            }
+
+            if (this.relEndPoints[0].x == 0 && this.dSprite.sprite.x != 0 && this.dSprite.sprite.x)
             {
                 let relativePosition = 
                 {
@@ -76,7 +86,7 @@ export default class DragSlider
                 }
                 this.relEndPoints = 
                 [
-                    {x: relativePosition.x, y: relativePosition.y * 0.66},
+                    {x: relativePosition.x, y: relativePosition.y * percent},
                     {x: relativePosition.x, y: relativePosition.y}
                 ]
             }
@@ -85,6 +95,8 @@ export default class DragSlider
                 {x: this.relEndPoints[0].x * appData.width, y: this.relEndPoints[0].y * appData.height},
                 {x: this.relEndPoints[1].x * appData.width, y: this.relEndPoints[1].y * appData.height}
             ]
+
+            this.buffer.lastDragging = this.slider.isDragging
         }, this)
 
         scene.events.on('render', function()
@@ -93,5 +105,31 @@ export default class DragSlider
         })
 
         this.sprite.setInteractive() 
+    }
+
+    snap(): void
+    {
+        let diffs = [this.snaps.length - 1]
+        let smallest = 
+        {
+            val: Number.MAX_SAFE_INTEGER,
+            index: -1
+        }
+
+        for (let i = 0; i < this.snaps.length; i++)
+        {
+            diffs[i] = Math.abs(this.snaps[i] - this.slider.value)
+        }
+
+        for (let i = 0; i < diffs.length; i ++)
+        {
+            if (diffs[i] < smallest.val)
+            {
+                smallest.val = diffs[i]
+                smallest.index = i
+            }
+        }
+        this.slider.setValue(this.snaps[smallest.index])
+        console.log(smallest)
     }
 }
