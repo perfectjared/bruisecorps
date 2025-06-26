@@ -3,6 +3,7 @@ import { scenes } from '../../app';
 import DynamicSprite from '../../data-types/dynamicsprite';
 import DragDial from '../../data-types/dragdial'
 import DragSlider from '../../data-types/dragslider'
+import CameraManager from '../cameramanager';
 
 export default class Marge extends Scene 
 {
@@ -14,7 +15,6 @@ export default class Marge extends Scene
   state : any
 
   dashSprite: DynamicSprite
-  rearviewSprite: DynamicSprite
   wheel: DragDial
   ignition: DragDial
   airCon: DragDial
@@ -22,6 +22,7 @@ export default class Marge extends Scene
   shifter: DragSlider
 
   bandConfig: object
+  cameraManager: CameraManager
 
   constructor() 
   {
@@ -41,14 +42,6 @@ export default class Marge extends Scene
         y: '80%',
         width: '100%',
         height: '40%'
-      }
-    )
-    this.rearviewSprite = new DynamicSprite(this,
-      {
-        x: '50%',
-        y: '10%',
-        width: '85%',
-        height: '27%'
       }
     )
 
@@ -108,6 +101,14 @@ export default class Marge extends Scene
 
     this.constants =
     {
+      cameraTarget: new DynamicSprite(this, 
+        {
+          x: '150%',
+          y: '50%',
+          width: '1%',
+          height: '1%'
+        }
+      ),
       gearValues: { min: 0, max: 4, step: 1 , start: 0},
       shifter:
       {
@@ -181,7 +182,12 @@ export default class Marge extends Scene
   
   create(): void 
   {
-
+    this.cameraManager = scenes.game.buffer.cameraManager
+    this.cameraManager.add('marge', this.cameras.main,
+      {
+        parallax: 0.5
+      }
+    )
   }
   
   update(): void 

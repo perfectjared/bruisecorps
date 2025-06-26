@@ -12,6 +12,7 @@ import Marge from './game/marge/marge'
 import Menu from './game/menu/menu'
 import Synth from './game/synth'
 import Road from './game/marge/road'
+import Rearview from './game/marge/rearview'
 
 import colors from './data/colors'
 
@@ -62,6 +63,7 @@ let scenes =
   game: new Game(),
   marge: new Marge(),
   menu: new Menu(),
+  rearview: new Rearview(),
   road: new Road(),
   synth: new Synth()
 }
@@ -95,7 +97,7 @@ var appData: AppData =
 const gameConfig: Phaser.Types.Core.GameConfig = 
 {
   title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.road, scenes.synth],
+  scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.road, scenes.rearview, scenes.synth],
   backgroundColor: colors[3],
   scale: {
     mode: Phaser.Scale.RESIZE,
@@ -161,6 +163,7 @@ var game: Phaser.Game
 window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
   window['game'] = game
+  appData.game = game
 
   game.events.on('pause', () => 
     {

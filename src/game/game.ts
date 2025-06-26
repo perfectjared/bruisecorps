@@ -1,6 +1,7 @@
 import { appData, scenes } from '../app'
 import { Scene, Physics } from 'phaser';
 import DynamicSprite from '../data-types/dynamicsprite';
+import CameraManager from './cameramanager'
 
 import * as trashTour from '../data/trsh-tour.json'
 export default class Game extends Scene 
@@ -38,7 +39,7 @@ export default class Game extends Scene
   }
   buffer : 
   {
-    dynamicSprites: DynamicSprite[]
+    dynamicSprites: DynamicSprite[],
     lastPlaying: boolean,
     lastSpeed: number,
     lastStep: number,
@@ -47,6 +48,7 @@ export default class Game extends Scene
     {
       touchingObject: Phaser.GameObjects.GameObject | null
     }
+    cameraManager: CameraManager
   }
 
   world: Physics.Matter.World
@@ -79,7 +81,15 @@ export default class Game extends Scene
         }
       },
       progressNumbers: { min: 0, max: 100, start: 0, step: .01 },
-      progressValues: [0, 1, 2, 4, 8]
+      progressValues: [0, 1, 2, 4, 8],
+      cameraTarget: new DynamicSprite(this,
+        {
+          x: '50%',
+          y: '50%',
+          width: '1%',
+          height: '1%'
+        }
+      )
     }
 
     this.state = //todo STARTING VALUES IN JSON
@@ -122,7 +132,7 @@ export default class Game extends Scene
     this.state.nextDate = tour[2].date
     this.state.showsLeft = tour.length - this.state.showIterator
 
-    this.buffer = 
+    this.buffer =
     {
       dynamicSprites: [],
       lastPlaying: false,
@@ -132,17 +142,23 @@ export default class Game extends Scene
       input: 
       {
         touchingObject: null
-      }
+      },
+      cameraManager: new CameraManager(this)
     }
 
     //this.scene.launch(scenes.road).scene
+    this.scene.launch(scenes.rearview).scene
     this.scene.launch(scenes.marge).scene
     this.scene.launch(scenes.debug).scene
   }
 
   create(): void 
   {
-
+    this.buffer.cameraManager.add('game', this.cameras.main,
+      {
+        main: true
+      }
+    )
   }
 
   startGame(): void
@@ -261,7 +277,7 @@ export default class Game extends Scene
       this.state.playing = false
       return
     }
-    if (!this.state.playing) return
+    //if (!this.state.playing) return TODO: put back
 
     let startPlaying = this.state.playing && !this.buffer.lastPlaying
     if (startPlaying)
@@ -283,7 +299,7 @@ export default class Game extends Scene
 
   feedback(): void
   {
-
+    this.buffer.cameraManager.update()
   }
 
   debug(): void
