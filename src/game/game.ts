@@ -158,7 +158,7 @@ export default class Game extends Scene
       {
         main: true
       }
-    )
+    ).setFollow(this.constants.cameraTarget.sprite)
   }
 
   startGame(): void
