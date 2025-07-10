@@ -38,18 +38,28 @@
 		#deck-container {
 			position: absolute;
 			top: 0;
+			left: 0;
 			z-index: 10;
 			width: 100vw;
 			height: 100vh;
 			border: none;
-			background-color: #facade;
+			background: transparent;
+			pointer-events: auto; /* Re-enable pointer events */
+		}
+		
+		#deck-container iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+			background: transparent;
+			pointer-events: auto; /* Re-enable pointer events */
 		}
     </style>
 </head>
 
 <body>
-	<!--<iframe src="./src/lib/decker.html" title="decker" id="deck-container"></iframe>-->
 	<div id="game-container"></div>
+	<iframe src="./src/lib/ddecker.html" title="decker" id="deck-container" allowtransparency="true"></iframe>
 	<div class="font-preloader"></div>
     <script src="app.js"></script>
 </body>
