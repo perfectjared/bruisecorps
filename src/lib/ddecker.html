@@ -4345,7 +4345,14 @@ n_panic=z=>{
 
 let audio=null, samples_playing=0, audio_loop=null, audio_loop_playing=null
 const audioContext=window.AudioContext||window.webkitAudioContext, offline=window.OfflineAudioContext||window.webkitOfflineAudioContext
-initaudio=_=>{if(!audio)audio=new audioContext({sampleRate:44100})}
+initaudio=_=>{
+	if(!audio) {
+		audio=new audioContext({sampleRate:44100})
+		if(window.parent !== window) {
+			window.parent.postMessage({ type: 'decker-message', message: 'audioInitialized' }, '*')
+		}
+	}
+}
 load_sound=(file,after)=>{
 	decode_sound=data=>{
 		const r=[];for(let z=0;z<data.length&&r.length<10*SFX_RATE;z+=8)r.push(sample_to_byte(data[z]));
@@ -6692,14 +6699,6 @@ all_menus=_=>{
 main_view=_=>{
 	if(in_layer()&&uimode=='object'&&ob.sel.length==0)tracking()
 	const back=con_image(), wids=con_wids(), pal=deck.patterns.pal.pix
-	// Skip background rendering for overlay mode - only render actual content
-	/*if(ms.type!='trans'){
-		const cl=con_clip(),s=con_size()
-		if(back.size.x!=s.x||back.size.y!=s.y)image_resize(back,s),mark_dirty()
-		if(dr.fatbits){frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),draw_fat(cl,back,pal,frame_count,0,dr.zoom,dr.offset)}
-		else if(s.x==frame.size.x&&s.y==frame.size.y){for(let z=0;z<back.pix.length;z++)frame.image.pix[z]=back.pix[z]}
-		else{frame.image.pix.fill(46),draw_rect(cl,dr.trans_mask?45:32),image_paste(cl,frame.clip,back,frame.image,0)}
-	}*/
 	ev=ev_to_con(ev)
 	if(uimode=='draw'&&in_layer())bg_tools()
 	if(dr.tool=='select'&&(dr.sel_start.w>0||dr.sel_start.h>0))draw_rect(con_to_screen(dr.sel_start),dr.fill)
@@ -6781,12 +6780,10 @@ validate_modules=_=>{
 }
 load_deck=d=>{
 	deck=d, dirty=0, wid.active=-1, wid.hist=[], au.hist=[], doc_hist=[], doc_hist_cursor=0, dr=draw_state(), con_set(null)
-	// Force transparency mask to be disabled for overlay integration
 	dr.trans_mask=0
 	FONT_BODY=dget(deck.fonts,lms('body')),FONT_MENU=dget(deck.fonts,lms('menu')),FONT_MONO=dget(deck.fonts,lms('mono'))
 	fb=image_make(getpair(ifield(ifield(deck,'card'),'size'))),context=frame=draw_frame(fb),validate_modules(),setmode('interact'),msg.next_view=1
 	seed=0|(new Date().getTime()/1000),n_play([NIL,lms('loop')])
-	// Initialize responsive sizing immediately and after brief delay
 	update_responsive_size()
 	resize()
 	sync()
@@ -6848,24 +6845,22 @@ sync=_=>{
 	const draw_color  =(pix,x,y)=>pix==ANTS?anim_ants(x,y): pix>47?0: pix>31?pix-32: draw_pattern(pix,x,y)?15:0
 	if(!id||id.width!=fb.size.x||id.height!=fb.size.y){id=new ImageData(fb.size.x,fb.size.y);id.data.fill(0)}
 	
-	// Clear the display canvas to transparent
 	const g=q('#display').getContext('2d')
 	g.clearRect(0, 0, g.canvas.width, g.canvas.height)
 	
 	for(let z=0,d=0,y=0;y<id.height;y++)for(let x=0;x<id.width;x++,z++,d+=4){
 		const pix=fb.pix[z], a=anim_pattern(pix,x,y), c=(a==0&&mask)?13:draw_color(a,x,y), cv=COLORS[c]
 		
-		// Since we're not drawing backgrounds, only BG_MASK should be transparent
 		if(pix == BG_MASK) {
 			id.data[d  ]=0
 			id.data[d+1]=0
 			id.data[d+2]=0
-			id.data[d+3]=0  // Make empty areas transparent
+			id.data[d+3]=0
 		} else {
 			id.data[d  ]=0xFF&(cv>>16)
 			id.data[d+1]=0xFF&(cv>> 8)
 			id.data[d+2]=0xFF&(cv    )
-			id.data[d+3]=255  // Keep all actual content opaque
+			id.data[d+3]=255
 		}
 	}
 	const r=q('#render');r.getContext('2d').putImageData(id,0,0)
@@ -6885,7 +6880,6 @@ up=(x,y,alt)=>{
 mouse=(e,f)=>{
 	ev.rawpos=rect(e.pageX,e.pageY);const c=q('#display').getBoundingClientRect()
 	if(e.button==1){if(f==down)ev.mdown=1;return}
-	// Account for CSS scaling - the canvas is scaled up by ~3x
 	const scale = 0.33
 	const scaledX = (e.pageX-c.x) * scale / zoom
 	const scaledY = (e.pageY-c.y) * scale / zoom
@@ -6902,9 +6896,8 @@ loop=stamp=>{
 }
 resize=_=>{
 	const b=q('body'), screen=rect(b.clientWidth,b.clientHeight)
-	// CSS scale factor to stretch small framebuffer to full screen
-	const cssScale = 1 / 0.33 // Inverse of the framebuffer scale
-	zoom = 1 // Keep Decker's internal zoom at 1
+	const cssScale = 1 / 0.33
+	zoom = 1
 	
 	tzoom=0|min((screen.x-(zoom*fb.size.x))/(2*toolsize.x),screen.y/toolsize.y)
 	const tz=tzoom*toolbars_enable
@@ -6922,11 +6915,9 @@ resize=_=>{
 }
 update_responsive_size=_=>{
 	const screen = rect(window.innerWidth || 800, window.innerHeight || 600)
-	// Use 33% of actual screen size for performance
 	const scale = 0.33
 	const newSize = rect(Math.floor(screen.x * scale), Math.floor(screen.y * scale))
 	
-	// Only recreate framebuffer if size actually changed
 	if(!fb || fb.size.x !== newSize.x || fb.size.y !== newSize.y) {
 		// Update deck size to scaled size
 		deck.size = newSize
@@ -6937,22 +6928,18 @@ update_responsive_size=_=>{
 		dirty = 1
 	}
 }
-// Pointer event passthrough for overlay integration
 isPixelTransparent=(x, y)=>{
 	if(!fb) return true
 	
-	// Convert from window coordinates to canvas coordinates
 	const canvas = q('#display')
 	const rect = canvas.getBoundingClientRect()
 	const canvasX = x - rect.left
 	const canvasY = y - rect.top
 	
-	// Check if click is outside canvas bounds
 	if(canvasX < 0 || canvasY < 0 || canvasX >= rect.width || canvasY >= rect.height) {
-		return true // Outside canvas = transparent
+		return true
 	}
 	
-	// Account for CSS scaling (canvas is scaled up by ~3x)
 	const scale = 0.33
 	const fbX = Math.floor((canvasX * scale) / zoom)
 	const fbY = Math.floor((canvasY * scale) / zoom)
@@ -6963,12 +6950,10 @@ isPixelTransparent=(x, y)=>{
 }
 
 handlePointerEvent=(e, handler)=>{
-	// Use window coordinates directly instead of canvas-relative
 	const x = e.clientX
 	const y = e.clientY
 	
 	if(isPixelTransparent(x, y)) {
-		// Forward to parent window (Phaser) AND let Decker handle it
 		if(window.parent !== window) {
 			window.parent.postMessage({
 				type: 'decker-pointer-passthrough',
@@ -6983,14 +6968,25 @@ handlePointerEvent=(e, handler)=>{
 		}
 	}
 	
-	// Always let Decker handle the event normally (for deselection and UI)
 	return handler(e)
 }
 
 window.onresize=_=>{update_responsive_size(),resize(),sync()}
-// Handle orientation changes for mobile devices
+
+// Handle focus events in iframe and notify parent
+window.addEventListener('focus', () => {
+	if(window.parent !== window) {
+		window.parent.postMessage({ type: 'decker-message', message: 'focus' }, '*')
+	}
+})
+
+window.addEventListener('blur', () => {
+	if(window.parent !== window) {
+		window.parent.postMessage({ type: 'decker-message', message: 'blur' }, '*')
+	}
+})
 window.addEventListener('orientationchange', _=>{
-	setTimeout(_=>{resize(),sync()}, 100) // Small delay to ensure window dimensions are updated
+	setTimeout(_=>{resize(),sync()}, 100)
 })
 q('body').addEventListener('mousedown'  ,e=>handlePointerEvent(e, e=>mouse(e,down)))
 q('body').addEventListener('mouseup'    ,e=>handlePointerEvent(e, e=>mouse(e,up)))

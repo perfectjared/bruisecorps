@@ -105,6 +105,8 @@ var appData: AppData =
   deckerFrame: null
 }
 
+let focusTimeout: ReturnType<typeof setTimeout> | null = null
+
 const gameConfig: Phaser.Types.Core.GameConfig =
 {
   title: 'bruisecorps presents summer-tour: margemaster',
@@ -305,7 +307,8 @@ function setupKeyboardControls()
 {
   document.addEventListener('keydown', (event) =>
   {
-    console.log('key:', event.key)
+    if (!appData.audioStarted) appData.audioStarted = true
+    
     switch (event.key)
     {
       case '1':
@@ -320,6 +323,11 @@ function setupKeyboardControls()
 
 function setupPointerTracking()
 {
+  function initializeAudio()
+  {
+    if (!appData.audioStarted) appData.audioStarted = true
+  }
+
   function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null
   {
     if (!appData.game) return null
@@ -356,12 +364,11 @@ function setupPointerTracking()
 
   document.addEventListener('mousedown', (event) =>
   {
-    appData.hasFocus = true
+    initializeAudio()
     
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
     appData.pointerActive.active = true
     appData.pointerActive.targetSprite = sprite
-    console.log('pointer active: mouse down', sprite ? `on sprite: ${sprite.texture.key}` : 'on background')
   })
   
   document.addEventListener('mouseup', () =>
@@ -370,20 +377,18 @@ function setupPointerTracking()
     
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
-    console.log('pointer inactive: mouse up')
   })
   
   document.addEventListener('touchstart', (event) =>
   {
-    appData.hasFocus = true
-    
+    initializeAudio()
+
     if (event.touches.length > 0)
     {
       const touch = event.touches[0]
       const sprite = getSpriteUnderPointer(touch.clientX, touch.clientY)
       appData.pointerActive.active = true
       appData.pointerActive.targetSprite = sprite
-      console.log('Pointer active: touch start', sprite ? `on sprite: ${sprite.texture.key}` : 'on background')
     }
   })
   
@@ -522,6 +527,7 @@ function setupDeckerCommunication()
       }
       else if (message.startsWith('sound:'))
       {
+        if (!appData.audioStarted) appData.audioStarted = true
         const params = message.split(':')[1]
         const [freq, dur] = params.split(',')
         synth.triggerAttackRelease(parseFloat(freq) || 440, parseFloat(dur) || 0.5)
@@ -535,6 +541,24 @@ function setupDeckerCommunication()
           width: appData.width,
           height: appData.height
         })
+      }
+      else if (message === 'focus')
+      {
+        if (focusTimeout) clearTimeout(focusTimeout)
+        appData.hasFocus = true
+      }
+      else if (message === 'blur')
+      {
+        if (focusTimeout) clearTimeout(focusTimeout)
+        focusTimeout = setTimeout(() => {
+          appData.hasFocus = false
+          appData.pointerActive.active = false
+          appData.pointerActive.targetSprite = null
+        }, 100)
+      }
+      else if (message === 'audioInitialized')
+      {
+        appData.audioStarted = true
       }
     }
   })
@@ -577,7 +601,6 @@ window.addEventListener('load', () =>
   setupKeyboardControls()
   setupPointerTracking()
   setupDeckerCommunication()
-  setupDeckerCommunication()
 
   game.events.on('pause', () =>
   {
@@ -587,18 +610,39 @@ window.addEventListener('load', () =>
   {
     console.log('game event: resume')
   })
-  game.events.on('focus', () =>
+  
+  window.addEventListener('focus', () =>
   {
-    console.log('game event: focus')
+    if (focusTimeout) clearTimeout(focusTimeout)
     appData.hasFocus = true
   })
-  game.events.on('blur', () =>
+  window.addEventListener('blur', () =>
   {
-    console.log('game event: blur')
-    appData.hasFocus = false
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
+    if (focusTimeout) clearTimeout(focusTimeout)
+    focusTimeout = setTimeout(() => {
+      appData.hasFocus = false
+      appData.pointerActive.active = false
+      appData.pointerActive.targetSprite = null
+    }, 100)
   })
+  
+  document.addEventListener('visibilitychange', () =>
+  {
+    if (focusTimeout) clearTimeout(focusTimeout)
+    if (document.hidden) {
+      appData.hasFocus = false
+      appData.pointerActive.active = false
+      appData.pointerActive.targetSprite = null
+    } else {
+      appData.hasFocus = true
+    }
+  })
+  
+  appData.hasFocus = !document.hidden && document.hasFocus()
+  
+  setTimeout(() => {
+    if (!appData.audioStarted) appData.audioStarted = true
+  }, 3000)
 }, this);
 
 window.addEventListener('resize', () =>
