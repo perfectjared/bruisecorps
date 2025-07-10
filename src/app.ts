@@ -83,7 +83,8 @@ interface AppData
     active: boolean,
     targetSprite: Phaser.GameObjects.Sprite | null
   },
-  viewport: Phaser.Geom.Rectangle
+  viewport: Phaser.Geom.Rectangle,
+  deckerFrame: HTMLIFrameElement | null
 }
 
 var appData: AppData =
@@ -100,7 +101,8 @@ var appData: AppData =
     active: false,
     targetSprite: null
   },
-  viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight)
+  viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight),
+  deckerFrame: null
 }
 
 const gameConfig: Phaser.Types.Core.GameConfig =
@@ -438,6 +440,134 @@ function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string)
   return appData.pointerActive.targetSprite === spriteOrTexture
 }
 
+function setupDeckerCommunication()
+{
+  appData.deckerFrame = document.getElementById('deck-container') as HTMLIFrameElement
+  
+  window.addEventListener('message', (event) =>
+  {
+    if (event.source !== appData.deckerFrame?.contentWindow) return
+    
+    const message = event.data
+    
+    // Handle different Decker message formats
+    if (typeof message === 'object' && message.type)
+    {
+      const { type, data } = message
+      
+      switch (type)
+      {
+        case 'switchCamera':
+          if (data.camera === 'marge') switchToMargeCamera()
+          else if (data.camera === 'rearview') switchToRearviewCamera()
+          break
+          
+        case 'playSound':
+          if (data.frequency && data.duration)
+          {
+            synth.triggerAttackRelease(data.frequency, data.duration)
+          }
+          break
+          
+        case 'decker-pointer-passthrough':
+          // Forward pointer events from Decker to Phaser
+          const pointerEvent = message.event
+          const canvas = document.querySelector('canvas') as HTMLCanvasElement
+          if (canvas && pointerEvent)
+          {
+            const rect = canvas.getBoundingClientRect()
+            const syntheticEvent = new MouseEvent(pointerEvent.type, {
+              clientX: pointerEvent.clientX,
+              clientY: pointerEvent.clientY,
+              button: pointerEvent.button,
+              buttons: pointerEvent.buttons,
+              bubbles: true,
+              cancelable: true
+            })
+            canvas.dispatchEvent(syntheticEvent)
+          }
+          break
+          
+        case 'requestGameState':
+          sendToDecker('gameState', {
+            hasFocus: appData.hasFocus,
+            pointerActive: appData.pointerActive.active,
+            targetSprite: appData.pointerActive.targetSprite?.texture.key || null,
+            width: appData.width,
+            height: appData.height
+          })
+          break
+          
+        // Handle direct Decker script calls
+        case 'deckScript':
+          if (data.action === 'switchCamera') {
+            if (data.target === 'marge') switchToMargeCamera()
+            else if (data.target === 'rearview') switchToRearviewCamera()
+          }
+          else if (data.action === 'playSound') {
+            synth.triggerAttackRelease(data.frequency || 440, data.duration || 0.5)
+          }
+          break
+      }
+    }
+    
+    // Handle string-based Decker messages
+    if (typeof message === 'string')
+    {
+      if (message.startsWith('camera:'))
+      {
+        const camera = message.split(':')[1]
+        if (camera === 'marge') switchToMargeCamera()
+        else if (camera === 'rearview') switchToRearviewCamera()
+      }
+      else if (message.startsWith('sound:'))
+      {
+        const params = message.split(':')[1]
+        const [freq, dur] = params.split(',')
+        synth.triggerAttackRelease(parseFloat(freq) || 440, parseFloat(dur) || 0.5)
+      }
+      else if (message === 'getState')
+      {
+        sendToDecker('gameState', {
+          hasFocus: appData.hasFocus,
+          pointerActive: appData.pointerActive.active,
+          targetSprite: appData.pointerActive.targetSprite?.texture.key || null,
+          width: appData.width,
+          height: appData.height
+        })
+      }
+    }
+  })
+  
+  setInterval(() =>
+  {
+    sendToDecker('pointerUpdate', {
+      active: appData.pointerActive.active,
+      targetSprite: appData.pointerActive.targetSprite?.texture.key || null
+    })
+  }, 100)
+}
+
+function sendToDecker(type: string, data: any)
+{
+  if (appData.deckerFrame?.contentWindow)
+  {
+    // Send in multiple formats that Decker might understand
+    appData.deckerFrame.contentWindow.postMessage({ type, data }, '*')
+    appData.deckerFrame.contentWindow.postMessage(`${type}:${JSON.stringify(data)}`, '*')
+    
+    // Try to call Decker functions directly if they exist
+    try {
+      const deckWindow = appData.deckerFrame.contentWindow as any
+      if (deckWindow.deck && deckWindow.deck.receiveMessage) {
+        deckWindow.deck.receiveMessage(type, data)
+      }
+    } catch (e) {
+      // Silently fail if Decker isn't ready
+    }
+  }
+}
+
 let game: Phaser.Game
 window.addEventListener('load', () =>
 {
@@ -446,6 +576,8 @@ window.addEventListener('load', () =>
   appData.game = game
   setupKeyboardControls()
   setupPointerTracking()
+  setupDeckerCommunication()
+  setupDeckerCommunication()
 
   game.events.on('pause', () =>
   {
@@ -500,5 +632,6 @@ export
   markSceneReady,
   isPointerActive,
   getPointerTarget,
-  isPointerOnSprite
+  isPointerOnSprite,
+  sendToDecker
 }
