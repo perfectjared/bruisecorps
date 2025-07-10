@@ -4,6 +4,17 @@ import DynamicSprite from '../data-types/dynamicsprite';
 import CameraManager from './cameramanager'
 
 import * as trashTour from '../data/trsh-tour.json'
+
+enum GameMode
+{
+  start,
+  end,
+  pause,
+  drive,
+  cyoa,
+  location
+}
+
 export default class Game extends Scene 
 {
   constants : any
@@ -82,14 +93,14 @@ export default class Game extends Scene
       },
       progressNumbers: { min: 0, max: 100, start: 0, step: .01 },
       progressValues: [0, 1, 2, 4, 8],
-      cameraTarget: new DynamicSprite(this,
-        {
-          x: '50%',
-          y: '50%',
-          width: '1%',
-          height: '1%'
-        }
-      )
+      // cameraTarget: new DynamicSprite(this,
+      //   {
+      //     x: '90%',
+      //     y: '50%',
+      //     width: '1%',
+      //     height: '1%'
+      //   }
+      // )
     }
 
     this.state = //todo STARTING VALUES IN JSON
@@ -149,16 +160,16 @@ export default class Game extends Scene
     //this.scene.launch(scenes.road).scene
     this.scene.launch(scenes.rearview).scene
     this.scene.launch(scenes.marge).scene
-    this.scene.launch(scenes.debug).scene
+    //this.scene.launch(scenes.debug).scene
   }
 
   create(): void 
   {
-    this.buffer.cameraManager.add('game', this.cameras.main,
-      {
-        main: true
-      }
-    ).setFollow(this.constants.cameraTarget.sprite)
+    // this.buffer.cameraManager.add('game', this.cameras.main,
+    //   {
+    //     main: true
+    //   }
+    // ).setFollow(this.constants.cameraTarget.sprite)
   }
 
   startGame(): void

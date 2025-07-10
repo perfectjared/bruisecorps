@@ -131,13 +131,13 @@ export default class Menu extends Scene
 
     create(): void
     {
-        //this.initiateStartDialog()
+        this.initiateStartDialog()
     }
 
     initiateStartDialog()
     {
-        this.startDialogSprite = new DynamicSprite(this, this.fullScreenAnchor)
-        this.startDialog.scene = this
+        // this.startDialogSprite = new DynamicSprite(this, this.fullScreenAnchor)
+        // this.startDialog.scene = this
     }
 
     update(): void

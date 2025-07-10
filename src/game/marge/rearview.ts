@@ -32,14 +32,14 @@ export default class Rearview extends Scene
         
         this.bandContainer = new Phaser.GameObjects.Container(this)
 
-        this.cameraTarget = new DynamicSprite(this,
-            {
-                x: '150%',
-                y: '50%',
-                width: '1%',
-                heigth: '1%'
-            }
-        )
+        // this.cameraTarget = new DynamicSprite(this,
+        //     {
+        //         x: '150%',
+        //         y: '50%',
+        //         width: '1%',
+        //         heigth: '1%'
+        //     }
+        // )
 
         this.rearviewSprite = new DynamicSprite(this,
             {
@@ -56,7 +56,7 @@ export default class Rearview extends Scene
         })
         this.rearviewSprite.sprite.on('pointerup', () =>
         {
-            this.cameraManager.setFollow(this.cameraTarget.sprite, 'game')
+            //this.cameraManager.setFollow(this.cameraTarget.sprite, 'game')
         })
 
         this.returnSprite = new DynamicSprite(this,
@@ -70,7 +70,7 @@ export default class Rearview extends Scene
         this.returnSprite.sprite.setInteractive()
         this.returnSprite.sprite.on('pointerup', () =>
         {
-            this.cameraManager.setFollow(scenes.marge.constants.cameraTarget.sprite, 'game')
+            //this.cameraManager.setFollow(scenes.marge.constants.cameraTarget.sprite, 'game')
         })
     }
 
@@ -88,12 +88,12 @@ export default class Rearview extends Scene
         (member: Tamagotchi) => {
             this.game.scene.add(member.key as string, member, true)
         })
-        this.cameraManager = scenes.game.buffer.cameraManager
-        this.cameraManager.add('rearview', this.cameras.main,
-            {
-                parallax: 0.5
-            }
-        )
+        // this.cameraManager = scenes.game.buffer.cameraManager
+        // this.cameraManager.add('rearview', this.cameras.main,
+        //     {
+        //         parallax: 0.5
+        //     }
+        // )
     }
 
     update()
