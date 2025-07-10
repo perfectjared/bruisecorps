@@ -1,8 +1,7 @@
 import DragRotate from "phaser3-rex-plugins/plugins/dragrotate"
 import { Scene } from "phaser"
 import DynamicSprite from "./dynamicsprite"
-import { scenes } from "../app"
-
+import { scenes, appData } from "../app"
 
 export interface IDragDialConfig
 {
@@ -18,8 +17,8 @@ export interface IDragDialConfig
 export default class DragDial
 {
     config: IDragDialConfig
-    
-    buffer: 
+
+    buffer:
     {
         lastDimensions:
         {
@@ -29,14 +28,17 @@ export default class DragDial
         },
         last
     }
-    
+
     dragRotatePlugin: any
     dragRotate: DragRotate
     dragging: boolean
+    
+    isPressed: boolean
+    initialPointerAngle: number
+    initialSpriteRotation: number
 
     scene: Scene
     graphics: Phaser.GameObjects.Graphics
-
 
     dSprite: DynamicSprite
     sprite: Phaser.GameObjects.Sprite
@@ -45,12 +47,12 @@ export default class DragDial
     {
         this.scene = scene
         this.graphics = scene.add.graphics()
-        
+
         this.dSprite = dSprite
         this.sprite = dSprite.sprite
-        
+
         this.dragRotatePlugin = scene.plugins.get('rexDragRotate')
-        this.dragRotate = this.dragRotatePlugin.add(scene, 
+        this.dragRotate = this.dragRotatePlugin.add(scene,
             {
                 x: this.sprite.x,
                 y: this.sprite.y,
@@ -63,28 +65,51 @@ export default class DragDial
             }
         )
         this.dragging = false
+        this.isPressed = false
+        this.initialPointerAngle = 0
+        this.initialSpriteRotation = 0
 
         this.config = config
         if (config.startAngle) this.sprite.setRotation(Phaser.Math.DegToRad(config.startAngle))
 
+        this.sprite.setInteractive()
+        
+        this.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) =>
+        {
+            this.isPressed = true
+            this.dragging = true
+            
+            this.initialPointerAngle = Phaser.Math.Angle.Between(
+                this.sprite.x, this.sprite.y,
+                pointer.worldX, pointer.worldY
+            )
+            this.initialSpriteRotation = this.sprite.rotation
+        })
         this.dragRotate.on('dragstart', function()
         {
             this.dragging = true
         }, this)
+        
         this.dragRotate.on('drag', function(dragRotate)
         {
-            this.sprite.rotation += dragRotate.deltaRotation
+            if (this.isPressed)
+            {
+                this.sprite.rotation += dragRotate.deltaRotation
+            }
         }, this)
 
         this.dragRotate.on('dragend', function()
         {
-            this.dragging = false
+            if (!this.isPressed)
+            {
+                this.dragging = false
+            }
         }, this)
-        
-        
+
         scene.events.on('update', function()
         {
             this.placeRelative()
+            this.handleGlobalPointerTracking()
             if (this.config.return) this.returnToCenter()
         }, this)
 
@@ -93,10 +118,7 @@ export default class DragDial
             this.graphics.clear()
             this.graphics.strokeCircle(this.sprite.x, this.sprite.y, this.dragRotate.maxRadius)
         }, this)
-
-
-        this.sprite.setInteractive()
-    }   
+    }
 
     placeRelative()
     {
@@ -107,12 +129,12 @@ export default class DragDial
 
     returnToCenter(speed = .1)
     {
-        if (this.dragging) return
+        if (this.dragging || this.isPressed) return
 
-        let center = Phaser.Math.DegToRad(this.config.startAngle)
-        let rotation = this.sprite.rotation
-        
-        let diff = Phaser.Math.Angle.ShortestBetween(rotation, center)
+        const center = Phaser.Math.DegToRad(this.config.startAngle)
+        const rotation = this.sprite.rotation
+
+        const diff = Phaser.Math.Angle.ShortestBetween(rotation, center)
 
         if (Math.abs(diff) < .001) {
             this.sprite.rotation = center
@@ -135,5 +157,44 @@ export default class DragDial
     update()
     {
 
+    }
+
+    handleGlobalPointerTracking()
+    {
+        if (this.isPressed && !appData.pointerActive.active)
+        {
+            this.isPressed = false
+            this.dragging = false
+        }
+        
+        if (this.isPressed && appData.pointerActive.active && this.scene.input.activePointer)
+        {
+            const pointer = this.scene.input.activePointer
+            
+            const currentAngle = Phaser.Math.Angle.Between(
+                this.sprite.x, this.sprite.y,
+                pointer.worldX, pointer.worldY
+            )
+            
+            const angleDiff = currentAngle - this.initialPointerAngle
+            
+            this.sprite.rotation = this.initialSpriteRotation + angleDiff
+        }
+    }
+
+    destroy()
+    {
+        this.isPressed = false
+        this.dragging = false
+        
+        if (this.dragRotate)
+        {
+            this.dragRotate.destroy()
+        }
+        
+        if (this.graphics)
+        {
+            this.graphics.destroy()
+        }
     }
 }

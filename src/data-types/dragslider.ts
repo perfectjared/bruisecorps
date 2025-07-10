@@ -57,8 +57,8 @@ export default class DragSlider
             {
                 endPoints:
                 [
-                    {x: 0, y:0},
-                    {x: 0, y:0}
+                    { x: 0, y:0 },
+                    { x: 0, y:0 }
                 ],
                 value: 0,
                 enable: true
@@ -69,7 +69,7 @@ export default class DragSlider
 
         }, this)
 
-        this.relEndPoints = [ {x: 0, y:0}, {x: 0, y:0}]
+        this.relEndPoints = [ { x: 0, y:0 }, { x: 0, y:0 }]
         scene.events.on('update', function()
         {
             if (!this.slider.isDragging && this.buffer.lastDragging)
@@ -79,21 +79,21 @@ export default class DragSlider
 
             if (this.relEndPoints[0].x == 0 && this.dSprite.sprite.x != 0 && this.dSprite.sprite.x)
             {
-                let relativePosition = 
+                const relativePosition =
                 {
                     x: this.dSprite.sprite.x / appData.width,
                     y: this.dSprite.sprite.y / appData.height
                 }
-                this.relEndPoints = 
+                this.relEndPoints =
                 [
-                    {x: relativePosition.x, y: relativePosition.y * percent},
-                    {x: relativePosition.x, y: relativePosition.y}
+                    { x: relativePosition.x, y: relativePosition.y * percent },
+                    { x: relativePosition.x, y: relativePosition.y }
                 ]
             }
             this.slider.endPoints =
             [
-                {x: this.relEndPoints[0].x * appData.width, y: this.relEndPoints[0].y * appData.height},
-                {x: this.relEndPoints[1].x * appData.width, y: this.relEndPoints[1].y * appData.height}
+                { x: this.relEndPoints[0].x * appData.width, y: this.relEndPoints[0].y * appData.height },
+                { x: this.relEndPoints[1].x * appData.width, y: this.relEndPoints[1].y * appData.height }
             ]
 
             this.buffer.lastDragging = this.slider.isDragging
@@ -101,16 +101,16 @@ export default class DragSlider
 
         scene.events.on('render', function()
         {
-            
+
         })
 
-        this.sprite.setInteractive() 
+        this.sprite.setInteractive()
     }
 
     snap(): void
     {
-        let diffs = [this.snaps.length - 1]
-        let smallest = 
+        const diffs = [this.snaps.length - 1]
+        const smallest =
         {
             val: Number.MAX_SAFE_INTEGER,
             index: -1

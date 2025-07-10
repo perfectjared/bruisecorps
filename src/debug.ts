@@ -4,13 +4,13 @@ import { Tamagotchi } from './game/tamagotchi/tamagotchi'
 
 export var debugFlags
 {
-  showFps: true
-  dynamicSpriteBounds: true
+  true
+  true
 }
 
 export var debugGraphics: Phaser.GameObjects.Graphics[]
 
-export default class Debug extends Scene 
+export default class Debug extends Scene
 {
   margeState : any
   fpsText: Phaser.GameObjects.Text
@@ -22,13 +22,13 @@ export default class Debug extends Scene
   }
 
   preload(): void {
-    this.fpsText = this.add.text(10, 10, '', { fontFamily: 'Basic-Sans', color: '#ffffff'}).setText(`${this.game.loop.actualFps.toFixed()}`)
+    this.fpsText = this.add.text(10, 10, '', { fontFamily: 'Basic-Sans', color: '#ffffff' }).setText(`${this.game.loop.actualFps.toFixed()}`)
   }
 
   create(): void {
-    let gameState = scenes.game.state
-    let margeState = scenes.marge.state
-    let synthState = scenes.synth.state
+    const gameState = scenes.game.state
+    const margeState = scenes.marge.state
+    const synthState = scenes.synth.state
 
     {
       const appFolder = datGui.macro.addFolder('app')
@@ -51,7 +51,7 @@ export default class Debug extends Scene
       playerFolder.add(gameState, 'monthlyListeners', 0, 1000000000, 1)
       playerFolder.open()
 
-      let timeFolder = gameFolder.addFolder('time')
+      const timeFolder = gameFolder.addFolder('time')
       timeFolder.add(gameState, 'hour', 0, 23, 1)
       timeFolder.add(gameState, 'date', 0, 1231, 1)
       timeFolder.open()
@@ -63,7 +63,7 @@ export default class Debug extends Scene
       margeFolder.add(margeState, 'signal', false)
       margeFolder.open()
 
-      let resourcesFolder = datGui.meso.addFolder('resources')
+      const resourcesFolder = datGui.meso.addFolder('resources')
       resourcesFolder.add(gameState.resources, 'pussy', 0, 10, 1)
       resourcesFolder.add(gameState.resources, 'money', 0, 99999, 1)
       resourcesFolder.add(gameState.resources, 'weed', 0, 10, 1)
@@ -92,7 +92,7 @@ export default class Debug extends Scene
     //   bandFolders.push(mitchFolder)
     //   let stanliFolder = bandFolder.addFolder('stanli')
     //   bandFolders.push(stanliFolder)
-  
+
     //   let iterator = 0
     //   let tamagotchis = scenes.rearview.bandMembers
     //   bandFolders.forEach((folder: any) =>
@@ -105,12 +105,12 @@ export default class Debug extends Scene
 
     //   // bandFolder.open()
     //   // mikeFolder.open()
-      
+
     //   datGui.micro.close() //todo TEMP
     // }
   }
 
-  update(): void 
+  update(): void
   {
     datGui.macro.updateDisplay()
   }

@@ -22,7 +22,7 @@ export default class Menu extends Scene
     startDialogContent: any
     startDialogSprite: DynamicSprite
 
-    constants: 
+    constants:
     {
 
     }
@@ -39,11 +39,10 @@ export default class Menu extends Scene
     {
         super(
             {
-                key: 'MenuScene',
+                key: 'MenuScene'
             }
         )
     }
-
 
     preload(): void
     {
@@ -57,12 +56,12 @@ export default class Menu extends Scene
             height: '80%',
             enable: true
         }
-        this.startDialogContent = 
+        this.startDialogContent =
         {
             title: 'welcome to bruisecorps',
             content: 'heres an explanation of the game OR an overview of the players save',
             buttonA: 'key turning animation'
-        }   
+        }
         this.startDialogStyle =
         {
             anchor: this.fullScreenAnchor,
@@ -79,7 +78,7 @@ export default class Menu extends Scene
                 content: true,
                 action: true
             },
-            background: 
+            background:
             {
                 color: colors[0]
             },
@@ -105,7 +104,7 @@ export default class Menu extends Scene
                 {
                     fontSize: 20,
                     color: colors[4]
-                },
+                }
             },
             buttonMode: 1,
             button:
@@ -156,7 +155,7 @@ export default class Menu extends Scene
 
     process(): void
     {
-        
+
     }
 
     system(): void

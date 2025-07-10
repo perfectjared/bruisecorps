@@ -25,7 +25,7 @@ export default class CameraManager
         this.lerp = 0.66
     }
 
-    add(name, camera, 
+    add(name, camera,
         {
             main = false,
             fixed = false,
@@ -54,7 +54,7 @@ export default class CameraManager
 
     setMain(name)
     {
-        let entry = this.cameras.get(name)
+        const entry = this.cameras.get(name)
         if (entry)
         {
             this.mainCamera = entry.camera
@@ -77,8 +77,8 @@ export default class CameraManager
     {
         if (!this.mainCamera || !this.target) return
 
-        let baseX = this.mainCamera.scrollX / this.parallax
-        let baseY = this.mainCamera.scrollY / this.parallax
+        const baseX = this.mainCamera.scrollX / this.parallax
+        const baseY = this.mainCamera.scrollY / this.parallax
 
         this.cameras.forEach(( { camera, fixed, parallax }) =>
         {

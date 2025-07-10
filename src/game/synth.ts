@@ -6,7 +6,7 @@ export default class Synth extends Scene
 {
     graphics: any
     constants: any
-    state: 
+    state:
     {
         step: number
     }
@@ -104,6 +104,6 @@ export default class Synth extends Scene
 
     debug()
     {
-        
+
     }
 }

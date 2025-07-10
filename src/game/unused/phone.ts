@@ -14,7 +14,7 @@ import RelativeTransform from "../../data-types/dynamicsprite"
 export default class Phone extends Scene
 {
     relativeTransform: RelativeTransform
-    
+
     constructor()
     {
         super({
@@ -28,10 +28,10 @@ export default class Phone extends Scene
         this.load.image('phone-screen', '../../../assets/image/phone/phone-perspective-screen.png')
         this.load.image('phone-cracks', '../../../assets/image/phone/phone-perspective-cracks.png')
     }
- 
+
     create(): void
     {
-        // this.relativeTransform = 
+        // this.relativeTransform =
         // {
         //     origin:
         //     {

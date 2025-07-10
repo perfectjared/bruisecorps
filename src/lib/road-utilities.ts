@@ -2,7 +2,7 @@
 
 class MathHelpers {
     constructor(test) {}
-    
+
     project(p, cameraX, cameraY, cameraZ, cameraDepth, width, height, roadWidth) {
         p.camera.x = (p.world.x || 0) - cameraX;
         p.camera.y = (p.world.y || 0) - cameraY;
@@ -12,13 +12,13 @@ class MathHelpers {
         p.screen.y = Math.round((height / 2) - (p.screen.scale * p.camera.y * height / 2));
         p.screen.w = Math.round((p.screen.scale * roadWidth * width / 2));
     }
-    
+
     overlap(x1, w1, x2, w2, percent) {
-        let half = (percent || 1) / 2;
-        let min1 = x1 - (w1 * half);
-        let max1 = x1 + (w1 * half);
-        let min2 = x2 - (w2 * half);
-        let max2 = x2 + (w2 * half);
+        const half = (percent || 1) / 2;
+        const min1 = x1 - (w1 * half);
+        const max1 = x1 + (w1 * half);
+        const min2 = x2 - (w2 * half);
+        const max2 = x2 + (w2 * half);
         return !((max1 < min2) || (min1 > max2));
     }
     exponentialFog(distance, density) {
@@ -43,7 +43,7 @@ class MathHelpers {
     }
     toInt(obj, def) {
         if (obj !== null) {
-            let x = parseInt(obj, 10);
+            const x = parseInt(obj, 10);
         if (!isNaN(x))
         return x;
         }
@@ -51,7 +51,7 @@ class MathHelpers {
     }
     limit(value, min, max){
         return Math.max(min, Math.min(value, max));
-    }                    
+    }
     interpolate(a,b,percent){
         return a + (b-a)*percent
     }
@@ -64,7 +64,7 @@ class RenderHelpers {
     scene
     COLORS
     WIREFRAME
-    
+
     constructor(scene) {
 
         this.scene = scene;
@@ -94,28 +94,28 @@ class RenderHelpers {
         };
         this.WIREFRAME = false;
       }
-    
+
       renderSegment(width, lanes, x1, y1, w1, x2, y2, w2, fog, color) {
-    
+
         let
           r1 = this.scene.mathHelper.rumbleWidth(w1, lanes),
           r2 = this.scene.mathHelper.rumbleWidth(w2, lanes),
           l1 = this.scene.mathHelper.laneMarkerWidth(w1, lanes),
           l2 = this.scene.mathHelper.laneMarkerWidth(w2, lanes),
           lanew1, lanew2, lanex1, lanex2, lane;
-    
+
         //DRAW GRASS
-    
+
         if (!this.WIREFRAME) {
           this.scene.graphics.fillStyle(color.grass);
           this.scene.graphics.fillRect(0, y2, width, y1 - y2);
         }
-    
+
         //DRAW RUMBLE
         this.renderPolygon(x1 - w1 - r1, y1, x1 - w1, y1, x2 - w2, y2, x2 - w2 - r2, y2, color.rumble);
         this.renderPolygon(x1 + w1 + r1, y1, x1 + w1, y1, x2 + w2, y2, x2 + w2 + r2, y2, color.rumble);
         this.renderPolygon(x1 - w1, y1, x1 + w1, y1, x2 + w2, y2, x2 - w2, y2, color.road);
-    
+
         if (color.lane) {
           lanew1 = w1 * 2 / lanes;
           lanew2 = w2 * 2 / lanes;
@@ -125,15 +125,15 @@ class RenderHelpers {
             this.renderPolygon(lanex1 - l1 / 2, y1, lanex1 + l1 / 2, y1, lanex2 + l2 / 2, y2, lanex2 - l2 / 2, y2, color.lane);
         }
         this.renderFog(0, y1, width, y2 - y1, fog);
-    
+
       }
       renderRect(x, y, width, height, color, fog) {
-        let rect = new Phaser.Geom.Rectangle(x, y, width, height);
+        const rect = new Phaser.Geom.Rectangle(x, y, width, height);
         this.scene.graphics.fillStyle(color, fog);
         this.scene.graphics.fillRectShape(rect);
       }
       renderPolygon(x1, y1, x2, y2, x3, y3, x4, y4, color) {
-        let polygon = new Phaser.Geom.Polygon([
+        const polygon = new Phaser.Geom.Polygon([
           x1, y1,
           x2, y2,
           x3, y3,
@@ -162,5 +162,5 @@ class RenderHelpers {
 
 export {
     MathHelpers,
-    RenderHelpers,
+    RenderHelpers
 }

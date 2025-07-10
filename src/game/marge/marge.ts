@@ -1,11 +1,10 @@
 import { Scene } from 'phaser';
-import { scenes } from '../../app';
+import { scenes, cameras, markSceneReady } from '../../app';
 import DynamicSprite from '../../data-types/dynamicsprite';
 import DragDial from '../../data-types/dragdial'
 import DragSlider from '../../data-types/dragslider'
-import CameraManager from '../cameramanager';
 
-export default class Marge extends Scene 
+export default class Marge extends Scene
 {
   graphics: any
   world: MatterJS.World
@@ -20,11 +19,11 @@ export default class Marge extends Scene
   airCon: DragDial
   signal: DragSlider
   shifter: DragSlider
+  rearviewSprite: DynamicSprite
 
   bandConfig: object
-  cameraManager: CameraManager
 
-  constructor() 
+  constructor()
   {
     super(
     {
@@ -32,7 +31,7 @@ export default class Marge extends Scene
     });
   }
 
-  preload(): void 
+  preload(): void
   {
     this.graphics = this.add.graphics()
 
@@ -45,7 +44,7 @@ export default class Marge extends Scene
       }
     )
 
-    this.wheel = new DragDial(this, new DynamicSprite(this, 
+    this.wheel = new DragDial(this, new DynamicSprite(this,
       {
         x: '50%',
         y: '75%',
@@ -99,17 +98,18 @@ export default class Marge extends Scene
       0.4
     )
 
+    this.rearviewSprite = new DynamicSprite(this,
+      {
+          x: '50%',
+          y: '10%',
+          width: '85%',
+          height: '27%'
+      }
+    )
+
     this.constants =
     {
-      cameraTarget: new DynamicSprite(this, 
-        {
-          x: '150%',
-          y: '50%',
-          width: '1%',
-          height: '1%'
-        }
-      ),
-      gearValues: { min: 0, max: 4, step: 1 , start: 0},
+      gearValues: { min: 0, max: 4, step: 1 , start: 0 },
       shifter:
       {
         dragDialConfig:
@@ -124,7 +124,7 @@ export default class Marge extends Scene
         },
         relativeTransformConfig:
         {
-          origin: 
+          origin:
           {
             x: 0,
             y: 1
@@ -134,7 +134,7 @@ export default class Marge extends Scene
           width: 0.3,
           maxScale: 2,
           minScale: 0.1
-        },
+        }
       },
       signal:
       {
@@ -165,38 +165,37 @@ export default class Marge extends Scene
       }
     }
 
-    this.state = 
+    this.state =
     {
       step: 0,
       gear: this.constants.gearValues.start,
       signal : false
     }
 
-    this.buffer = 
+    this.buffer =
     {
       dragging: false,
       lastGear: null,
       lastSignal: null
     }
   }
-  
-  create(): void 
+
+  create(): void
   {
-    this.cameraManager = scenes.game.buffer.cameraManager
-    this.cameraManager.add('marge', this.cameras.main,
-      {
-        parallax: 0.5
-      }
-    )
+    // Signal that this scene is ready
+    markSceneReady('marge')
   }
-  
-  update(): void 
+
+  update(): void
   {
-    let nextStep = (scenes.synth.state.step != this.state.step)
-    if (nextStep)
-    {
-      this.step()
-      this.state.step = scenes.synth.state.step
+    // Check if synth scene and its state are available before accessing
+    if (scenes.synth?.state?.step !== undefined) {
+      const nextStep = (scenes.synth.state.step != this.state.step)
+      if (nextStep)
+      {
+        this.step()
+        this.state.step = scenes.synth.state.step
+      }
     }
 
     this.control()
@@ -210,17 +209,17 @@ export default class Marge extends Scene
   {
 
   }
-  
+
   step(): void
   {
-    
+
   }
 
   process(): void
   {
 
   }
-  
+
   system(): void
   {
 

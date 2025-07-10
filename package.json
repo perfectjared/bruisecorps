@@ -7,17 +7,18 @@
     "build": "webpack --config webpack-dist.config.js",
     "deploy": "npm run build && gh-pages -d dist",
     "start": "webpack serve",
-    "lint": "eslint . --ext .js --ext .ts"
+    "lint": "eslint . --ext .js --ext .ts",
+    "lint:fix": "eslint . --ext .js --ext .ts --fix"
   },
   "author": "cloakedninjas",
   "license": "ISC",
   "devDependencies": {
     "@types/dat.gui": "^0.7.13",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "copy-webpack-plugin": "^10.0.0",
     "dat.gui": "^0.7.9",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.1",
     "eslint-config-google": "^0.14.0",
     "gh-pages": "^6.3.0",
     "phaser-import-pipeline": "^3.0.0",

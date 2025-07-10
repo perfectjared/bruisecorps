@@ -3,7 +3,7 @@ import { MathHelpers } from '../../lib/road-utilities';
 import { RenderHelpers } from '../../lib/road-utilities';
 import { appData, scenes } from '../../app';
 
-export default class Road extends Scene 
+export default class Road extends Scene
 {
   renderSettings
   ROAD
@@ -19,7 +19,7 @@ export default class Road extends Scene
 
   mathHelper
   renderHelper
-  
+
   graphics
   cursors
 
@@ -34,13 +34,13 @@ export default class Road extends Scene
   state
   buffer
 
-  constructor() 
+  constructor()
   {
     super({
       key: 'RoadScene'
     });
   }
-  
+
   preload(): void //TODO move this to preload.ts
   {
     this.renderSettings = {
@@ -107,12 +107,12 @@ export default class Road extends Scene
       ]
     }
 
-    this.state = 
+    this.state =
     {
-      speed: 0,
+      speed: 0
     }
 
-    this.buffer = 
+    this.buffer =
     {
       lastGear: 0
     }
@@ -122,16 +122,16 @@ export default class Road extends Scene
       y: 0
     });
     //this.cameras.main.setBackgroundColor(this.renderHelper.COLORS.SKY);
-    
+
     this.build();
   }
 
-  create(): void 
+  create(): void
   {
-   
+
   }
 
-  update(): void 
+  update(): void
   {
     this.controller()
     this.view()
@@ -144,14 +144,14 @@ export default class Road extends Scene
 
   controller(): void
   {
-    let paused = !scenes.game.state.playing
+    const paused = !scenes.game.state.playing
     if (paused)
     {
       this.state.speed = 0
       return
     }
 
-    let gear = scenes.marge.state.gear
+    const gear = scenes.marge.state.gear
     this.state.speed = gear
 
   }
@@ -163,7 +163,7 @@ export default class Road extends Scene
 
   view(): void
   {
-    
+
   }
 
   debug(): void
@@ -212,7 +212,7 @@ export default class Road extends Scene
     this.buildSprites();
   }
 
-  buildRoad() 
+  buildRoad()
   {
     this.segments = [];
 
@@ -232,15 +232,15 @@ export default class Road extends Scene
     //this.buildSprites();
   }
 
-  updateRoad() 
+  updateRoad()
   {
     this.graphics.clear();
 
-    let baseSegment = this.findSegment(this.renderSettings.position);
+    const baseSegment = this.findSegment(this.renderSettings.position);
 
-    let basePercent = this.mathHelper.percentRemaining(this.renderSettings.position, this.segmentLength);
-    let playerSegment = this.findSegment(this.renderSettings.position + this.playerZ);
-    let playerPercent = this.mathHelper.percentRemaining(this.renderSettings.position + this.playerZ, this.segmentLength);
+    const basePercent = this.mathHelper.percentRemaining(this.renderSettings.position, this.segmentLength);
+    const playerSegment = this.findSegment(this.renderSettings.position + this.playerZ);
+    const playerPercent = this.mathHelper.percentRemaining(this.renderSettings.position + this.playerZ, this.segmentLength);
     this.playerY = this.mathHelper.interpolate(playerSegment.p1.world.y, playerSegment.p2.world.y, playerPercent);
 
     let maxy = this.renderSettings.height;
@@ -264,9 +264,9 @@ export default class Road extends Scene
 
       if (segment.sprites.length) {
         for (let i = 0; i < segment.sprites.length; i++) {
-          let spriteScale = segment.p1.screen.scale;
-          let spriteX = segment.p1.screen.x + (spriteScale * segment.sprites[i].offset * this.roadWidth * this.renderSettings.width / 2);
-          let spriteY = segment.p1.screen.y;
+          const spriteScale = segment.p1.screen.scale;
+          const spriteX = segment.p1.screen.x + (spriteScale * segment.sprites[i].offset * this.roadWidth * this.renderSettings.width / 2);
+          const spriteY = segment.p1.screen.y;
 
           if (segment.p2.screen.y <= maxy) // clip by (already rendered) segment
           {
@@ -299,9 +299,9 @@ export default class Road extends Scene
 
   buildSprites()
   {
-    
+
   }
-  
+
   buildDefaultSprites() {
     this.addSegmentSprite(720, 'billboard', 1);
     this.addSegmentSprite(620, 'billboard', 1);
@@ -325,7 +325,7 @@ export default class Road extends Scene
   }
 
   addSegmentSprite(index, spriteKey, offset) {
-    let sprite = this.add.sprite(0, 0, spriteKey);
+    const sprite = this.add.sprite(0, 0, spriteKey);
 
     this.segments[index].sprites.push({
       key: spriteKey,
@@ -336,7 +336,7 @@ export default class Road extends Scene
   }
 
   addSegment(curve, y) {
-    let n = this.segments.length;
+    const n = this.segments.length;
     this.segments.push({
       index: n,
       p1: {
@@ -363,8 +363,8 @@ export default class Road extends Scene
   }
 
   addRoad(enter, hold, leave, curve, y) {
-    let startY = this.lastY();
-    let endY = startY + (this.mathHelper.toInt(y, 0) * this.segmentLength);
+    const startY = this.lastY();
+    const endY = startY + (this.mathHelper.toInt(y, 0) * this.segmentLength);
     let n, total = enter + hold + leave;
     for (n = 0; n < enter; n++)
       this.addSegment(this.mathHelper.easeIn(0, curve, n / enter), this.mathHelper.easeInOut(startY, endY, n / total));
@@ -381,7 +381,7 @@ export default class Road extends Scene
   addHill(num = this.ROAD.LENGTH.MEDIUM, height = this.ROAD.HILL.MEDIUM) {
     this.addRoad(num, num, num, 0, height);
   }
-  
+
   addCurve(num = this.ROAD.LENGTH.MEDIUM, curve = this.ROAD.CURVE.MEDIUM, height = this.ROAD.HILL.NONE) {
     this.addRoad(num, num, num, curve, height);
   }

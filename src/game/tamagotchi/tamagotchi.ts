@@ -22,7 +22,7 @@ export enum Mood
     Freaking
 }
 
-export class Tamagotchi extends Scene 
+export class Tamagotchi extends Scene
 {
     constants: any
     state: any
@@ -34,11 +34,11 @@ export class Tamagotchi extends Scene
 
     feedButton: GameObjects.Text
     giveButton: GameObjects.Text
-    
+
     bathroomText: GameObjects.Text
     boredText: GameObjects.Text
     hungerText: GameObjects.Text
-    
+
     bathroomValueText: GameObjects.Text
     boredValueText: GameObjects.Text
     hungerValueText: GameObjects.Text
@@ -51,12 +51,12 @@ export class Tamagotchi extends Scene
         ({
             key: 'Tamagotchi' + bandMember
         })
-        
+
         this.bandMember = bandMember
         this.container = container
         this.key = 'Tamagotchi' + bandMember
 
-        this.constants = 
+        this.constants =
         {
             feedValues: //validation: 5 arrays of 8 numbers
             [
@@ -108,15 +108,15 @@ export class Tamagotchi extends Scene
             ],
             position: //validation: 5 objects w/ x: and y:
             [
-                {x: 225, y: 10},
-                {x: 340, y: 25},
-                {x: 465, y: 15},
-                {x: 580, y: 5},
-                {x: 695, y: 20},
+                { x: 225, y: 10 },
+                { x: 340, y: 25 },
+                { x: 465, y: 15 },
+                { x: 580, y: 5 },
+                { x: 695, y: 20 }
             ]
         }
 
-        this.state = 
+        this.state =
         {
             bathroom: 0,
             bathroomCurveAt: 0,
@@ -129,9 +129,9 @@ export class Tamagotchi extends Scene
 
         this.bounds =
         {
-            bathroom: {min: 0, max: 100},
-            bored: {min: 0, max: 100},
-            hunger: {min: 0, max: 100}
+            bathroom: { min: 0, max: 100 },
+            bored: { min: 0, max: 100 },
+            hunger: { min: 0, max: 100 }
         }
     }
 
@@ -144,7 +144,7 @@ export class Tamagotchi extends Scene
     {
         this.addDebugTexts()
     }
-    
+
     update()
     {
         this.control()
@@ -156,7 +156,7 @@ export class Tamagotchi extends Scene
 
     control()
     {
-        let nextStep = (this.state.step != scenes.synth.state.step)
+        const nextStep = (this.state.step != scenes.synth.state.step)
         if (nextStep)
         {
             this.step()
@@ -186,17 +186,17 @@ export class Tamagotchi extends Scene
 
     addDebugTexts()
     {
-        let x = this.container.x + this.constants.position[this.bandMember].x
-        let y = this.container.y + this.constants.position[this.bandMember].y
+        const x = this.container.x + this.constants.position[this.bandMember].x
+        const y = this.container.y + this.constants.position[this.bandMember].y
 
-        this.feedButton = this.add.text(x + 5, y + 66, '(feed)', { color: '#f6300a'})
+        this.feedButton = this.add.text(x + 5, y + 66, '(feed)', { color: '#f6300a' })
         this.feedButton.setInteractive()
-        this.feedButton.on('pointerup', 
+        this.feedButton.on('pointerup',
             () => {
                 this.tryFeed()
             }
         )
-        this.giveButton = this.add.text(x + 66, y + 66, '(give)', { color: '#f6300a'})
+        this.giveButton = this.add.text(x + 66, y + 66, '(give)', { color: '#f6300a' })
         this.giveButton.setInteractive()
         this.giveButton.on('pointerup',
             () => {
@@ -204,13 +204,13 @@ export class Tamagotchi extends Scene
             }
         )
 
-        this.hungerText = this.add.text(x + 12, y + 10, 'hngr:', { color: '#f6a60a'})
-        this.boredText = this.add.text(x + 12, y + 28, 'bord:', { color: '#f6a60a'})
-        this.bathroomText = this.add.text(x + 12, y + 44, 'poop:', { color: '#f6a60a'})
-        
-        this.hungerValueText = this.add.text(x + 83, y + 10, '00 %', { color: '#000000'})
-        this.boredValueText = this.add.text(x + 83, y + 28, '00 %', { color: '#000000'})
-        this.bathroomValueText = this.add.text(x + 83, y + 44, '00 %', { color: '#000000'})
+        this.hungerText = this.add.text(x + 12, y + 10, 'hngr:', { color: '#f6a60a' })
+        this.boredText = this.add.text(x + 12, y + 28, 'bord:', { color: '#f6a60a' })
+        this.bathroomText = this.add.text(x + 12, y + 44, 'poop:', { color: '#f6a60a' })
+
+        this.hungerValueText = this.add.text(x + 83, y + 10, '00 %', { color: '#000000' })
+        this.boredValueText = this.add.text(x + 83, y + 28, '00 %', { color: '#000000' })
+        this.bathroomValueText = this.add.text(x + 83, y + 44, '00 %', { color: '#000000' })
     }
 
     step(stepAmount: number = .1)
@@ -223,8 +223,8 @@ export class Tamagotchi extends Scene
 
     updateTextLocations()
     {
-        let x = this.container.x + this.constants.position[this.bandMember].x
-        let y = this.container.y + this.constants.position[this.bandMember].y
+        const x = this.container.x + this.constants.position[this.bandMember].x
+        const y = this.container.y + this.constants.position[this.bandMember].y
 
         this.hungerText.setPosition(x + 12,  y + 10)
         this.boredText.setPosition(x + 12,  y + 28)
@@ -236,16 +236,16 @@ export class Tamagotchi extends Scene
 
     updateBathroomValueText()
     {
-        this.bathroomValueText.text = 
+        this.bathroomValueText.text =
         (this.state.bathroom >= 10) ?
-            (this.state.bathroom > 99) ? "!!" : this.state.bathroom as string : 
+            (this.state.bathroom > 99) ? "!!" : this.state.bathroom as string :
         "0" + this.state.bathroom as string
         this.bathroomValueText.text += " %"
     }
     updateBathroom(amount)
     {
         if (this.state.bathroom >= this.bounds.bathroom.max) return
-        let addToBathroom = this.constants.bathroomCurve[this.bandMember][Math.round(this.state.bathroomCurveAt)]
+        const addToBathroom = this.constants.bathroomCurve[this.bandMember][Math.round(this.state.bathroomCurveAt)]
         this.state.bathroom = Math.min(this.bounds.bathroom.max, this.state.bathroom + addToBathroom)
         this.state.bathroomCurveAt = (this.state.bathroomCurveAt == 10) ? 10 : this.state.bathroomCurveAt + amount
         this.updateBathroomValueText()
@@ -254,16 +254,16 @@ export class Tamagotchi extends Scene
     updateBored(amount)
     {
         if (this.state.bored >= this.bounds.bored.max) return
-        let addToBored = this.constants.boredCurve[this.bandMember][Math.round(this.state.boredCurveAt)]
+        const addToBored = this.constants.boredCurve[this.bandMember][Math.round(this.state.boredCurveAt)]
         this.state.bored = Math.min(this.bounds.bored.max, this.state.bored + addToBored)
         this.state.boredCurveAt = (this.state.boredCurveAt == 10) ? 10 : this.state.boredCurveAt + amount
         this.updateBoredValueText()
     }
 
     updateHunger(amount)
-    {   
+    {
         if (this.state.hunger >= this.bounds.hunger.max) return
-        let addToHunger = this.constants.hungerCurve[this.bandMember][Math.round(this.state.hungerCurveAt)]
+        const addToHunger = this.constants.hungerCurve[this.bandMember][Math.round(this.state.hungerCurveAt)]
         this.state.hunger = Math.min(this.bounds.hunger.max, this.state.hunger + addToHunger)
         this.state.hungerCurveAt = (this.state.hungerCurveAt == 10) ? 10 : this.state.hungerCurveAt + amount
         this.updateHungerValueText()
@@ -271,25 +271,25 @@ export class Tamagotchi extends Scene
 
     updateBoredValueText()
     {
-        this.boredValueText.text = 
+        this.boredValueText.text =
         (this.state.bored >= 10) ?
-            (this.state.bored > 99) ? "!!" : this.state.bored as string : 
+            (this.state.bored > 99) ? "!!" : this.state.bored as string :
         "0" + this.state.bored as string
         this.boredValueText.text += " %"
     }
 
     updateHungerValueText()
     {
-        this.hungerValueText.text = 
+        this.hungerValueText.text =
         (this.state.hunger >= 10) ?
-            (this.state.hunger > 99) ? "!!" : this.state.hunger as string : 
+            (this.state.hunger > 99) ? "!!" : this.state.hunger as string :
         "0" + this.state.hunger as string
         this.hungerValueText.text += " %"
     }
 
     tryFeed()
     {
-        if (scenes.game.state.playing && scenes.game.state.resources.hotdogs > 0) 
+        if (scenes.game.state.playing && scenes.game.state.resources.hotdogs > 0)
         {
             this.feed()
             scenes.game.state.resources.hotdogs-- //TODO: DON'T DO THIS!!!!!
@@ -298,7 +298,7 @@ export class Tamagotchi extends Scene
 
     tryGive()
     {
-        if (scenes.game.state.playing && scenes.game.state.resources.weed > 0) 
+        if (scenes.game.state.playing && scenes.game.state.resources.weed > 0)
         {
             this.give()
             scenes.game.state.resources.weed--
@@ -307,8 +307,8 @@ export class Tamagotchi extends Scene
 
     feed()
     {
-        let diceRoll = Math.round(Math.random() * 7)
-        let diceResult = this.constants.feedValues[this.bandMember][diceRoll]
+        const diceRoll = Math.round(Math.random() * 7)
+        const diceResult = this.constants.feedValues[this.bandMember][diceRoll]
         this.state.hunger = (this.state.hunger - diceResult < 0) ? 0 : this.state.hunger - diceResult
         this.state.hungerCurveAt = 0
         this.updateHungerValueText()
@@ -316,8 +316,8 @@ export class Tamagotchi extends Scene
 
     give()
     {
-        let diceRoll = Math.round(Math.random() * 4)
-        let diceResult = this.constants.giveValues[this.bandMember][diceRoll]
+        const diceRoll = Math.round(Math.random() * 4)
+        const diceResult = this.constants.giveValues[this.bandMember][diceRoll]
         console.log('give ' + diceResult)
         this.state.bored = (this.state.bored - diceResult < 0) ? 0 : this.state.bored - diceResult
         this.state.boredCurveAt = 0

@@ -15,10 +15,10 @@ enum GameMode
   location
 }
 
-export default class Game extends Scene 
+export default class Game extends Scene
 {
   constants : any
-  state : 
+  state :
   {
     playing
     speed
@@ -48,7 +48,7 @@ export default class Game extends Scene
     nextDate //
     showsLeft //
   }
-  buffer : 
+  buffer :
   {
     dynamicSprites: DynamicSprite[],
     lastPlaying: boolean,
@@ -63,18 +63,18 @@ export default class Game extends Scene
   }
 
   world: Physics.Matter.World
-  
+
   tour: any
   marge: Scene
   phone: Scene
 
-  constructor() 
+  constructor()
   {
     super({
       key: 'GameScene'
     });
   }
-  
+
   preload(): void
   {
     this.constants = //todo MOVE TO JSON
@@ -85,22 +85,14 @@ export default class Game extends Scene
       needsNumbers: { min: 0, max: 100, start: 0, step : 1 }, //tamagotchis needs
       bleedValues: [0, .1, .4, 1.6, 3.1],
       speedNumbers: { min: 60, max: 240, start: 60, step: 1 },
-      stepNumbers: { min: 0, max: 256, start: 0, 
-        step: function() 
-        { 
+      stepNumbers: { min: 0, max: 256, start: 0,
+        step: function()
+        {
           this.min +=1
         }
       },
       progressNumbers: { min: 0, max: 100, start: 0, step: .01 },
-      progressValues: [0, 1, 2, 4, 8],
-      // cameraTarget: new DynamicSprite(this,
-      //   {
-      //     x: '90%',
-      //     y: '50%',
-      //     width: '1%',
-      //     height: '1%'
-      //   }
-      // )
+      progressValues: [0, 1, 2, 4, 8]
     }
 
     this.state = //todo STARTING VALUES IN JSON
@@ -119,7 +111,7 @@ export default class Game extends Scene
         money: 100,
         weed: 3,
         hotdogs: 5,
-        pissjugs: 0,
+        pissjugs: 0
       },
 
       tour: {},
@@ -128,15 +120,14 @@ export default class Game extends Scene
       nextShow: "",
       nextDate: 666,
       showsLeft: 69,
-      
+
       month: 4,
       day: 16,
       hour: 8,
       date: 416
     }
 
-
-    let tour = trashTour.shows //array
+    const tour = trashTour.shows //array
     this.state.tour.shows = tour
     this.state.lastShow = tour[1].city
     this.state.nextShow = tour[2].city
@@ -150,7 +141,7 @@ export default class Game extends Scene
       lastSpeed: 0,
       lastStep: 0,
       lastTime: 666,
-      input: 
+      input:
       {
         touchingObject: null
       },
@@ -163,13 +154,9 @@ export default class Game extends Scene
     //this.scene.launch(scenes.debug).scene
   }
 
-  create(): void 
+  create(): void
   {
-    // this.buffer.cameraManager.add('game', this.cameras.main,
-    //   {
-    //     main: true
-    //   }
-    // ).setFollow(this.constants.cameraTarget.sprite)
+
   }
 
   startGame(): void
@@ -178,7 +165,7 @@ export default class Game extends Scene
     this.state.playing = true
   }
 
-  update(): void 
+  update(): void
   {
     this.control()
     this.process()
@@ -189,7 +176,7 @@ export default class Game extends Scene
 
   control(): void
   {
-    let nextStep = (this.buffer.lastStep != scenes.synth.state.step)
+    const nextStep = (this.buffer.lastStep != scenes.synth.state.step)
     if (nextStep) this.step()
   }
 
@@ -198,7 +185,7 @@ export default class Game extends Scene
     //this.healthBleed()
     //this.progressIncrement()
 
-    let nextTime = (scenes.synth.state.step % 11 == 0)
+    const nextTime = (scenes.synth.state.step % 11 == 0)
     if (nextTime) this.timeIncrement()
 
     this.buffer.lastStep = scenes.synth.state.step
@@ -212,7 +199,7 @@ export default class Game extends Scene
     let month = this.state.month
 
     hour ++
-    if (hour > 23) 
+    if (hour > 23)
     {
       hour = 0
       day ++
@@ -261,13 +248,13 @@ export default class Game extends Scene
     this.state.day = day
     this.state.hour = hour
     this.state.date = (month * 100) + (day)
-    
+
     return [ month, day, hour ]
   }
 
   healthBleed(): number
   {
-    let bleedAmount = this.constants.bleedValues[Math.round(Math.random() * scenes.marge.state.shifter.gear)]
+    const bleedAmount = this.constants.bleedValues[Math.round(Math.random() * scenes.marge.state.shifter.gear)]
     this.state.health -= bleedAmount
     console.log('bleed ' + bleedAmount + ', health ' + this.state.health)
     return this.state.health
@@ -275,7 +262,7 @@ export default class Game extends Scene
 
   progressIncrement(): number
   {
-    let progressAmount = this.constants.progressValues[scenes.marge.state.shifter.gear]
+    const progressAmount = this.constants.progressValues[scenes.marge.state.shifter.gear]
     this.state.progress += progressAmount
     console.log('progress ' + progressAmount)
     return this.state.progress
@@ -283,20 +270,20 @@ export default class Game extends Scene
 
   process(): void
   {
-    if (!appData.audioStarted) 
+    if (!appData.audioStarted)
     {
       this.state.playing = false
       return
     }
     //if (!this.state.playing) return TODO: put back
 
-    let startPlaying = this.state.playing && !this.buffer.lastPlaying
+    const startPlaying = this.state.playing && !this.buffer.lastPlaying
     if (startPlaying)
     {
       this.startGame()
     }
 
-    let stopPlaying = !this.state.playing && this.buffer.lastPlaying
+    const stopPlaying = !this.state.playing && this.buffer.lastPlaying
     {
 
     }
@@ -315,6 +302,6 @@ export default class Game extends Scene
 
   debug(): void
   {
-    
+
   }
 }
