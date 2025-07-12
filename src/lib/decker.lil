@@ -1,0 +1,41 @@
+% Decker Demo Configuration
+% This configures the basic deck presentation
+
+on init do
+  % Set up the deck with some basic cards
+  deck.name:"Decker Demo"
+  deck.author:"Decker System"
+  deck.version:"1.0"
+end
+
+on start do
+  % Initialize the presentation
+  show["Welcome to Decker!"]
+end
+
+on navigate x do
+  % Handle navigation between cards
+  if x~"left" 
+    go["prev"]
+  end
+  if x~"right"
+    go["next"] 
+  end
+end
+
+on keydown key do
+  % Handle keyboard navigation
+  if key~"ArrowRight" | key~" "
+    go["next"]
+  end
+  if key~"ArrowLeft"
+    go["prev"]
+  end
+end
+
+% Basic deck structure
+cards:[
+  {name:"Welcome" content:"Welcome to Decker! This is a modular presentation system."}
+  {name:"Navigation" content:"Use arrow keys, spacebar, or click to navigate between cards."}
+  {name:"Features" content:"Decker supports custom styling, JavaScript integration, and Lil scripting."}
+]
