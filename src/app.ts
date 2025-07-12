@@ -1,4 +1,3 @@
-//https://phaser.discourse.group/t/game-scaling-resizing-example-v3/1555
 import 'phaser'
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
@@ -16,43 +15,33 @@ import Rearview from './game/marge/rearview'
 
 import colors from './data/colors'
 
-class App extends Phaser.Scene
-{
+class App extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics
 
-  constructor()
-  {
-    super(
-    {
-      key: 'BootScene'
-    })
+  constructor() {
+    super({ key: 'BootScene' })
   }
 
-  preload()
-  {
+  preload() {
     this.load.image('x', './assets/image/x.png')
     this.graphics = this.add.graphics()
   }
 
-  create()
-  {
+  create() {
     this.scene.launch('SynthScene')
     this.scene.launch('MargeScene')
     this.scene.launch('RearviewScene')
   }
 
-  update()
-  {
+  update() {
     this.graphics.clear()
-    if (!appData.audioStarted || !appData.hasFocus)
-    {
+    if (!appData.audioStarted || !appData.hasFocus) {
       this.graphics.fillStyle(colors[5], 0.66)
       this.graphics.fillRect(0, 0, appData.width, appData.height)
     }
   }
 
-  render()
-  {
+  render() {
 
   }
 }
@@ -69,8 +58,7 @@ const scenes =
   synth: new Synth()
 }
 
-interface AppData
-{
+interface AppData {
   game: Phaser.Game,
   gameConfig: Phaser.Types.Core.GameConfig,
   width: number,
@@ -87,14 +75,13 @@ interface AppData
   deckerFrame: HTMLIFrameElement | null
 }
 
-var appData: AppData =
-{
+var appData: AppData = {
   game: null,
   gameConfig: null,
   width: 0,
   height: 0,
   scaleRatio: window.devicePixelRatio / 3,
-  audioStarted: false, //TODO: SET BY SYNTH.TS
+  audioStarted: false,
   hasFocus: true,
   playing: false,
   pointerActive: {
@@ -106,6 +93,26 @@ var appData: AppData =
 }
 
 let focusTimeout: ReturnType<typeof setTimeout> | null = null
+
+function setFocus(focused: boolean, immediate = false) {
+  if (focusTimeout) clearTimeout(focusTimeout)
+  
+  if (focused) {
+    appData.hasFocus = true
+  } else if (immediate) {
+    appData.hasFocus = false
+    appData.pointerActive.active = false
+    appData.pointerActive.targetSprite = null
+  } else {
+    focusTimeout = setTimeout(() => {
+      if (!document.hasFocus()) {
+        appData.hasFocus = false
+        appData.pointerActive.active = false
+        appData.pointerActive.targetSprite = null
+      }
+    }, 100)
+  }
+}
 
 const gameConfig: Phaser.Types.Core.GameConfig =
 {
@@ -213,30 +220,25 @@ const scenesReady =
   rearview: false
 }
 
-function markSceneReady(sceneName: keyof typeof scenesReady)
-{
+function markSceneReady(sceneName: keyof typeof scenesReady) {
   if (scenesReady[sceneName]) return
 
   scenesReady[sceneName] = true
 
-  if (Object.values(scenesReady).every(ready => ready))
-  {
+  if (Object.values(scenesReady).every(ready => ready)) {
     console.log('scenes ready, initializing cameras')
     initializeCameras()
   }
 }
 
-function initializeCameras()
-{
+function initializeCameras() {
   if (!appData.game) return
 
-  Object.keys(cameras).forEach(key =>
-  {
-    if (!cameras[key as keyof typeof cameras])
-    {
+  Object.keys(cameras).forEach(key => {
+    const cameraKey = key as keyof typeof cameras
+    if (!cameras[cameraKey]) {
       let sceneName = ''
-      switch (key)
-      {
+      switch (key) {
         case 'marge':
           sceneName = 'MargeScene'
           break
@@ -245,72 +247,56 @@ function initializeCameras()
           break
       }
 
-      if (sceneName)
-      {
+      if (sceneName) {
         const scene = appData.game.scene.getScene(sceneName)
-        if (scene)
-        {
+        if (scene) {
           const camera = scene.cameras.main
           camera.setViewport(0, 0, appData.width, appData.height)
-          cameras[key as keyof typeof cameras] = camera
+          cameras[cameraKey] = camera
         }
       }
-    }
-    else
-    {
-      const camera = cameras[key as keyof typeof cameras]
-      if (camera && camera instanceof Phaser.Cameras.Scene2D.Camera)
-      {
+    } else {
+      const camera = cameras[cameraKey]
+      if (camera) {
         camera.setViewport(0, 0, appData.width, appData.height)
       }
     }
   })
 
-  if (cameras.marge && cameras.rearview)
-  {
+  if (cameras.marge && cameras.rearview) {
     cameras.marge.setVisible(true)
     cameras.rearview.setVisible(false)
   }
 }
 
-function resizeCameras()
-{
-  Object.keys(cameras).forEach(key =>
-  {
+function resizeCameras() {
+  Object.keys(cameras).forEach(key => {
     const camera = cameras[key as keyof typeof cameras]
-    if (camera && camera instanceof Phaser.Cameras.Scene2D.Camera)
-    {
+    if (camera) {
       camera.setViewport(0, 0, appData.width, appData.height)
     }
   })
 }
 
-function switchToMargeCamera()
-{
- if (cameras.marge && cameras.rearview)
- {
+function switchToMargeCamera() {
+  if (cameras.marge && cameras.rearview) {
     cameras.marge.setVisible(true)
     cameras.rearview.setVisible(false)
   }
 }
 
-function switchToRearviewCamera()
-{
-  if (cameras.marge && cameras.rearview)
-  {
+function switchToRearviewCamera() {
+  if (cameras.marge && cameras.rearview) {
     cameras.marge.setVisible(false)
     cameras.rearview.setVisible(true)
   }
 }
 
-function setupKeyboardControls()
-{
-  document.addEventListener('keydown', (event) =>
-  {
+function setupKeyboardControls() {
+  document.addEventListener('keydown', (event) => {
     if (!appData.audioStarted) appData.audioStarted = true
     
-    switch (event.key)
-    {
+    switch (event.key) {
       case '1':
         switchToMargeCamera()
         break
@@ -321,21 +307,17 @@ function setupKeyboardControls()
   })
 }
 
-function setupPointerTracking()
-{
-  function initializeAudio()
-  {
+function setupPointerTracking() {
+  function initializeAudio() {
     if (!appData.audioStarted) appData.audioStarted = true
   }
 
-  function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null
-  {
+  function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null {
     if (!appData.game) return null
     
     const activeScenes = appData.game.scene.getScenes(true)
     
-    for (const scene of activeScenes)
-    {
+    for (const scene of activeScenes) {
       if (!scene.cameras.main) continue
       
       const camera = scene.cameras.main
@@ -344,13 +326,10 @@ function setupPointerTracking()
       
       let foundSprite: Phaser.GameObjects.Sprite | null = null
       
-      scene.children.list.forEach((child) =>
-      {
-        if (child instanceof Phaser.GameObjects.Sprite && child.visible && child.active)
-        {
+      scene.children.list.forEach((child) => {
+        if (child instanceof Phaser.GameObjects.Sprite && child.visible && child.active) {
           const bounds = child.getBounds()
-          if (bounds.contains(worldX, worldY))
-          {
+          if (bounds.contains(worldX, worldY)) {
             foundSprite = child
           }
         }
@@ -362,29 +341,21 @@ function setupPointerTracking()
     return null
   }
 
-  document.addEventListener('mousedown', (event) =>
-  {
+  document.addEventListener('mousedown', (event) => {
     initializeAudio()
-    
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
     appData.pointerActive.active = true
     appData.pointerActive.targetSprite = sprite
   })
   
-  document.addEventListener('mouseup', () =>
-  {
-    if (!appData.hasFocus) return
-    
+  document.addEventListener('mouseup', () => {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
   
-  document.addEventListener('touchstart', (event) =>
-  {
+  document.addEventListener('touchstart', (event) => {
     initializeAudio()
-
-    if (event.touches.length > 0)
-    {
+    if (event.touches.length > 0) {
       const touch = event.touches[0]
       const sprite = getSpriteUnderPointer(touch.clientX, touch.clientY)
       appData.pointerActive.active = true
@@ -392,95 +363,73 @@ function setupPointerTracking()
     }
   })
   
-  document.addEventListener('touchend', () =>
-  {
-    if (!appData.hasFocus) return
-    
+  document.addEventListener('touchend', () => {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
   
-  document.addEventListener('touchcancel', () =>
-  {
-    if (!appData.hasFocus) return
-    
+  document.addEventListener('touchcancel', () => {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
   
-  document.addEventListener('mouseleave', () =>
-  {
+  document.addEventListener('mouseleave', () => {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
 }
 
-function isPointerActive(): boolean
-{
+function isPointerActive(): boolean {
   return appData.pointerActive.active
 }
 
-function getPointerTarget(): Phaser.GameObjects.Sprite | null
-{
+function getPointerTarget(): Phaser.GameObjects.Sprite | null {
   return appData.pointerActive.targetSprite
 }
 
-function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string): boolean
-{
-  if (!appData.pointerActive.active || !appData.pointerActive.targetSprite)
-  {
+function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string): boolean {
+  if (!appData.pointerActive.active || !appData.pointerActive.targetSprite) {
     return false
   }
   
-  if (!spriteOrTexture)
-  {
+  if (!spriteOrTexture) {
     return true
   }
   
-  if (typeof spriteOrTexture === 'string')
-  {
+  if (typeof spriteOrTexture === 'string') {
     return appData.pointerActive.targetSprite.texture.key === spriteOrTexture
   }
   
   return appData.pointerActive.targetSprite === spriteOrTexture
 }
 
-function setupDeckerCommunication()
-{
+function setupDeckerCommunication() {
   appData.deckerFrame = document.getElementById('deck-container') as HTMLIFrameElement
   
-  window.addEventListener('message', (event) =>
-  {
+  window.addEventListener('message', (event) => {
     if (event.source !== appData.deckerFrame?.contentWindow) return
     
     const message = event.data
     
-    // Handle different Decker message formats
-    if (typeof message === 'object' && message.type)
-    {
+    if (typeof message === 'object' && message.type) {
       const { type, data } = message
       
-      switch (type)
-      {
+      switch (type) {
         case 'switchCamera':
           if (data.camera === 'marge') switchToMargeCamera()
           else if (data.camera === 'rearview') switchToRearviewCamera()
           break
           
         case 'playSound':
-          if (data.frequency && data.duration)
-          {
+          if (data.frequency && data.duration) {
             synth.triggerAttackRelease(data.frequency, data.duration)
           }
           break
           
         case 'decker-pointer-passthrough':
-          // Forward pointer events from Decker to Phaser
           const pointerEvent = message.event
           const canvas = document.querySelector('canvas') as HTMLCanvasElement
-          if (canvas && pointerEvent)
-          {
-            const rect = canvas.getBoundingClientRect()
+          if (canvas && pointerEvent) {
             const syntheticEvent = new MouseEvent(pointerEvent.type, {
               clientX: pointerEvent.clientX,
               clientY: pointerEvent.clientY,
@@ -503,37 +452,33 @@ function setupDeckerCommunication()
           })
           break
           
-        // Handle direct Decker script calls
         case 'deckScript':
           if (data.action === 'switchCamera') {
             if (data.target === 'marge') switchToMargeCamera()
             else if (data.target === 'rearview') switchToRearviewCamera()
-          }
-          else if (data.action === 'playSound') {
+          } else if (data.action === 'playSound') {
             synth.triggerAttackRelease(data.frequency || 440, data.duration || 0.5)
           }
+          break
+          
+        case 'decker-message':
+          if (message.message === 'focus') setFocus(true)
+          else if (message.message === 'blur') setFocus(false)
           break
       }
     }
     
-    // Handle string-based Decker messages
-    if (typeof message === 'string')
-    {
-      if (message.startsWith('camera:'))
-      {
+    if (typeof message === 'string') {
+      if (message.startsWith('camera:')) {
         const camera = message.split(':')[1]
         if (camera === 'marge') switchToMargeCamera()
         else if (camera === 'rearview') switchToRearviewCamera()
-      }
-      else if (message.startsWith('sound:'))
-      {
+      } else if (message.startsWith('sound:')) {
         if (!appData.audioStarted) appData.audioStarted = true
         const params = message.split(':')[1]
         const [freq, dur] = params.split(',')
         synth.triggerAttackRelease(parseFloat(freq) || 440, parseFloat(dur) || 0.5)
-      }
-      else if (message === 'getState')
-      {
+      } else if (message === 'getState') {
         sendToDecker('gameState', {
           hasFocus: appData.hasFocus,
           pointerActive: appData.pointerActive.active,
@@ -541,30 +486,17 @@ function setupDeckerCommunication()
           width: appData.width,
           height: appData.height
         })
-      }
-      else if (message === 'focus')
-      {
-        if (focusTimeout) clearTimeout(focusTimeout)
-        appData.hasFocus = true
-      }
-      else if (message === 'blur')
-      {
-        if (focusTimeout) clearTimeout(focusTimeout)
-        focusTimeout = setTimeout(() => {
-          appData.hasFocus = false
-          appData.pointerActive.active = false
-          appData.pointerActive.targetSprite = null
-        }, 100)
-      }
-      else if (message === 'audioInitialized')
-      {
+      } else if (message === 'focus') {
+        setFocus(true)
+      } else if (message === 'blur') {
+        setFocus(false)
+      } else if (message === 'audioInitialized') {
         appData.audioStarted = true
       }
     }
   })
   
-  setInterval(() =>
-  {
+  setInterval(() => {
     sendToDecker('pointerUpdate', {
       active: appData.pointerActive.active,
       targetSprite: appData.pointerActive.targetSprite?.texture.key || null
@@ -572,29 +504,14 @@ function setupDeckerCommunication()
   }, 100)
 }
 
-function sendToDecker(type: string, data: any)
-{
-  if (appData.deckerFrame?.contentWindow)
-  {
-    // Send in multiple formats that Decker might understand
+function sendToDecker(type: string, data: any) {
+  if (appData.deckerFrame?.contentWindow) {
     appData.deckerFrame.contentWindow.postMessage({ type, data }, '*')
-    appData.deckerFrame.contentWindow.postMessage(`${type}:${JSON.stringify(data)}`, '*')
-    
-    // Try to call Decker functions directly if they exist
-    try {
-      const deckWindow = appData.deckerFrame.contentWindow as any
-      if (deckWindow.deck && deckWindow.deck.receiveMessage) {
-        deckWindow.deck.receiveMessage(type, data)
-      }
-    } catch (e) {
-      // Silently fail if Decker isn't ready
-    }
   }
 }
 
 let game: Phaser.Game
-window.addEventListener('load', () =>
-{
+window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
   window['game'] = game
   appData.game = game
@@ -602,40 +519,11 @@ window.addEventListener('load', () =>
   setupPointerTracking()
   setupDeckerCommunication()
 
-  game.events.on('pause', () =>
-  {
-    console.log('game event: pause')
-  })
-  game.events.on('resume', () =>
-  {
-    console.log('game event: resume')
-  })
+  window.addEventListener('focus', () => setFocus(true))
+  window.addEventListener('blur', () => setFocus(false))
   
-  window.addEventListener('focus', () =>
-  {
-    if (focusTimeout) clearTimeout(focusTimeout)
-    appData.hasFocus = true
-  })
-  window.addEventListener('blur', () =>
-  {
-    if (focusTimeout) clearTimeout(focusTimeout)
-    focusTimeout = setTimeout(() => {
-      appData.hasFocus = false
-      appData.pointerActive.active = false
-      appData.pointerActive.targetSprite = null
-    }, 100)
-  })
-  
-  document.addEventListener('visibilitychange', () =>
-  {
-    if (focusTimeout) clearTimeout(focusTimeout)
-    if (document.hidden) {
-      appData.hasFocus = false
-      appData.pointerActive.active = false
-      appData.pointerActive.targetSprite = null
-    } else {
-      appData.hasFocus = true
-    }
+  document.addEventListener('visibilitychange', () => {
+    setFocus(!document.hidden, true)
   })
   
   appData.hasFocus = !document.hidden && document.hasFocus()
@@ -643,17 +531,17 @@ window.addEventListener('load', () =>
   setTimeout(() => {
     if (!appData.audioStarted) appData.audioStarted = true
   }, 3000)
-}, this);
+})
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
   appData.width = window.innerWidth
-  appData.viewport.width = appData.width
   appData.height = window.innerHeight
+  appData.viewport.width = appData.width
   appData.viewport.height = appData.height
-  appData.scaleRatio =  window.devicePixelRatio / 3
+  appData.scaleRatio = window.devicePixelRatio / 3
   resizeCameras()
 })
+
 appData.width = window.innerWidth
 appData.height = window.innerHeight
 
