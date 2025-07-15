@@ -276,3 +276,36 @@ end
 2. Verify "Start Game" button is visible and clickable
 3. Test click-through functionality after game starts
 4. Check if debug console messages appear correctly
+
+## CRITICAL INSIGHT: DragDial/DragSlider Interaction Dependencies
+
+**Problem Found**: DragDial class has `handleGlobalPointerTracking()` method that checks `appData.pointerActive.active` to determine if it should respond to drag events.
+
+**Code Analysis**:
+```typescript
+// In dragdial.ts line 165:
+if (this.isPressed && !appData.pointerActive.active) {
+    this.isPressed = false
+    this.dragging = false
+}
+```
+
+**Root Cause**: 
+- DragDial expects `appData.pointerActive.active` to be true during interactions
+- When iframe has `pointer-events: none`, clicks pass through but may not properly trigger Phaser's input system
+- Document-level mousedown sets `appData.pointerActive.active = true` but sprite detection might fail
+
+**Debug Strategy**:
+1. Added console logging to mousedown event handler
+2. Added detailed logging to `getSpriteUnderPointer` function
+3. Changed approach: Set container to `pointer-events: none` but keep iframe interactive
+
+**Current Testing**:
+- Container div: `pointer-events: none` (allows click-through)
+- Iframe: `pointer-events: auto` (keeps Decker widgets working)
+- This should allow both Phaser interactions AND Decker widgets to work
+
+**Next Steps**:
+1. Test if this approach allows both Decker and Phaser interactions
+2. Check console logs to see if sprite detection is working
+3. Verify DragDial `isPressed` state is properly managed

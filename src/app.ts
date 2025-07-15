@@ -343,9 +343,11 @@ function setupPointerTracking() {
   }
 
   function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null {
+    console.log('getSpriteUnderPointer called with:', x, y)
     if (!appData.game) return null
     
     const activeScenes = appData.game.scene.getScenes(true)
+    console.log('Active scenes:', activeScenes.length)
     
     for (const scene of activeScenes) {
       if (!scene.cameras.main) continue
@@ -354,12 +356,15 @@ function setupPointerTracking() {
       const worldX = camera.scrollX + (x - camera.x) / camera.zoom
       const worldY = camera.scrollY + (y - camera.y) / camera.zoom
       
+      console.log('Checking scene:', scene.scene.key, 'worldX:', worldX, 'worldY:', worldY)
+      
       let foundSprite: Phaser.GameObjects.Sprite | null = null
       
       scene.children.list.forEach((child) => {
         if (child instanceof Phaser.GameObjects.Sprite && child.visible && child.active) {
           const bounds = child.getBounds()
           if (bounds.contains(worldX, worldY)) {
+            console.log('Found sprite:', child.texture.key, 'at', bounds)
             foundSprite = child
           }
         }
@@ -368,12 +373,15 @@ function setupPointerTracking() {
       if (foundSprite) return foundSprite
     }
     
+    console.log('No sprite found under pointer')
     return null
   }
 
   document.addEventListener('mousedown', (event) => {
+    console.log('Mousedown event triggered:', event.target)
     initializeAudio()
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
+    console.log('Sprite under pointer:', sprite)
     appData.pointerActive.active = true
     appData.pointerActive.targetSprite = sprite
     appData.lastPointerTime = Date.now()
@@ -570,13 +578,19 @@ function setupDeckerCommunication() {
         // Switch to Marge card and allow clicks through to Phaser
         sendToDecker('go', { card: 'marge' })
         
-        // Set Decker iframe to allow clicks through (widgets inside will override this)
-        const deckIframe = document.getElementById('deck-iframe') as HTMLIFrameElement
-        if (deckIframe) {
-          console.log('Setting iframe pointer-events to none')
-          deckIframe.style.pointerEvents = 'none'
+        // Set Decker container to allow clicks through but keep iframe interactive
+        const deckContainer = document.getElementById('deck-container')
+        if (deckContainer) {
+          console.log('Setting deck-container pointer-events to none')
+          deckContainer.style.pointerEvents = 'none'
+          
+          // Keep iframe interactive
+          const deckIframe = document.getElementById('deck-iframe') as HTMLIFrameElement
+          if (deckIframe) {
+            deckIframe.style.pointerEvents = 'auto'
+          }
         } else {
-          console.log('ERROR: Could not find deck-iframe')
+          console.log('ERROR: Could not find deck-container')
         }
       } else if (message === 'audioInitialized') {
         appData.audioStarted = true
