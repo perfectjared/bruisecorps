@@ -13,7 +13,6 @@ import Synth from './game/synth'
 import Road from './game/marge/road'
 import Rearview from './game/marge/rearview'
 import { initVectorGraphics, getVectorGraphics } from './lib/vector-graphics'
-
 import colors from './data/colors'
 
 class App extends Phaser.Scene {
@@ -41,14 +40,9 @@ class App extends Phaser.Scene {
       this.graphics.fillRect(0, 0, appData.width, appData.height)
     }
   }
-
-  render() {
-
-  }
 }
 
-const scenes =
-{
+const scenes = {
   app: new App(),
   debug: new Debug(),
   game: new Game(),
@@ -106,7 +100,6 @@ function setFocus(focused: boolean, immediate = false) {
   
   if (focused) {
     appData.hasFocus = true
-    console.log('Focus enabled - hasFocus:', appData.hasFocus, 'gameStarted:', appData.gameStarted)
   } else if (immediate) {
     appData.hasFocus = false
     appData.pointerActive.active = false
@@ -234,7 +227,6 @@ function markSceneReady(sceneName: keyof typeof scenesReady) {
   scenesReady[sceneName] = true
 
   if (Object.values(scenesReady).every(ready => ready)) {
-    console.log('scenes ready, initializing cameras')
     initializeCameras()
   }
 }
@@ -305,10 +297,7 @@ function switchToRearviewCamera() {
 }
 
 function handleCardChange(cardName: string) {
-  console.log('Card changed to:', cardName)
-  
-  // Switch camera view based on card, but don't send message back to Decker
-  // (this would create a feedback loop)
+  // Switch camera view based on card
   if (cardName === 'marge') {
     if (cameras.marge && cameras.rearview) {
       cameras.marge.setVisible(true)
@@ -320,16 +309,10 @@ function handleCardChange(cardName: string) {
       cameras.rearview.setVisible(true)
     }
   }
-  
-  // Send card change notification to other systems (but not back to Decker)
-  // sendToDecker('cardChanged', { card: cardName }) // Removed to prevent feedback loop
 }
 
 function handleHealthChange(healthValue: number) {
-  console.log('Health changed to:', healthValue)
-  
-  // Update game state or other systems based on health
-  // For now, just log and send to other systems
+  // Update game state based on health value
   sendToDecker('healthChanged', { health: healthValue })
 }
 
@@ -517,13 +500,11 @@ function setupDeckerCommunication() {
           break
           
         case 'decker-pointer-passthrough':
-          // Pass through pointer events from transparent Decker areas to game
           if (!appData.gameStarted) break
           
           const pointerEvent = message.event
           const canvas = document.querySelector('canvas') as HTMLCanvasElement
           if (canvas && pointerEvent) {
-            // Create universal synthetic event (handles both mouse and touch)
             const syntheticEvent = pointerEvent.type.startsWith('touch') 
               ? new TouchEvent(pointerEvent.type, { bubbles: true, cancelable: true })
               : new MouseEvent(pointerEvent.type, {
@@ -575,7 +556,6 @@ function setupDeckerCommunication() {
         if (camera === 'marge') switchToMargeCamera()
         else if (camera === 'rearview') switchToRearviewCamera()
       } else if (message.startsWith('sound:')) {
-        // Only play sounds if game has started
         if (!appData.gameStarted) return
         
         if (!appData.audioStarted) appData.audioStarted = true
@@ -598,7 +578,6 @@ function setupDeckerCommunication() {
         const healthValue = parseInt(message.split(':')[1])
         handleHealthChange(healthValue)
       } else if (message === 'game-started') {
-        // Enable game state and audio after start button
         appData.gameStarted = true
         appData.audioStarted = true
         setFocus(true)
@@ -608,6 +587,7 @@ function setupDeckerCommunication() {
     }
   })
   
+  // Send periodic updates to Decker
   setInterval(() => {
     sendToDecker('pointerUpdate', {
       active: appData.pointerActive.active,
@@ -656,6 +636,7 @@ function setupHydraEffects() {
   });
 }
 
+// Initialize application
 let game: Phaser.Game
 window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
@@ -666,28 +647,22 @@ window.addEventListener('load', () => {
   setupDeckerCommunication()
   setupHydraEffects()
   
-  // Initialize vector graphics after DOM is loaded
   setTimeout(() => {
     initVectorGraphics()
   }, 100)
 
   window.addEventListener('focus', () => {
-    // Only set focus if game has already started
     if (appData.gameStarted) setFocus(true)
   })
   window.addEventListener('blur', () => {
-    // Only handle blur if game has started
     if (appData.gameStarted) setFocus(false)
   })
   
   document.addEventListener('visibilitychange', () => {
-    // Only handle visibility changes if game has started
     if (appData.gameStarted) setFocus(!document.hidden, true)
   })
   
   appData.hasFocus = !document.hidden && document.hasFocus()
-  
-  // Audio is gated behind game start - no automatic initialization
 })
 
 window.addEventListener('resize', () => {
@@ -702,8 +677,7 @@ window.addEventListener('resize', () => {
 appData.width = window.innerWidth
 appData.height = window.innerHeight
 
-export
-{
+export {
   UIPlugin,
   AnchorPlugin,
   AppData,

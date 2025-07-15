@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover">
@@ -9,12 +7,12 @@
     <title>bruisecorps: margemaster</title>
 	<link rel="preload" as="font" href="./assets/fonts/basic-sans/Basic-Sans.otf" type="font/otf" />
     <style>
-        html,
-        body {
+        html, body {
             margin: 0;
             background: black;
 			overflow: hidden;
         }
+        
 		@font-face {
 			font-family: Basic-Sans;
 			src: url('./assets/fonts/basic-sans/Basic-Sans.otf');
@@ -22,6 +20,7 @@
 			font-style: normal;
 			font-display: block;
 		}
+		
 		.font-preloader {
 			font-family: 'Basic-Sans';
 			position: absolute;
@@ -30,11 +29,15 @@
 			width: 0;
 			overflow: hidden;
 		}
+		
+		/* Main game container */
 		#game-container {
 			position: relative;
 			width: 100vw;
 			height: 100vh;
 		}
+		
+		/* Decker UI overlay */
 		#deck-container {
 			position: absolute;
 			top: 0;
@@ -44,17 +47,21 @@
 			height: 100vh;
 			border: none;
 			background: transparent;
-			pointer-events: auto; /* Re-enable pointer events */
+			pointer-events: auto;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 		
 		#deck-container iframe {
-			width: 100%;
-			height: 100%;
+			width: 512px;
+			height: 342px;
 			border: none;
 			background: transparent;
-			pointer-events: auto; /* Re-enable pointer events */
+			pointer-events: auto;
 		}
 		
+		/* Hydra effects overlay */
 		#hydra-container {
 			position: absolute;
 			top: 0;
@@ -78,6 +85,7 @@
 			pointer-events: none;
 		}
 		
+		/* Vector graphics overlay */
 		#anime-container {
 			position: absolute;
 			top: 0;
@@ -110,6 +118,4 @@
 	<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
     <script src="app.js"></script>
 </body>
-</div>
-
 </html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Decker - Clean Architecture</title>
+<style>
+html,body{
+	height:100%;
+	width:100%;
+	margin:0;
+	padding:0;
+	background:transparent;
+	pointer-events:auto;
+}
+body{
+	display:block;
+	-webkit-user-select:none;
+	user-select:none;
+	touch-action:none;
+	overflow:hidden;
+}
+#display{
+	position:absolute;
+	top:0;
+	left:0;
+	image-rendering:pixelated;
+	image-rendering:-moz-crisp-edges;
+	image-rendering:crisp-edges;
+	pointer-events:auto;
+}
+</style>
+</head>
+<body>
+
+<!-- Canvas for rendering -->
+<canvas id="display" width="530" height="320" style="cursor: default;"></canvas>
+
+<!-- Load separated components -->
+<script src="lil-engine.js"></script>
+<script src="decker-engine.js"></script>
+
+<!-- Main integration script -->
+<script>
+// Load deck content from separate file
+async function loadDeckContent() {
+    try {
+        const response = await fetch('deck-content.lil');
+        const lilContent = await response.text();
+        
+        // Parse Lil content into JavaScript objects
+        const deckData = parseLilContent(lilContent);
+        
+        // Load the deck into the engine
+        DECKER.load_deck(deckData);
+        
+        console.log('Deck content loaded successfully');
+    } catch (error) {
+        console.error('Failed to load deck content:', error);
+    }
+}
+
+// Simple Lil content parser (simplified for this example)
+function parseLilContent(content) {
+    // This is a very basic parser - in a real system you'd use the full Lil parser
+    const deck = {
+        version: 1,
+        name: "Bruise Corps",
+        size: { x: 530, y: 320 },
+        cards: [
+            {
+                name: "home",
+                image: null, // Would parse the image data
+                widgets: [
+                    {
+                        type: "field",
+                        pos: [106, 100],
+                        size: [300, 30],
+                        text: "Bruise Corps",
+                        style: "transparent"
+                    },
+                    {
+                        type: "field", 
+                        pos: [156, 130],
+                        size: [200, 20],
+                        text: "Digital Exploration",
+                        style: "transparent"
+                    },
+                    {
+                        type: "field",
+                        pos: [81, 180],
+                        size: [350, 60],
+                        text: "Ready to Begin Your Journey?",
+                        style: "transparent"
+                    },
+                    {
+                        type: "button",
+                        pos: [205, 280],
+                        size: [120, 40],
+                        text: "Start Game",
+                        script: "home.1",
+                        style: "rect"
+                    }
+                ]
+            }
+        ]
+    };
+    
+    return deck;
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the Decker engine
+    DECKER.initDecker();
+    
+    // Load the deck content
+    loadDeckContent();
+});
+</script>
+
+</body>
+</html>

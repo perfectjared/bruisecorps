@@ -1,0 +1,60 @@
+{deck}
+version:1
+card:0
+size:[512,342]
+name:"Bruise Corps"
+
+{card:home}
+image:"%%IMG2AgABVgD/AJIBAQAZAQEA/wCmAQEAPwEBAAcBAQARAQIA/wCfAQQAAgEBAAUBAQA0AQIABAEBAAoBAQABAQMAAgEBAAYBAQD/AKABAwADAQEABQEBACcBBQACAQMAAgECAAEBAQAEAQQAAwEBAAIBAQABAQEAAQEBAAIBAgAFAQEA/wCiAQIAAgEEAAIBAQARAQEAFgEBAAIBAQABAQEAAgEBAAIBAQACAQEABAEDAAQBAgABAQIAAgECAAEBAwAEAQEA/wCgAQUAAQECAAEBAgABAQQADgEBAAEBAgAEAQMADAEBAAEBAgABAQQAAgEDAAUBAgABAQMAAgEBAAIBAQADAQEAAQEDAP8ApQEBAAgBAgABAQIAAQEBAA4BAwABAQEAAgEBAAMBAQAMAQIAAgECAAQBAgAHAQEAAwEBAAIBAQACAQEAAwEBAAMBAQAEAQEA/wCsAQEAAgEBAAQBAgAIAQEAAwEBAAIBAQADAQIACwEBAAQBBAACAQMAFwEBAP8AtAECAAQBAQAIAQEAAwECAAEBBQAMAQEAIAEBAAMBAQD/ALkBAgAgAQIAHwECAAEBAgD/ALkBAgBCAQIA/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wCQASkAjwETAP8ANQE2AIIBEQD/ADUBOgCAAREA/wA1ATwAfgERAP8ANQE/AHkBEQD/ADUBPwB5ARQA/wA1AUEAFAEVACQBFgAUARQAKwkVADEJCgC4ARUADQEgAA8BIAAZASAADwEUAAcBFwAICR8AEAkSAAcJEAC1ARUAEgEcAAwBIwAWASUADAEUAAcBFgAGCSQADgkTAAUJEgC0ARUAFQEZAAoBKAAQASoACQEUAAcBFgAFCSgACwkUAAQJFACzARUAFgEYAAgBKwAOASwACAEUAAYBFgAFCSoACgkUAAIJFwCyARUAFwEXAAcBLgAKAS8ABwEUAAUBFgAECS4ACAkUAAEJGQCwARUAGQEWAAUBMQAIATEABgEUAAQBFgAECTAABwkvAK8BFQAZARYABQExAAgBMgAFARQAAwEWAAQJMgAGCS8ArwEVABkBFgAEATMABQE0AAQBFAADARYABAkzAAUJMACvARUAGQEWAAMBFgAJARUABQE1AAMBFAADARUABQkWAAgJFgAECTAArwEVABkBFgADARQADQETAAUBFwAHARcAAwEUAAIBFQAFCRUADAkUAAQJMACvARQAGgEWAAIBFAAPARMAAwEWAAsBFQADASoABgkUAA4JEwAECTAArwEUABoBFgACARQADwETAAMBFQAMARUAAwEqAAYJEwAPCRMABAkWAAUJFQCuARUAGgEWAAIBNgACARUADgEUAAMBKQAGCTYABAkUAAgJFACuARUAGQEXAAEBNwACARUADgEUAAMBKAAHCTYABAkUAAgJFACuARUAGQEXAAEBNwACARQAJgEnAAgJNgAECRMACQkUAK4BFQAYARcAAgE3AAIBFAAlASgABwk3AAMJFAAJCRQArgEVABcBGAACATcAAgEUACUBKAAHCTcAAwkUAAkJFACuARQAFgEZAAMBNwACARQAJQEpAAYJNwADCRQACQkUAK4BFAAUARsAAwE3AAIBFAAOARQAAwEpAAYJNwADCRQACQkUAK0BFQAOASEAAwEUACUBFAAOARQAAwETAAEBFgAFCRQAJgkTAMsBQwAEARQAJQEUAA0BFQADARMAAgEVAAUJFAAlCRQAywFDAAQBFAAOARQAAwEVAAsBFgADARMAAgEWAAUJFAAOCRQAAgkUAMsBQgAFARUADAEVAAMBFgAJARYAAwEUAAMBFgAECRUADAkVAAIJFADLAUEABwEVAAoBFgADARcABwEXAAMBFAADARYABQkVAAkJFgADCRQAygFBAAgBNQADATUAAwEUAAQBFgAECTQAAwkUAMoBQAAKATMABQEzAAQBFAAEARYABAkzAAQJFADKAT8ACwEyAAcBMQAFARQABQEWAAQJMgAECRQAygE+AA0BMQAHATEABAEUAAYBFgAFCTAABAkUAMsBPAAQAS4ACgEuAAYBFAAHARYABQkuAAUJFADLAToAFAErAA0BKwAHARQABwEWAAYJKwAHCRQAywE4ABYBKgAOASkACQEUAAgBFgAHCScACQkUAMsBNAAdASQAFAEkAAsBFAAIARcACAkjAAsJFADKATEAIwEgABgBIAANARMACgEWAAoJHwANCRQA/wAjARcAIQEXAFMJFwD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8AtA=="
+script:"home.0"
+{widgets}
+titletext:{"type":"field","size":[300,30],"pos":[106,100],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Bruise Corps"}
+subtitletext:{"type":"field","size":[200,20],"pos":[156,130],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Digital Exploration"}
+greetingtext:{"type":"field","size":[350,60],"pos":[81,180],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Welcome to the interactive driving experience"}
+startbutton:{"type":"button","size":[120,40],"pos":[196,280],"script":"home.1","text":"Start Game","style":"rect"}
+
+{script:home.0}
+on view do
+ card.widgets["greetingtext"].text:"Welcome to the interactive driving experience"
+end
+{end}
+
+{script:home.1}
+on click do
+  send:"game-started"
+end
+{end}
+
+{card:marge}
+script:"marge.0"
+{widgets}
+titletext:{"type":"field","size":[300,30],"pos":[106,50],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Marge Dashboard"}
+statustext:{"type":"field","size":[350,40],"pos":[81,100],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Main driving interface - Control your vehicle"}
+healthlabel:{"type":"field","size":[100,20],"pos":[50,180],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"left","text":"Vehicle Health:"}
+healthslider:{"type":"slider","size":[300,30],"pos":[160,175],"script":"marge.1","value":75,"range":[0,100]}
+healthvalue:{"type":"field","size":[80,20],"pos":[470,180],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"75%"}
+instructiontext:{"type":"field","size":[400,30],"pos":[56,240],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Use steering wheel and controls to navigate"}
+
+{script:marge.0}
+% Card view bypass handles message sending
+{end}
+
+{script:marge.1}
+on change do
+ value: this.value
+ card.widgets["healthvalue"].text: value "%"
+ % Send health data to parent
+ send("health-changed:" . value)
+end
+{end}
+
+{card:rearview}
+script:"rearview.0"
+{widgets}
+titletext:{"type":"field","size":[300,30],"pos":[106,50],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Rearview Mirror"}
+statustext:{"type":"field","size":[350,40],"pos":[81,120],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Mirror View Interface"}
+placeholdertext:{"type":"field","size":[400,60],"pos":[56,180],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Rear visibility and mirror adjustments\n\nPlaceholder for rearview controls"}
+
+{script:rearview.0}
+% Card view bypass handles message sending
+{end}

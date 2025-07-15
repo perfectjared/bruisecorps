@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Decker - Minimal</title>
+<style>
+html,body{
+	height:100%;
+	width:100%;
+	margin:0;
+	padding:0;
+	background:transparent;
+	pointer-events:auto;
+}
+body{
+	display:block;
+	-webkit-user-select:none;
+	user-select:none;
+	touch-action:none;
+	overflow:hidden;
+}
+#display{
+	position:absolute;
+	top:0;
+	left:0;
+	image-rendering:pixelated;
+	image-rendering:-moz-crisp-edges;
+	image-rendering:crisp-edges;
+	pointer-events:auto;
+	background:transparent;
+}
+</style>
+</head>
+<body>
+
+<canvas id="display" width="530" height="320" style="cursor: default;"></canvas>
+
+<script>
+// MINIMAL DECKER FOR TRANSPARENCY TESTING
+
+// Constants
+const BG_MASK = 100;
+const COLORS = [
+	0xFFFFFFFF,0xFFFFFF00,0xFFFF6500,0xFFDC0000,0xFFFF0097,0xFF360097,0xFF0000CA,0xFF0097FF,
+	0xFF00A800,0xFF006500,0xFF653600,0xFF976536,0xFFB9B9B9,0xFF868686,0xFF454545,0xFF000000,
+];
+
+// Simple framebuffer
+let fb = {
+	size: { x: 530, y: 320 },
+	pix: new Array(530 * 320).fill(BG_MASK) // Start with all transparent
+};
+
+// Add some test content - a simple button
+function drawTestButton() {
+	const centerX = Math.floor(fb.size.x / 2);
+	const centerY = Math.floor(fb.size.y / 2);
+	const width = 120;
+	const height = 40;
+	
+	// Draw button background (color index 13 = gray)
+	for(let y = centerY - height/2; y < centerY + height/2; y++) {
+		for(let x = centerX - width/2; x < centerX + width/2; x++) {
+			if(x >= 0 && x < fb.size.x && y >= 0 && y < fb.size.y) {
+				fb.pix[y * fb.size.x + x] = 13; // Gray background
+			}
+		}
+	}
+	
+	// Draw button text "Start Game" (color index 0 = white)
+	const textY = centerY;
+	const textStartX = centerX - 40;
+	for(let i = 0; i < 10; i++) {
+		for(let j = 0; j < 5; j++) {
+			const x = textStartX + i * 8;
+			const y = textY - 2 + j;
+			if(x >= 0 && x < fb.size.x && y >= 0 && y < fb.size.y) {
+				fb.pix[y * fb.size.x + x] = 0; // White text
+			}
+		}
+	}
+}
+
+// Initialize test content
+drawTestButton();
+
+// Render function
+function render() {
+	const canvas = document.getElementById('display');
+	const ctx = canvas.getContext('2d', { alpha: true });
+	
+	// Clear canvas to transparent
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	// Create image data
+	const imageData = ctx.createImageData(fb.size.x, fb.size.y);
+	
+	// Fill pixel data
+	for(let z = 0, d = 0; z < fb.pix.length; z++, d += 4) {
+		const pix = fb.pix[z];
+		
+		if(pix === BG_MASK) {
+			// Transparent pixel
+			imageData.data[d] = 0;     // R
+			imageData.data[d+1] = 0;   // G
+			imageData.data[d+2] = 0;   // B
+			imageData.data[d+3] = 0;   // A (transparent)
+		} else {
+			// Opaque pixel with color
+			const color = COLORS[pix] || 0xFF000000;
+			imageData.data[d] = 0xFF & (color >> 16);    // R
+			imageData.data[d+1] = 0xFF & (color >> 8);   // G
+			imageData.data[d+2] = 0xFF & color;          // B
+			imageData.data[d+3] = 255;                   // A (opaque)
+		}
+	}
+	
+	// Put image data on canvas
+	ctx.putImageData(imageData, 0, 0);
+}
+
+// Start rendering
+render();
+
+// Handle messages from parent
+window.addEventListener('message', function(event) {
+	if(event.data === 'game-started') {
+		console.log('Game started!');
+	}
+});
+
+// Handle clicks
+document.getElementById('display').addEventListener('click', function(event) {
+	const rect = this.getBoundingClientRect();
+	const x = event.clientX - rect.left;
+	const y = event.clientY - rect.top;
+	
+	// Check if click is in button area
+	const centerX = fb.size.x / 2;
+	const centerY = fb.size.y / 2;
+	if(x > centerX - 60 && x < centerX + 60 && y > centerY - 20 && y < centerY + 20) {
+		// Send message to parent
+		window.parent.postMessage('game-started', '*');
+	}
+});
+
+</script>
+</body>
+</html>
