@@ -16,7 +16,6 @@ export default class Marge extends Scene
   dashSprite: DynamicSprite
   wheel: DragDial
   ignition: DragDial
-  airCon: DragDial
   signal: DragSlider
   shifter: DragSlider
   rearviewSprite: DynamicSprite
@@ -41,7 +40,7 @@ export default class Marge extends Scene
     this.dashSprite = new DynamicSprite(this,
       {
         x: '50%',
-        y: '80%',
+        y: '75%',
         width: '100%',
         height: '40%'
       }
@@ -50,7 +49,7 @@ export default class Marge extends Scene
     this.wheel = new DragDial(this, new DynamicSprite(this,
       {
         x: '50%',
-        y: '75%',
+        y: '70%',
         width: '50%',
         height: '40%'
       }
@@ -62,7 +61,7 @@ export default class Marge extends Scene
     this.ignition = new DragDial(this, new DynamicSprite(this,
       {
         x: '85%',
-        y: '90%',
+        y: '85%',
         width: '15%',
         height: '15%'
       }
@@ -71,19 +70,11 @@ export default class Marge extends Scene
       startAngle: 0,
       return: true
     })
-    this.airCon = new DragDial(this, new DynamicSprite(this,
-      {
-        x: '15%',
-        y: '90%',
-        width: '15%',
-        height: '15%'
-      }
-    ))
 
     this.signal = new DragSlider(this, new DynamicSprite(this,
       {
         x: '10%',
-        y: '70%',
+        y: '65%',
         width: '20%',
         height: '20%'
       }),
@@ -93,7 +84,7 @@ export default class Marge extends Scene
       (this,
       {
         x: '90%',
-        y: '70%',
+        y: '65%',
         width: '20%',
         height: '20%'
       }),
@@ -104,7 +95,7 @@ export default class Marge extends Scene
     this.rearviewSprite = new DynamicSprite(this,
       {
           x: '50%',
-          y: '10%',
+          y: '5%',
           width: '85%',
           height: '27%'
       }
@@ -192,7 +183,6 @@ export default class Marge extends Scene
     this.dashSprite.create()
     this.wheel.create()
     this.ignition.create()
-    this.airCon.create()
     this.signal.dSprite.create()  // DragSlider doesn't have create(), but its DynamicSprite does
     this.shifter.dSprite.create() // DragSlider doesn't have create(), but its DynamicSprite does
     this.rearviewSprite.create()
@@ -217,7 +207,7 @@ export default class Marge extends Scene
         this.state.step = scenes.synth.state.step
         
         const speed = Math.abs(this.wheel.sprite.rotation) / Math.PI
-        const intensity = (this.ignition.sprite.rotation + this.airCon.sprite.rotation) / (Math.PI * 2)
+        const intensity = this.ignition.sprite.rotation / Math.PI
         
         sendGameDataToHydra({
           scene: 'marge',

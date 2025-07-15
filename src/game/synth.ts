@@ -25,16 +25,16 @@ export default class Synth extends Scene
         this.player = new Tone.Player().toDestination()
         
         // Create percussive click sound using noise
-        this.clickNoise = new Tone.Noise('pink')
+        this.clickNoise = new Tone.Noise('white')
         this.clickEnv = new Tone.AmplitudeEnvelope({
             attack: 0.001,
-            decay: 0.02,
+            decay: 0.01,
             sustain: 0,
-            release: 0.02
+            release: 0.01
         })
         
         // Chain: Noise -> Envelope -> Gain -> Destination
-        const clickGain = new Tone.Gain(-25)
+        const clickGain = new Tone.Gain(-46)
         this.clickNoise.chain(this.clickEnv, clickGain, Tone.getDestination())
         
         Tone.getTransport().bpm.value = this.constants.bpms[0]
@@ -78,8 +78,8 @@ export default class Synth extends Scene
             
             if (appData.hasFocus) {
                 this.clickNoise.start(time)
-                this.clickEnv.triggerAttackRelease('32n', time)
-                this.clickNoise.stop(time + 0.05)
+                this.clickEnv.triggerAttackRelease('64n', time)
+                this.clickNoise.stop(time + 0.02)
             }
         }, "4n")
         

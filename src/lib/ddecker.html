@@ -2,6 +2,12 @@
 <head>
 <meta charset="UTF-8">
 <title>Decker</title>
+<style>
+/* Ensure widgets remain interactive when iframe has pointer-events: none */
+.widget, button, input, select, textarea, [onclick], [onmousedown], [onmouseup] {
+  pointer-events: auto !important;
+}
+</style>
 </head>
 <body>
 <script language="decker">
@@ -36,12 +42,12 @@ end
 {card:marge}
 script:"marge.0"
 {widgets}
-titletext:{"type":"field","size":[300,30],"pos":[810,150],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Marge Dashboard"}
-statustext:{"type":"field","size":[350,40],"pos":[785,250],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Main driving interface - Control your vehicle"}
-healthlabel:{"type":"field","size":[100,20],"pos":[710,450],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"left","text":"Vehicle Health:"}
-healthslider:{"type":"slider","size":[300,30],"pos":[820,445],"script":"marge.1","value":75,"range":[0,100]}
-healthvalue:{"type":"field","size":[80,20],"pos":[1130,450],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"75%"}
-instructiontext:{"type":"field","size":[400,30],"pos":[760,650],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Use steering wheel and controls to navigate"}
+titletext:{"type":"field","size":[150,30],"pos":[420,50],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Marge Dashboard"}
+statustext:{"type":"field","size":[180,40],"pos":[410,90],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Main driving interface"}
+healthlabel:{"type":"field","size":[80,20],"pos":[360,150],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"left","text":"Health:"}
+healthslider:{"type":"slider","size":[120,30],"pos":[360,170],"script":"marge.1","value":75,"range":[0,100]}
+healthvalue:{"type":"field","size":[50,20],"pos":[490,175],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"75%"}
+instructiontext:{"type":"field","size":[200,30],"pos":[350,250],"locked":1,"volatile":1,"show":"transparent","border":0,"style":"plain","align":"center","text":"Use controls to navigate"}
 
 {script:marge.0}
 % Card view bypass handles message sending
@@ -7346,6 +7352,15 @@ window.addEventListener('message', function(event) {
       // Use the proper Decker API to switch cards
       n_go([lms(cardName)], deck);
     }
+  } else if (event.data && event.data.type === 'background-click') {
+    // Simulate a click on the transparent background to deselect widgets
+    const clickEvent = new MouseEvent('click', {
+      clientX: event.data.data.x,
+      clientY: event.data.data.y,
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(clickEvent);
   }
 });
 

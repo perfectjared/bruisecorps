@@ -32,7 +32,7 @@
 		
 		/* Main game container */
 		#game-container {
-			position: relative;
+			position: absolute;
 			width: 100vw;
 			height: 100vh;
 		}
@@ -47,18 +47,16 @@
 			height: 100vh;
 			border: none;
 			background: transparent;
-			pointer-events: auto;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 		}
 		
-		#deck-container iframe {
-			width: 512px;
-			height: 342px;
+		#deck-iframe {
+			width: 100vw;
+			height: 100vh;
 			border: none;
 			background: transparent;
-			pointer-events: auto;
 		}
 		
 		/* Hydra effects overlay */
@@ -112,7 +110,9 @@
 			<!-- Vector graphics will be dynamically generated here -->
 		</svg>
 	</div>
-	<iframe src="./src/lib/ddecker.html" title="decker" id="deck-container" allowtransparency="true"></iframe>
+	<div id="deck-container">
+		<iframe src="./src/lib/ddecker.html" title="decker" id="deck-iframe" allowtransparency="true"></iframe>
+	</div>
 	<iframe src="./src/lib/hydra.html" title="hydra-effects" id="hydra-container" allowtransparency="true"></iframe>
 	<div class="font-preloader"></div>
 	<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>

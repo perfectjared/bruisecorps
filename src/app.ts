@@ -372,9 +372,6 @@ function setupPointerTracking() {
   }
 
   document.addEventListener('mousedown', (event) => {
-    // Gate pointer events behind game start
-    if (!appData.gameStarted) return
-    
     initializeAudio()
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
     appData.pointerActive.active = true
@@ -384,31 +381,27 @@ function setupPointerTracking() {
   })
   
   document.addEventListener('mouseup', (event) => {
-    // Gate pointer events behind game start
-    if (!appData.gameStarted) return
-    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
     sendPointerToHydra(event.clientX, event.clientY, false)
   })
   
   document.addEventListener('click', (event) => {
-    // Gate click events behind game start
-    if (!appData.gameStarted) return
+    // If clicking on Phaser area, forward a deselect event to Decker
+    if (event.target && (event.target as Element).tagName !== 'IFRAME') {
+      sendToDecker('background-click', {
+        x: event.clientX,
+        y: event.clientY
+      })
+    }
   })
   
   document.addEventListener('mousemove', (event) => {
-    // Gate pointer events behind game start
-    if (!appData.gameStarted) return
-    
     appData.lastPointerTime = Date.now()
     sendPointerToHydra(event.clientX, event.clientY, appData.pointerActive.active)
   })
   
   document.addEventListener('touchstart', (event) => {
-    // Gate touch events behind game start
-    if (!appData.gameStarted) return
-    
     initializeAudio()
     if (event.touches.length > 0) {
       const touch = event.touches[0]
@@ -421,9 +414,6 @@ function setupPointerTracking() {
   })
   
   document.addEventListener('touchend', (event) => {
-    // Gate touch events behind game start
-    if (!appData.gameStarted) return
-    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
     if (event.changedTouches.length > 0) {
@@ -433,9 +423,6 @@ function setupPointerTracking() {
   })
   
   document.addEventListener('touchmove', (event) => {
-    // Gate touch events behind game start
-    if (!appData.gameStarted) return
-    
     if (event.touches.length > 0) {
       const touch = event.touches[0]
       appData.lastPointerTime = Date.now()
@@ -444,9 +431,6 @@ function setupPointerTracking() {
   })
   
   document.addEventListener('mouseleave', () => {
-    // Gate mouse leave events behind game start
-    if (!appData.gameStarted) return
-    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
@@ -477,7 +461,7 @@ function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string)
 }
 
 function setupDeckerCommunication() {
-  appData.deckerFrame = document.getElementById('deck-container') as HTMLIFrameElement
+  appData.deckerFrame = document.getElementById('deck-iframe') as HTMLIFrameElement
   
   window.addEventListener('message', (event) => {
     if (event.source !== appData.deckerFrame?.contentWindow) return
@@ -578,9 +562,22 @@ function setupDeckerCommunication() {
         const healthValue = parseInt(message.split(':')[1])
         handleHealthChange(healthValue)
       } else if (message === 'game-started') {
+        console.log('Game started - enabling interactions')
         appData.gameStarted = true
         appData.audioStarted = true
         setFocus(true)
+        
+        // Switch to Marge card and allow clicks through to Phaser
+        sendToDecker('go', { card: 'marge' })
+        
+        // Set Decker iframe to allow clicks through (widgets inside will override this)
+        const deckIframe = document.getElementById('deck-iframe') as HTMLIFrameElement
+        if (deckIframe) {
+          console.log('Setting iframe pointer-events to none')
+          deckIframe.style.pointerEvents = 'none'
+        } else {
+          console.log('ERROR: Could not find deck-iframe')
+        }
       } else if (message === 'audioInitialized') {
         appData.audioStarted = true
       }
@@ -642,6 +639,24 @@ window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
   window['game'] = game
   appData.game = game
+  
+  // Debug: Check if canvas is created
+  setTimeout(() => {
+    const canvas = document.querySelector('canvas')
+    if (canvas) {
+      console.log('Phaser canvas found:', canvas)
+      console.log('Canvas position:', canvas.getBoundingClientRect())
+      console.log('Canvas z-index:', getComputedStyle(canvas).zIndex)
+      
+      // Add direct click handler to canvas for debugging
+      canvas.addEventListener('click', (e) => {
+        console.log('CANVAS CLICK DETECTED:', e.clientX, e.clientY)
+      })
+    } else {
+      console.log('ERROR: Phaser canvas not found')
+    }
+  }, 1000)
+  
   setupKeyboardControls()
   setupPointerTracking()
   setupDeckerCommunication()
