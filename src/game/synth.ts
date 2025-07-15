@@ -1,4 +1,4 @@
-import { appData } from '../app'
+import { appData, sendSynthDataToHydra } from '../app'
 import { Scene } from 'phaser'
 import * as Tone from 'tone'
 
@@ -67,8 +67,16 @@ export default class Synth extends Scene
             this.state.step++
             if (this.state.step > 256) this.state.step = 0
             
+            const currentBPM = Tone.getTransport().bpm.value
+            const volume = 0.5 + (this.state.step % 16) / 32
+            
+            sendSynthDataToHydra({
+                bpm: currentBPM,
+                step: this.state.step,
+                volume: volume
+            })
+            
             if (appData.hasFocus) {
-                // Make percussive click sound
                 this.clickNoise.start(time)
                 this.clickEnv.triggerAttackRelease('32n', time)
                 this.clickNoise.stop(time + 0.05)

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hydra Reactive Feedback</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hydra-canvas"></canvas>
+    <script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+    <script>
+        // REACTIVE FEEDBACK TYPE - Multi-layered responsive visuals
+        let synthData = { bpm: 120, step: 0, volume: 0.5 }
+        let pointerData = { x: 0.5, y: 0.5, pressed: false }
+        let gameData = { scene: 'default', level: 1, speed: 0.5, intensity: 0.5 }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const canvas = document.getElementById('hydra-canvas');
+                
+                const hydra = new Hydra({
+                    canvas: canvas,
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    makeGlobal: true,
+                    detectAudio: false,
+                    enableStreamCapture: false
+                });
+
+                setTimeout(() => {
+                    try {
+                        solid(1.0, 0.0, 0.5)
+                            .diff(osc(8, 0.1, 0.8).color(0.0, 1.0, 0.8))
+                            .modulate(noise(2), 0.3)
+                            .out();
+                        
+                        window.parent.postMessage({ type: 'hydra-ready' }, '*');
+                    } catch (effectError) {
+                        window.parent.postMessage({ type: 'hydra-ready' }, '*');
+                    }
+                }, 100);
+
+                window.addEventListener('resize', () => {
+                    hydra.setResolution(window.innerWidth, window.innerHeight);
+                });
+
+                window.addEventListener('message', (event) => {
+                    if (event.data.type === 'hydra-effect') {
+                        try {
+                            eval(event.data.code);
+                        } catch (e) {
+                            console.warn('Hydra effect error:', e);
+                        }
+                    } else if (event.data.type === 'hydra-synth-data') {
+                        synthData = { ...synthData, ...event.data.data };
+                        updateSynthVisuals();
+                    } else if (event.data.type === 'hydra-pointer') {
+                        pointerData = {
+                            x: event.data.x,
+                            y: event.data.y,
+                            pressed: event.data.pressed
+                        };
+                        updatePointerVisuals();
+                    } else if (event.data.type === 'hydra-game-data') {
+                        gameData = { ...gameData, ...event.data.data };
+                        updateGameVisuals();
+                    }
+                });
+
+                function updateSynthVisuals() {
+                    const stepIntensity = (synthData.step % 16) / 16;
+                    const bpmNorm = Math.max(0.1, Math.min(1.0, synthData.bpm / 200));
+                    
+                    try {
+                        solid(1.0, stepIntensity, 0.5)
+                            .diff(osc(bpmNorm * 20, 0.1, 1.0).color(0.2, 1.0, 0.3))
+                            .modulate(noise(3 + bpmNorm * 2), 0.2 + synthData.volume * 0.3)
+                            .out();
+                    } catch (e) {
+                        console.warn('Synth visual error:', e);
+                    }
+                }
+
+                function updatePointerVisuals() {
+                    const intensity = pointerData.pressed ? 1.0 : 0.3;
+                    
+                    try {
+                        solid(1.0, 0.2, pointerData.x)
+                            .diff(osc(pointerData.x * 30, 0.1, 1.0).color(pointerData.y, 0.8, 1.0))
+                            .blend(solid(0.0, pointerData.y, 1.0), intensity)
+                            .modulate(noise(4), 0.3)
+                            .out();
+                    } catch (e) {
+                        console.warn('Pointer visual error:', e);
+                    }
+                }
+
+                function updateGameVisuals() {
+                    const speedFactor = gameData.speed;
+                    const intensityFactor = gameData.intensity;
+                    
+                    try {
+                        solid(0.8, intensityFactor, 0.9)
+                            .diff(osc(speedFactor * 40, 0.1, 1.0).color(0.1, 0.9, intensityFactor))
+                            .blend(solid(speedFactor, 0.3, 1.0), 0.5)
+                            .modulate(noise(5), 0.2)
+                            .out();
+                    } catch (e) {
+                        console.warn('Game visual error:', e);
+                    }
+                }
+
+            } catch (error) {
+                window.parent.postMessage({ 
+                    type: 'hydra-error', 
+                    error: error.message 
+                }, '*');
+            }
+        });
+    </script>
+</body>
+</html>

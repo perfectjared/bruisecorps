@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hydra Visual Effects</title>
+    <style>
+        body { margin: 0; padding: 0; background: transparent; overflow: hidden; width: 100vw; height: 100vh; }
+        canvas { display: block; width: 100% !important; height: 100% !important; position: absolute; top: 0; left: 0; }
+    </style>
+</head>
+<body>
+    <canvas id="hydra-canvas"></canvas>
+    <script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+    <script>
+        let state = { 
+            synth: { bpm: 120, step: 0, volume: 0.5 }, 
+            pointer: { x: 0.5, y: 0.5, pressed: false }, 
+            game: { scene: 'default', level: 1, speed: 0.5, intensity: 0.5 } 
+        };
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const hydra = new Hydra({
+                    canvas: document.getElementById('hydra-canvas'),
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    makeGlobal: true,
+                    detectAudio: false,
+                    enableStreamCapture: false
+                });
+
+                // Default effect
+                setTimeout(() => {
+                    try {
+                        solid(1.0, 0.0, 0.5)
+                            .diff(osc(8, 0.1, 0.8).color(0.0, 1.0, 0.8))
+                            .modulate(noise(2), 0.3)
+                            .out();
+                    } catch (e) { /* ignore */ }
+                    window.parent.postMessage({ type: 'hydra-ready' }, '*');
+                }, 100);
+
+                window.addEventListener('resize', () => hydra.setResolution(window.innerWidth, window.innerHeight));
+
+                window.addEventListener('message', (event) => {
+                    const { type } = event.data;
+                    try {
+                        if (type === 'hydra-effect') eval(event.data.code);
+                        else if (type === 'hydra-synth-data') { state.synth = { ...state.synth, ...event.data.data }; updateVisuals(); }
+                        else if (type === 'hydra-pointer') { state.pointer = { x: event.data.x, y: event.data.y, pressed: event.data.pressed }; updateVisuals(); }
+                        else if (type === 'hydra-game-data') { state.game = { ...state.game, ...event.data.data }; updateVisuals(); }
+                    } catch (e) { console.warn('Hydra error:', e); }
+                });
+
+                function updateVisuals() {
+                    const { synth, pointer, game } = state;
+                    const stepIntensity = (synth.step % 16) / 16;
+                    const bpmNorm = Math.max(0.1, Math.min(1.0, synth.bpm / 200));
+                    const intensity = pointer.pressed ? 1.0 : 0.3;
+                    
+                    try {
+                        solid(1.0, stepIntensity, pointer.x)
+                            .diff(osc(bpmNorm * 20 + pointer.x * 10, 0.1, 1.0).color(pointer.y, 1.0, game.intensity))
+                            .blend(solid(game.speed, pointer.y, 1.0), intensity)
+                            .modulate(noise(3 + bpmNorm * 2), 0.2 + synth.volume * 0.3)
+                            .out();
+                    } catch (e) { console.warn('Visual update error:', e); }
+                }
+
+            } catch (error) {
+                window.parent.postMessage({ type: 'hydra-error', error: error.message }, '*');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -151,7 +151,8 @@ export default class DragDial
 
     create()
     {
-
+        // Create the underlying DynamicSprite
+        this.dSprite.create()
     }
 
     update()

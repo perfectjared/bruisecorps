@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { scenes, cameras, markSceneReady } from '../../app';
+import { scenes, cameras, markSceneReady, sendGameDataToHydra } from '../../app';
 import DynamicSprite from '../../data-types/dynamicsprite';
 import DragDial from '../../data-types/dragdial'
 import DragSlider from '../../data-types/dragslider'
@@ -20,6 +20,9 @@ export default class Marge extends Scene
   signal: DragSlider
   shifter: DragSlider
   rearviewSprite: DynamicSprite
+  
+  // Debug UI elements
+  debugText: Phaser.GameObjects.Text | null
 
   bandConfig: object
 
@@ -169,7 +172,8 @@ export default class Marge extends Scene
     {
       step: 0,
       gear: this.constants.gearValues.start,
-      signal : false
+      signal : false,
+      position: 0.5  // Road position: 0=left, 0.5=center, 1=right
     }
 
     this.buffer =
@@ -178,23 +182,50 @@ export default class Marge extends Scene
       lastGear: null,
       lastSignal: null
     }
+    
+    this.debugText = null;
   }
 
   create(): void
   {
+    // Create all the DynamicSprites and controls
+    this.dashSprite.create()
+    this.wheel.create()
+    this.ignition.create()
+    this.airCon.create()
+    this.signal.dSprite.create()  // DragSlider doesn't have create(), but its DynamicSprite does
+    this.shifter.dSprite.create() // DragSlider doesn't have create(), but its DynamicSprite does
+    this.rearviewSprite.create()
+    
+    // Create debug text once
+    this.debugText = this.add.text(20, 20, '', {
+      fontSize: '20px',
+      color: '#ffffff'
+    }).setDepth(1000);
+    
     // Signal that this scene is ready
     markSceneReady('marge')
   }
 
   update(): void
   {
-    // Check if synth scene and its state are available before accessing
     if (scenes.synth?.state?.step !== undefined) {
       const nextStep = (scenes.synth.state.step != this.state.step)
       if (nextStep)
       {
         this.step()
         this.state.step = scenes.synth.state.step
+        
+        const speed = Math.abs(this.wheel.sprite.rotation) / Math.PI
+        const intensity = (this.ignition.sprite.rotation + this.airCon.sprite.rotation) / (Math.PI * 2)
+        
+        sendGameDataToHydra({
+          scene: 'marge',
+          level: Math.floor(this.state.step / 64) + 1,
+          speed: speed,
+          intensity: intensity,
+          position: this.state.position
+        })
       }
     }
 
@@ -207,7 +238,15 @@ export default class Marge extends Scene
 
   control(): void
   {
-
+    // Update road position based on steering wheel rotation
+    const wheelRotation = this.wheel.sprite.rotation;
+    const steeringInput = wheelRotation / Math.PI; // Normalize to -1 to 1
+    
+    // Accumulate position changes (scaled down for smooth movement)
+    this.state.position += steeringInput * 0.01;
+    
+    // Clamp position to road bounds (0-1)
+    this.state.position = Math.max(0, Math.min(1, this.state.position));
   }
 
   step(): void
@@ -232,6 +271,14 @@ export default class Marge extends Scene
 
   debug(): void
   {
-
+    // Show position indicator on screen
+    const positionX = this.state.position * (this.scale.width - 40) + 20;
+    this.graphics.fillStyle(0x00ff88);
+    this.graphics.fillCircle(positionX, 50, 8);
+    
+    // Update debug text (reuse existing text object)
+    if (this.debugText) {
+      this.debugText.setText(`Position: ${this.state.position.toFixed(3)}`);
+    }
   }
 }

@@ -12,6 +12,7 @@ import Menu from './game/menu/menu'
 import Synth from './game/synth'
 import Road from './game/marge/road'
 import Rearview from './game/marge/rearview'
+import { initVectorGraphics, getVectorGraphics } from './lib/vector-graphics'
 
 import colors from './data/colors'
 
@@ -35,7 +36,7 @@ class App extends Phaser.Scene {
 
   update() {
     this.graphics.clear()
-    if (!appData.audioStarted || !appData.hasFocus) {
+    if (!appData.gameStarted || !appData.hasFocus) {
       this.graphics.fillStyle(colors[5], 0.66)
       this.graphics.fillRect(0, 0, appData.width, appData.height)
     }
@@ -66,13 +67,16 @@ interface AppData {
   scaleRatio: number,
   audioStarted: boolean,
   hasFocus: boolean,
+  gameStarted: boolean,
   playing: boolean,
+  lastPointerTime: number,
   pointerActive: {
     active: boolean,
     targetSprite: Phaser.GameObjects.Sprite | null
   },
   viewport: Phaser.Geom.Rectangle,
-  deckerFrame: HTMLIFrameElement | null
+  deckerFrame: HTMLIFrameElement | null,
+  hydraFrame: HTMLIFrameElement | null
 }
 
 var appData: AppData = {
@@ -82,14 +86,17 @@ var appData: AppData = {
   height: 0,
   scaleRatio: window.devicePixelRatio / 3,
   audioStarted: false,
-  hasFocus: true,
+  hasFocus: false,
+  gameStarted: false,
   playing: false,
+  lastPointerTime: 0,
   pointerActive: {
     active: false,
     targetSprite: null
   },
   viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight),
-  deckerFrame: null
+  deckerFrame: null,
+  hydraFrame: null
 }
 
 let focusTimeout: ReturnType<typeof setTimeout> | null = null
@@ -99,6 +106,7 @@ function setFocus(focused: boolean, immediate = false) {
   
   if (focused) {
     appData.hasFocus = true
+    console.log('Focus enabled - hasFocus:', appData.hasFocus, 'gameStarted:', appData.gameStarted)
   } else if (immediate) {
     appData.hasFocus = false
     appData.pointerActive.active = false
@@ -282,6 +290,8 @@ function switchToMargeCamera() {
   if (cameras.marge && cameras.rearview) {
     cameras.marge.setVisible(true)
     cameras.rearview.setVisible(false)
+    // Also switch Decker to marge card
+    sendToDecker('switchCard', { card: 'marge' })
   }
 }
 
@@ -289,11 +299,45 @@ function switchToRearviewCamera() {
   if (cameras.marge && cameras.rearview) {
     cameras.marge.setVisible(false)
     cameras.rearview.setVisible(true)
+    // Also switch Decker to rearview card
+    sendToDecker('switchCard', { card: 'rearview' })
   }
+}
+
+function handleCardChange(cardName: string) {
+  console.log('Card changed to:', cardName)
+  
+  // Switch camera view based on card, but don't send message back to Decker
+  // (this would create a feedback loop)
+  if (cardName === 'marge') {
+    if (cameras.marge && cameras.rearview) {
+      cameras.marge.setVisible(true)
+      cameras.rearview.setVisible(false)
+    }
+  } else if (cardName === 'rearview') {
+    if (cameras.marge && cameras.rearview) {
+      cameras.marge.setVisible(false)
+      cameras.rearview.setVisible(true)
+    }
+  }
+  
+  // Send card change notification to other systems (but not back to Decker)
+  // sendToDecker('cardChanged', { card: cardName }) // Removed to prevent feedback loop
+}
+
+function handleHealthChange(healthValue: number) {
+  console.log('Health changed to:', healthValue)
+  
+  // Update game state or other systems based on health
+  // For now, just log and send to other systems
+  sendToDecker('healthChanged', { health: healthValue })
 }
 
 function setupKeyboardControls() {
   document.addEventListener('keydown', (event) => {
+    // Only handle keyboard controls if game has started
+    if (!appData.gameStarted) return
+    
     if (!appData.audioStarted) appData.audioStarted = true
     
     switch (event.key) {
@@ -309,7 +353,10 @@ function setupKeyboardControls() {
 
 function setupPointerTracking() {
   function initializeAudio() {
-    if (!appData.audioStarted) appData.audioStarted = true
+    // Audio only initializes after game starts
+    if (appData.gameStarted && !appData.audioStarted) {
+      appData.audioStarted = true
+    }
   }
 
   function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null {
@@ -342,38 +389,81 @@ function setupPointerTracking() {
   }
 
   document.addEventListener('mousedown', (event) => {
+    // Gate pointer events behind game start
+    if (!appData.gameStarted) return
+    
     initializeAudio()
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
     appData.pointerActive.active = true
     appData.pointerActive.targetSprite = sprite
+    appData.lastPointerTime = Date.now()
+    sendPointerToHydra(event.clientX, event.clientY, true)
   })
   
-  document.addEventListener('mouseup', () => {
+  document.addEventListener('mouseup', (event) => {
+    // Gate pointer events behind game start
+    if (!appData.gameStarted) return
+    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
+    sendPointerToHydra(event.clientX, event.clientY, false)
+  })
+  
+  document.addEventListener('click', (event) => {
+    // Gate click events behind game start
+    if (!appData.gameStarted) return
+  })
+  
+  document.addEventListener('mousemove', (event) => {
+    // Gate pointer events behind game start
+    if (!appData.gameStarted) return
+    
+    appData.lastPointerTime = Date.now()
+    sendPointerToHydra(event.clientX, event.clientY, appData.pointerActive.active)
   })
   
   document.addEventListener('touchstart', (event) => {
+    // Gate touch events behind game start
+    if (!appData.gameStarted) return
+    
     initializeAudio()
     if (event.touches.length > 0) {
       const touch = event.touches[0]
       const sprite = getSpriteUnderPointer(touch.clientX, touch.clientY)
       appData.pointerActive.active = true
       appData.pointerActive.targetSprite = sprite
+      appData.lastPointerTime = Date.now()
+      sendPointerToHydra(touch.clientX, touch.clientY, true)
     }
   })
   
-  document.addEventListener('touchend', () => {
+  document.addEventListener('touchend', (event) => {
+    // Gate touch events behind game start
+    if (!appData.gameStarted) return
+    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
+    if (event.changedTouches.length > 0) {
+      const touch = event.changedTouches[0]
+      sendPointerToHydra(touch.clientX, touch.clientY, false)
+    }
   })
   
-  document.addEventListener('touchcancel', () => {
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
+  document.addEventListener('touchmove', (event) => {
+    // Gate touch events behind game start
+    if (!appData.gameStarted) return
+    
+    if (event.touches.length > 0) {
+      const touch = event.touches[0]
+      appData.lastPointerTime = Date.now()
+      sendPointerToHydra(touch.clientX, touch.clientY, appData.pointerActive.active)
+    }
   })
   
   document.addEventListener('mouseleave', () => {
+    // Gate mouse leave events behind game start
+    if (!appData.gameStarted) return
+    
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
   })
@@ -427,17 +517,24 @@ function setupDeckerCommunication() {
           break
           
         case 'decker-pointer-passthrough':
+          // Pass through pointer events from transparent Decker areas to game
+          if (!appData.gameStarted) break
+          
           const pointerEvent = message.event
           const canvas = document.querySelector('canvas') as HTMLCanvasElement
           if (canvas && pointerEvent) {
-            const syntheticEvent = new MouseEvent(pointerEvent.type, {
-              clientX: pointerEvent.clientX,
-              clientY: pointerEvent.clientY,
-              button: pointerEvent.button,
-              buttons: pointerEvent.buttons,
-              bubbles: true,
-              cancelable: true
-            })
+            // Create universal synthetic event (handles both mouse and touch)
+            const syntheticEvent = pointerEvent.type.startsWith('touch') 
+              ? new TouchEvent(pointerEvent.type, { bubbles: true, cancelable: true })
+              : new MouseEvent(pointerEvent.type, {
+                  clientX: pointerEvent.clientX,
+                  clientY: pointerEvent.clientY,
+                  button: pointerEvent.button,
+                  buttons: pointerEvent.buttons,
+                  bubbles: true,
+                  cancelable: true
+                })
+            
             canvas.dispatchEvent(syntheticEvent)
           }
           break
@@ -464,6 +561,10 @@ function setupDeckerCommunication() {
         case 'decker-message':
           if (message.message === 'focus') setFocus(true)
           else if (message.message === 'blur') setFocus(false)
+          else if (message.data?.action === 'game-started') {
+            appData.gameStarted = true
+            setFocus(true)
+          }
           break
       }
     }
@@ -474,6 +575,9 @@ function setupDeckerCommunication() {
         if (camera === 'marge') switchToMargeCamera()
         else if (camera === 'rearview') switchToRearviewCamera()
       } else if (message.startsWith('sound:')) {
+        // Only play sounds if game has started
+        if (!appData.gameStarted) return
+        
         if (!appData.audioStarted) appData.audioStarted = true
         const params = message.split(':')[1]
         const [freq, dur] = params.split(',')
@@ -490,6 +594,14 @@ function setupDeckerCommunication() {
         setFocus(true)
       } else if (message === 'blur') {
         setFocus(false)
+      } else if (message.startsWith('health-changed:')) {
+        const healthValue = parseInt(message.split(':')[1])
+        handleHealthChange(healthValue)
+      } else if (message === 'game-started') {
+        // Enable game state and audio after start button
+        appData.gameStarted = true
+        appData.audioStarted = true
+        setFocus(true)
       } else if (message === 'audioInitialized') {
         appData.audioStarted = true
       }
@@ -510,6 +622,40 @@ function sendToDecker(type: string, data: any) {
   }
 }
 
+// Hydra Integration Functions
+function sendToHydra(data: any) {
+  if (appData.hydraFrame?.contentWindow) {
+    appData.hydraFrame.contentWindow.postMessage(data, '*');
+  }
+}
+
+function sendSynthDataToHydra(data: { bpm?: number, step?: number, volume?: number, frequency?: number }) {
+  sendToHydra({ type: 'hydra-synth-data', data });
+}
+
+function sendPointerToHydra(x: number, y: number, pressed: boolean) {
+  sendToHydra({ 
+    type: 'hydra-pointer', 
+    x: x / window.innerWidth,
+    y: y / window.innerHeight,
+    pressed 
+  });
+}
+
+function sendGameDataToHydra(data: { scene?: string, level?: number, speed?: number, intensity?: number, position?: number }) {
+  sendToHydra({ type: 'hydra-game-data', data });
+}
+
+function setupHydraEffects() {
+  appData.hydraFrame = document.getElementById('hydra-container') as HTMLIFrameElement;
+  
+  window.addEventListener('message', (event) => {
+    if (event.source === appData.hydraFrame?.contentWindow && event.data.type === 'hydra-ready') {
+      // Hydra is ready
+    }
+  });
+}
+
 let game: Phaser.Game
 window.addEventListener('load', () => {
   game = new Phaser.Game(gameConfig)
@@ -518,19 +664,30 @@ window.addEventListener('load', () => {
   setupKeyboardControls()
   setupPointerTracking()
   setupDeckerCommunication()
+  setupHydraEffects()
+  
+  // Initialize vector graphics after DOM is loaded
+  setTimeout(() => {
+    initVectorGraphics()
+  }, 100)
 
-  window.addEventListener('focus', () => setFocus(true))
-  window.addEventListener('blur', () => setFocus(false))
+  window.addEventListener('focus', () => {
+    // Only set focus if game has already started
+    if (appData.gameStarted) setFocus(true)
+  })
+  window.addEventListener('blur', () => {
+    // Only handle blur if game has started
+    if (appData.gameStarted) setFocus(false)
+  })
   
   document.addEventListener('visibilitychange', () => {
-    setFocus(!document.hidden, true)
+    // Only handle visibility changes if game has started
+    if (appData.gameStarted) setFocus(!document.hidden, true)
   })
   
   appData.hasFocus = !document.hidden && document.hasFocus()
   
-  setTimeout(() => {
-    if (!appData.audioStarted) appData.audioStarted = true
-  }, 3000)
+  // Audio is gated behind game start - no automatic initialization
 })
 
 window.addEventListener('resize', () => {
@@ -565,5 +722,10 @@ export
   isPointerActive,
   getPointerTarget,
   isPointerOnSprite,
-  sendToDecker
+  sendToDecker,
+  sendToHydra,
+  sendSynthDataToHydra,
+  sendPointerToHydra,
+  sendGameDataToHydra,
+  setupHydraEffects
 }

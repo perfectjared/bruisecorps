@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "ddecker.html": "plaintext"
+  },
+  "typescript.validate.enable": false,
+  "javascript.validate.enable": false
+}
