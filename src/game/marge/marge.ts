@@ -256,7 +256,27 @@ export default class Marge extends Scene
 
   feedback(): void
   {
-    this.graphics.clear()
+    this.graphics.clear();
+    // --- Rumble effect (visual only, does not break anchor or input) ---
+    const rumbleStrength = 1.5; // pixels
+    const spritesToRumble = [
+      this.dashSprite,
+      this.wheel.dSprite,
+      this.ignition.dSprite,
+      this.signal.dSprite,
+      this.shifter.dSprite,
+      this.rearviewSprite
+    ];
+    spritesToRumble.forEach(ds => {
+      if (ds) {
+        ds.rumbleOffset = {
+          x: (Math.random() - 0.5) * 2 * rumbleStrength,
+          y: (Math.random() - 0.5) * 2 * rumbleStrength
+        };
+        if (typeof ds.draw === 'function') ds.draw();
+        ds.rumbleOffset = { x: 0, y: 0 }; // Reset after draw
+      }
+    });
   }
 
   debug(): void

@@ -10,6 +10,8 @@ export default class DynamicSprite {
     anchorConfig: any;
     sizer: Sizer;
     uiPlugin: any;
+    _origPos?: { x: number, y: number };
+    rumbleOffset?: { x: number, y: number } = { x: 0, y: 0 };
 
     constructor(scene: Phaser.Scene, anchor: any = {}, sprite?: Phaser.GameObjects.Sprite) {
         this.scene = scene;
@@ -45,6 +47,15 @@ export default class DynamicSprite {
         }
         this.graphics.clear();
         this.graphics.lineStyle(1, 0xFFFFFF, 1);
-        this.graphics.strokeRectShape(this.sprite.getBounds());
+        // Use rumbleOffset for visual-only effect
+        const offsetX = this.rumbleOffset?.x || 0;
+        const offsetY = this.rumbleOffset?.y || 0;
+        const bounds = this.sprite.getBounds();
+        this.graphics.strokeRect(
+            bounds.x + offsetX,
+            bounds.y + offsetY,
+            bounds.width,
+            bounds.height
+        );
     }
 }
