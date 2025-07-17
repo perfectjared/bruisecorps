@@ -131,6 +131,50 @@ export class VectorGraphics {
     updateBeatData(data: { step?: number; volume?: number }) {
         this.beatData = { ...this.beatData, ...data };
     }
+
+    // Update road position based on wheel steering input
+    updateRoadPosition(position: number) {
+        // Convert position (0-1) to road offset
+        // Position 0.5 = center, 0 = left, 1 = right
+        const centerOffset = (position - 0.5) * 200; // Scale factor for road movement
+        
+        // Apply position offset to road elements
+        this.elements.forEach((element, id) => {
+            if (id.includes('road-left') || id.includes('road-right')) {
+                // Main road perspective lines
+                const currentPath = element.getAttribute('d');
+                if (id === 'road-left') {
+                    const newPath = `M ${-centerOffset} 1080 L ${760 - centerOffset} 350`;
+                    element.setAttribute('d', newPath);
+                } else if (id === 'road-right') {
+                    const newPath = `M ${1920 - centerOffset} 1080 L ${1160 - centerOffset} 350`;
+                    element.setAttribute('d', newPath);
+                }
+            } else if (id.includes('center-line')) {
+                // Center road divider
+                const newPath = `M ${960 - centerOffset} 1080 L ${960 - centerOffset} 350`;
+                element.setAttribute('d', newPath);
+            } else if (id.includes('stripe-')) {
+                // Road stripes
+                const currentX1 = parseFloat(element.getAttribute('x1') || '960');
+                const currentX2 = parseFloat(element.getAttribute('x2') || '960');
+                element.setAttribute('x1', (960 - centerOffset).toString());
+                element.setAttribute('x2', (960 - centerOffset).toString());
+            } else if (id.includes('marker-l')) {
+                // Left side markers
+                const markerIndex = parseInt(id.split('marker-l')[1]);
+                const baseX = 760 - (markerIndex * 80);
+                element.setAttribute('x1', (baseX - centerOffset).toString());
+                element.setAttribute('x2', (baseX - 20 - centerOffset).toString());
+            } else if (id.includes('marker-r')) {
+                // Right side markers
+                const markerIndex = parseInt(id.split('marker-r')[1]);
+                const baseX = 1160 + (markerIndex * 80);
+                element.setAttribute('x1', (baseX - centerOffset).toString());
+                element.setAttribute('x2', (baseX + 20 - centerOffset).toString());
+            }
+        });
+    }
     
     setVisibility(visible: boolean) {
         this.container.style.display = visible ? 'block' : 'none';

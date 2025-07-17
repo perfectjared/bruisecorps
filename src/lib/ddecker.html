@@ -7352,15 +7352,6 @@ window.addEventListener('message', function(event) {
       // Use the proper Decker API to switch cards
       n_go([lms(cardName)], deck);
     }
-  } else if (event.data && event.data.type === 'background-click') {
-    // Simulate a click on the transparent background to deselect widgets
-    const clickEvent = new MouseEvent('click', {
-      clientX: event.data.data.x,
-      clientY: event.data.data.y,
-      bubbles: true,
-      cancelable: true
-    });
-    document.dispatchEvent(clickEvent);
   }
 });
 

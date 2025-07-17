@@ -12,8 +12,15 @@ import Menu from './game/menu/menu'
 import Synth from './game/synth'
 import Road from './game/marge/road'
 import Rearview from './game/marge/rearview'
-import { initVectorGraphics, getVectorGraphics } from './lib/vector-graphics'
+import { initVectorGraphics } from './lib/vector-graphics'
 import colors from './data/colors'
+
+// Import new systems
+import { gameState } from './game/state'
+import { gameHistory } from './game/history'
+import { roadSystem } from './game/road'
+import { storyManager } from './game/story'
+import { deckerBridge } from './game/decker-bridge'
 
 class App extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics
@@ -28,9 +35,80 @@ class App extends Phaser.Scene {
   }
 
   create() {
+    // Initialize core systems first
+    this.initializeCoreSystemsAndEventListeners();
+    
+    // Launch scenes
     this.scene.launch('SynthScene')
     this.scene.launch('MargeScene')
     this.scene.launch('RearviewScene')
+  }
+
+  private initializeCoreSystemsAndEventListeners(): void {
+    // Initialize game state
+    gameState.startGame();
+    
+    // Initialize story manager
+    storyManager.startStory();
+    
+    // Set up cross-system event listeners for clean communication
+    this.setupSystemEventListeners();
+    
+    // Initialize road system (will be activated by Marge scene)
+    roadSystem.reset();
+    
+    // Initialize Decker bridge
+    const deckerFrame = appData.deckerFrame;
+    if (deckerFrame) {
+      deckerBridge.connectToIframe(deckerFrame);
+    }
+  }
+
+  private setupSystemEventListeners(): void {
+    // Game state events
+    gameState.on('game-started', () => {
+      console.log('Game started');
+      appData.gameStarted = true;
+    });
+    
+    gameState.on('game-paused', () => {
+      console.log('Game paused');
+      appData.gameStarted = false;
+    });
+    
+    // Story events (these can create commands)
+    storyManager.on('story-node-entered', (node) => {
+      console.log(`Story node entered: ${node.title}`);
+      deckerBridge.syncStoryState();
+    });
+    
+    storyManager.on('objective-completed', (objective) => {
+      console.log(`Objective completed: ${objective.title}`);
+      // This could create a command for major objectives
+    });
+    
+    // Road system events (mostly informational, not command-worthy)
+    roadSystem.on('major-position-change', (data) => {
+      console.log(`Major position change: ${data.change.toFixed(3)}`);
+      // Could create a command for significant driving events
+    });
+    
+    // History events for debugging (much cleaner now)
+    gameHistory.on('command-executed', (command) => {
+      console.log(`Command executed: ${command.type}`);
+    });
+    
+    // Decker bridge events
+    deckerBridge.on('decker-connected', () => {
+      console.log('Decker bridge connected');
+      deckerBridge.syncGameState();
+      deckerBridge.syncStoryState();
+    });
+    
+    deckerBridge.on('decker-event', (event) => {
+      console.log(`Decker event: ${event.type} on ${event.widget}`);
+      // Decker events can create commands for menu navigation, story choices, etc.
+    });
   }
 
   update() {
@@ -52,6 +130,9 @@ const scenes = {
   road: new Road(),
   synth: new Synth()
 }
+
+// Export new systems for global access
+export { gameState, gameHistory, roadSystem, storyManager, deckerBridge };
 
 interface AppData {
   game: Phaser.Game,
@@ -226,6 +307,11 @@ function markSceneReady(sceneName: keyof typeof scenesReady) {
 
   scenesReady[sceneName] = true
 
+  // Set up event listeners when specific scenes are ready
+  if (sceneName === 'marge') {
+    setupMargeEventListeners();
+  }
+
   if (Object.values(scenesReady).every(ready => ready)) {
     initializeCameras()
   }
@@ -343,11 +429,9 @@ function setupPointerTracking() {
   }
 
   function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null {
-    console.log('getSpriteUnderPointer called with:', x, y)
     if (!appData.game) return null
     
     const activeScenes = appData.game.scene.getScenes(true)
-    console.log('Active scenes:', activeScenes.length)
     
     for (const scene of activeScenes) {
       if (!scene.cameras.main) continue
@@ -356,15 +440,12 @@ function setupPointerTracking() {
       const worldX = camera.scrollX + (x - camera.x) / camera.zoom
       const worldY = camera.scrollY + (y - camera.y) / camera.zoom
       
-      console.log('Checking scene:', scene.scene.key, 'worldX:', worldX, 'worldY:', worldY)
-      
       let foundSprite: Phaser.GameObjects.Sprite | null = null
       
       scene.children.list.forEach((child) => {
         if (child instanceof Phaser.GameObjects.Sprite && child.visible && child.active) {
           const bounds = child.getBounds()
           if (bounds.contains(worldX, worldY)) {
-            console.log('Found sprite:', child.texture.key, 'at', bounds)
             foundSprite = child
           }
         }
@@ -373,15 +454,12 @@ function setupPointerTracking() {
       if (foundSprite) return foundSprite
     }
     
-    console.log('No sprite found under pointer')
     return null
   }
 
   document.addEventListener('mousedown', (event) => {
-    console.log('Mousedown event triggered:', event.target)
     initializeAudio()
     const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
-    console.log('Sprite under pointer:', sprite)
     appData.pointerActive.active = true
     appData.pointerActive.targetSprite = sprite
     appData.lastPointerTime = Date.now()
@@ -392,16 +470,6 @@ function setupPointerTracking() {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
     sendPointerToHydra(event.clientX, event.clientY, false)
-  })
-  
-  document.addEventListener('click', (event) => {
-    // If clicking on Phaser area, forward a deselect event to Decker
-    if (event.target && (event.target as Element).tagName !== 'IFRAME') {
-      sendToDecker('background-click', {
-        x: event.clientX,
-        y: event.clientY
-      })
-    }
   })
   
   document.addEventListener('mousemove', (event) => {
@@ -570,7 +638,6 @@ function setupDeckerCommunication() {
         const healthValue = parseInt(message.split(':')[1])
         handleHealthChange(healthValue)
       } else if (message === 'game-started') {
-        console.log('Game started - enabling interactions')
         appData.gameStarted = true
         appData.audioStarted = true
         setFocus(true)
@@ -581,7 +648,6 @@ function setupDeckerCommunication() {
         // Set Decker container to allow clicks through but keep iframe interactive
         const deckContainer = document.getElementById('deck-container')
         if (deckContainer) {
-          console.log('Setting deck-container pointer-events to none')
           deckContainer.style.pointerEvents = 'none'
           
           // Keep iframe interactive
@@ -589,8 +655,6 @@ function setupDeckerCommunication() {
           if (deckIframe) {
             deckIframe.style.pointerEvents = 'auto'
           }
-        } else {
-          console.log('ERROR: Could not find deck-container')
         }
       } else if (message === 'audioInitialized') {
         appData.audioStarted = true
@@ -654,20 +718,11 @@ window.addEventListener('load', () => {
   window['game'] = game
   appData.game = game
   
-  // Debug: Check if canvas is created
+  // Initialize debug canvas monitoring
   setTimeout(() => {
     const canvas = document.querySelector('canvas')
     if (canvas) {
-      console.log('Phaser canvas found:', canvas)
-      console.log('Canvas position:', canvas.getBoundingClientRect())
-      console.log('Canvas z-index:', getComputedStyle(canvas).zIndex)
-      
-      // Add direct click handler to canvas for debugging
-      canvas.addEventListener('click', (e) => {
-        console.log('CANVAS CLICK DETECTED:', e.clientX, e.clientY)
-      })
-    } else {
-      console.log('ERROR: Phaser canvas not found')
+      // Canvas found and ready
     }
   }, 1000)
   
@@ -731,4 +786,22 @@ export {
   sendPointerToHydra,
   sendGameDataToHydra,
   setupHydraEffects
+}
+
+// New function to set up event listeners specific to the Marge scene
+function setupMargeEventListeners() {
+  // Vehicle control events from Marge scene
+  scenes.marge.events.on('significant-position-change', (data) => {
+    console.log(`Significant driving event: position ${data.position.toFixed(3)}`);
+    // This could trigger story events or game state changes
+  });
+  
+  scenes.marge.events.on('gear-changed', (data) => {
+    console.log(`Gear changed to: ${data.newValue.toFixed(2)}`);
+    // Only create commands for meaningful gear changes (like first time putting in gear)
+    if (data.oldValue >= 1 && data.newValue < 1) {
+      console.log('Player first engaged gear - significant game event');
+      // This could trigger story progression
+    }
+  });
 }

@@ -29,6 +29,9 @@ export default class DragDial
         last
     }
 
+    // Track relative position for repositioning
+    relativePosition: { x: number, y: number } = { x: 0, y: 0 }
+
     dragRotatePlugin: any
     dragRotate: DragRotate
     dragging: boolean
@@ -108,6 +111,7 @@ export default class DragDial
 
         scene.events.on('update', function()
         {
+            this.updateRelativePosition()
             this.placeRelative()
             this.handleGlobalPointerTracking()
             if (this.config.return) this.returnToCenter()
@@ -120,8 +124,24 @@ export default class DragDial
         }, this)
     }
 
+    updateRelativePosition()
+    {
+        // Store relative position when it's first calculated
+        if (this.relativePosition.x === 0 && this.dSprite.sprite.x !== 0) {
+            this.relativePosition.x = this.dSprite.sprite.x / appData.width
+            this.relativePosition.y = this.dSprite.sprite.y / appData.height
+        }
+    }
+
     placeRelative()
     {
+        // Update sprite position based on relative position and current window size
+        if (this.relativePosition.x !== 0) {
+            this.sprite.x = this.relativePosition.x * appData.width
+            this.sprite.y = this.relativePosition.y * appData.height
+        }
+        
+        // Update drag plugin position and constraints
         this.dragRotate.x = this.sprite.x
         this.dragRotate.y = this.sprite.y
         this.dragRotate.maxRadius = this.sprite.displayWidth / 2
@@ -157,7 +177,7 @@ export default class DragDial
 
     update()
     {
-
+        this.handleGlobalPointerTracking()
     }
 
     handleGlobalPointerTracking()

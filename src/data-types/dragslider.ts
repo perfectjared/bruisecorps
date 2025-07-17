@@ -36,7 +36,7 @@ export default class DragSlider
     snaps: number[] | null
     percent: number
 
-    constructor(scene, dSprite: DynamicSprite, snaps: number[] = null, percent: number = 0.66)
+    constructor(scene, dSprite: DynamicSprite, snaps: number[] = null, percent: number = 0.66, initialValue: number = 0)
     {
         this.buffer =
         {
@@ -60,7 +60,7 @@ export default class DragSlider
                     { x: 0, y:0 },
                     { x: 0, y:0 }
                 ],
-                value: 0,
+                value: initialValue,
                 enable: true
             }
         )
@@ -130,6 +130,5 @@ export default class DragSlider
             }
         }
         this.slider.setValue(this.snaps[smallest.index])
-        console.log(smallest)
     }
 }
