@@ -19,9 +19,6 @@ export default class Marge extends Scene
   signal: DragSlider
   shifter: DragSlider
   rearviewSprite: DynamicSprite
-  
-  // Debug UI elements
-  debugText: Phaser.GameObjects.Text | null
 
   bandConfig: object
 
@@ -56,18 +53,6 @@ export default class Marge extends Scene
     ),
     {
       startAngle: 3,
-      return: true
-    })
-    this.ignition = new DragDial(this, new DynamicSprite(this,
-      {
-        x: '85%',
-        y: '85%',
-        width: '15%',
-        height: '15%'
-      }
-    ),
-    {
-      startAngle: 0,
       return: true
     })
 
@@ -164,7 +149,7 @@ export default class Marge extends Scene
       step: 0,
       gear: this.constants.gearValues.start,
       signal : false,
-      position: 0.5  // Road position: 0=left, 0.5=center, 1=right
+      position: 0.5
     }
 
     this.buffer =
@@ -174,26 +159,16 @@ export default class Marge extends Scene
       lastSignal: null
     }
     
-    this.debugText = null;
   }
 
   create(): void
   {
-    // Create all the DynamicSprites and controls
     this.dashSprite.create()
     this.wheel.create()
-    this.ignition.create()
-    this.signal.dSprite.create()  // DragSlider doesn't have create(), but its DynamicSprite does
-    this.shifter.dSprite.create() // DragSlider doesn't have create(), but its DynamicSprite does
+    this.signal.dSprite.create()
+    this.shifter.dSprite.create()
     this.rearviewSprite.create()
-    
-    // Create debug text once
-    this.debugText = this.add.text(20, 20, '', {
-      fontSize: '20px',
-      color: '#ffffff'
-    }).setDepth(1000);
-    
-    // Signal that this scene is ready
+
     markSceneReady('marge')
   }
 
@@ -204,18 +179,6 @@ export default class Marge extends Scene
       if (nextStep)
       {
         this.step()
-        this.state.step = scenes.synth.state.step
-        
-        const speed = Math.abs(this.wheel.sprite.rotation) / Math.PI
-        const intensity = this.ignition.sprite.rotation / Math.PI
-        
-        sendGameDataToHydra({
-          scene: 'marge',
-          level: Math.floor(this.state.step / 64) + 1,
-          speed: speed,
-          intensity: intensity,
-          position: this.state.position
-        })
       }
     }
 
@@ -228,20 +191,17 @@ export default class Marge extends Scene
 
   control(): void
   {
-    // Update road position based on steering wheel rotation
     const wheelRotation = this.wheel.sprite.rotation;
-    const steeringInput = wheelRotation / Math.PI; // Normalize to -1 to 1
+    const steeringInput = wheelRotation / Math.PI;
     
-    // Accumulate position changes (scaled down for smooth movement)
     this.state.position += steeringInput * 0.01;
     
-    // Clamp position to road bounds (0-1)
     this.state.position = Math.max(0, Math.min(1, this.state.position));
   }
 
   step(): void
   {
-
+    this.state.step = scenes.synth.state.step
   }
 
   process(): void
@@ -257,38 +217,10 @@ export default class Marge extends Scene
   feedback(): void
   {
     this.graphics.clear();
-    // --- Rumble effect (visual only, does not break anchor or input) ---
-    const rumbleStrength = 1.5; // pixels
-    const spritesToRumble = [
-      this.dashSprite,
-      this.wheel.dSprite,
-      this.ignition.dSprite,
-      this.signal.dSprite,
-      this.shifter.dSprite,
-      this.rearviewSprite
-    ];
-    spritesToRumble.forEach(ds => {
-      if (ds) {
-        ds.rumbleOffset = {
-          x: (Math.random() - 0.5) * 2 * rumbleStrength,
-          y: (Math.random() - 0.5) * 2 * rumbleStrength
-        };
-        if (typeof ds.draw === 'function') ds.draw();
-        ds.rumbleOffset = { x: 0, y: 0 }; // Reset after draw
-      }
-    });
   }
 
   debug(): void
   {
-    // Show position indicator on screen
-    const positionX = this.state.position * (this.scale.width - 40) + 20;
-    this.graphics.fillStyle(0x00ff88);
-    this.graphics.fillCircle(positionX, 50, 8);
-    
-    // Update debug text (reuse existing text object)
-    if (this.debugText) {
-      this.debugText.setText(`Position: ${this.state.position.toFixed(3)}`);
-    }
+
   }
 }

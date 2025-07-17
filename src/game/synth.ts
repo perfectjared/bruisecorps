@@ -33,10 +33,7 @@ export default class Synth extends Scene
             release: 0.01
         })
         
-        // Chain: Noise -> Envelope -> Gain -> Destination
-        const clickGain = new Tone.Gain(-46)
-        this.clickNoise.chain(this.clickEnv, clickGain, Tone.getDestination())
-        
+        this.clickNoise.chain(this.clickEnv, new Tone.Gain(-100), Tone.getDestination())
         Tone.getTransport().bpm.value = this.constants.bpms[0]
     }
 
@@ -68,13 +65,7 @@ export default class Synth extends Scene
             if (this.state.step > 256) this.state.step = 0
             
             const currentBPM = Tone.getTransport().bpm.value
-            const volume = 0.5 + (this.state.step % 16) / 32
-            
-            sendSynthDataToHydra({
-                bpm: currentBPM,
-                step: this.state.step,
-                volume: volume
-            })
+            const volume = 0.5
             
             if (appData.hasFocus) {
                 this.clickNoise.start(time)

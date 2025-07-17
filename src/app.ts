@@ -1,5 +1,4 @@
 import 'phaser'
-// Use dynamic imports to bypass TypeScript's type checking
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
@@ -13,13 +12,13 @@ import Menu from './game/menu/menu'
 import Synth from './game/synth'
 import Road from './game/marge/road'
 import Rearview from './game/marge/rearview'
+
 import { initVectorGraphics } from './lib/vector-graphics'
 import colors from './data/colors'
 
-// Import new systems
 import { gameState } from './game/state'
 import { gameHistory } from './game/history'
-import { roadSystem } from './game/road'
+//import { roadSystem } from './game/road'
 import { storyManager } from './game/story'
 import { deckerBridge } from './game/decker-bridge'
 
@@ -46,19 +45,14 @@ class App extends Phaser.Scene {
   }
 
   private initializeCoreSystemsAndEventListeners(): void {
-    // Initialize game state
     gameState.startGame();
     
-    // Initialize story manager
     storyManager.startStory();
     
-    // Set up cross-system event listeners for clean communication
     this.setupSystemEventListeners();
     
-    // Initialize road system (will be activated by Marge scene)
-    roadSystem.reset();
+    //roadSystem.reset();
     
-    // Initialize Decker bridge
     const deckerFrame = appData.deckerFrame;
     if (deckerFrame) {
       deckerBridge.connectToIframe(deckerFrame);
@@ -89,10 +83,10 @@ class App extends Phaser.Scene {
     });
     
     // Road system events (mostly informational, not command-worthy)
-    roadSystem.on('major-position-change', (data) => {
-      console.log(`Major position change: ${data.change.toFixed(3)}`);
-      // Could create a command for significant driving events
-    });
+    // roadSystem.on('major-position-change', (data) => {
+    //   console.log(`Major position change: ${data.change.toFixed(3)}`);
+    //   // Could create a command for significant driving events
+    // });
     
     // History events for debugging (much cleaner now)
     gameHistory.on('command-executed', (command) => {
@@ -132,8 +126,7 @@ const scenes = {
   synth: new Synth()
 }
 
-// Export new systems for global access
-export { gameState, gameHistory, roadSystem, storyManager, deckerBridge };
+export { gameState, gameHistory, storyManager, deckerBridge };
 
 interface AppData {
   game: Phaser.Game,
@@ -399,13 +392,11 @@ function handleCardChange(cardName: string) {
 }
 
 function handleHealthChange(healthValue: number) {
-  // Update game state based on health value
   sendToDecker('healthChanged', { health: healthValue })
 }
 
 function setupKeyboardControls() {
   document.addEventListener('keydown', (event) => {
-    // Only handle keyboard controls if game has started
     if (!appData.gameStarted) return
     
     if (!appData.audioStarted) appData.audioStarted = true
@@ -423,7 +414,6 @@ function setupKeyboardControls() {
 
 function setupPointerTracking() {
   function initializeAudio() {
-    // Audio only initializes after game starts
     if (appData.gameStarted && !appData.audioStarted) {
       appData.audioStarted = true
     }
@@ -458,22 +448,22 @@ function setupPointerTracking() {
     return null
   }
 
-  document.addEventListener('mousedown', (event) => {
+  document.addEventListener('ponterdown', (event) => {
     initializeAudio()
-    const sprite = getSpriteUnderPointer(event.clientX, event.clientY)
+    //const sprite = getSpriteUnderPointer(event.width, event.height)
     appData.pointerActive.active = true
-    appData.pointerActive.targetSprite = sprite
+    //appData.pointerActive.targetSprite = sprite
     appData.lastPointerTime = Date.now()
-    sendPointerToHydra(event.clientX, event.clientY, true)
+    //sendPointerToHydra(event.clientX, event.clientY, true)
   })
   
-  document.addEventListener('mouseup', (event) => {
+  document.addEventListener('pointerup', (event) => {
     appData.pointerActive.active = false
     appData.pointerActive.targetSprite = null
     sendPointerToHydra(event.clientX, event.clientY, false)
   })
   
-  document.addEventListener('mousemove', (event) => {
+  document.addEventListener('pointermove', (event) => {
     appData.lastPointerTime = Date.now()
     sendPointerToHydra(event.clientX, event.clientY, appData.pointerActive.active)
   })

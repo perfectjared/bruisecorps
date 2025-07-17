@@ -39,22 +39,13 @@ export interface GameState {
     completedObjectives: string[];
     unlockedFeatures: string[];
   };
-  
-  // Audio/Visual state
-  audioVisual: {
-    synthStep: number;
-    musicIntensity: number;
-    visualEffects: string[];
-    rumbleIntensity: number;
-  };
-  
-  // Session state
-  session: {
-    startTime: number;
-    playTime: number;
-    sessionId: string;
-    lastSaveTime: number;
-  };
+
+  session:
+  {
+    startTime: number; // Timestamp when the session started
+    playTime: number;  // Total play time in milliseconds
+    lastSaveTime: number;  // Timestamp of last save
+  }
 }
 
 export class GameStateManager extends EventEmitter {
@@ -102,19 +93,12 @@ export class GameStateManager extends EventEmitter {
         completedObjectives: [],
         unlockedFeatures: []
       },
-      
-      audioVisual: {
-        synthStep: 0,
-        musicIntensity: 0,
-        visualEffects: [],
-        rumbleIntensity: 0
-      },
-      
-      session: {
+
+      session:
+      {
+        lastSaveTime: Date.now(),
         startTime: Date.now(),
-        playTime: 0,
-        sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        lastSaveTime: Date.now()
+        playTime: 0
       }
     };
   }
@@ -139,14 +123,6 @@ export class GameStateManager extends EventEmitter {
   
   getProgressionState(): Readonly<GameState['progression']> {
     return this.state.progression;
-  }
-  
-  getAudioVisualState(): Readonly<GameState['audioVisual']> {
-    return this.state.audioVisual;
-  }
-  
-  getSessionState(): Readonly<GameState['session']> {
-    return this.state.session;
   }
   
   // Update state with validation and events
@@ -182,11 +158,6 @@ export class GameStateManager extends EventEmitter {
   updateProgressionState(updates: Partial<GameState['progression']>): void {
     this.updateState({ progression: { ...this.state.progression, ...updates } });
     this.emit('progression-state-updated', this.state.progression);
-  }
-  
-  updateAudioVisualState(updates: Partial<GameState['audioVisual']>): void {
-    this.updateState({ audioVisual: { ...this.state.audioVisual, ...updates } });
-    this.emit('audiovisual-state-updated', this.state.audioVisual);
   }
   
   // Game flow methods

@@ -10,7 +10,6 @@ export interface StoryNode {
   description: string;
   content: string;
   
-  // Conditions for this node to be active
   conditions?: {
     requiredLevel?: number;
     requiredObjectives?: string[];
@@ -18,7 +17,6 @@ export interface StoryNode {
     customCondition?: () => boolean;
   };
   
-  // Actions to take when this node is activated
   actions?: {
     setObjective?: string;
     completeObjective?: string;
@@ -27,7 +25,6 @@ export interface StoryNode {
     customAction?: () => void;
   };
   
-  // Navigation options
   nextNodes?: string[];
   choices?: {
     id: string;
@@ -36,7 +33,6 @@ export interface StoryNode {
     conditions?: any;
   }[];
   
-  // Timing and triggers
   autoAdvance?: boolean;
   autoAdvanceDelay?: number;
   triggers?: {
@@ -45,7 +41,6 @@ export interface StoryNode {
     onChoice?: (choiceId: string) => void;
   };
   
-  // Metadata
   metadata?: {
     category?: string;
     tags?: string[];
@@ -63,14 +58,12 @@ export interface StoryObjective {
   progress?: number;
   maxProgress?: number;
   
-  // Completion conditions
   conditions?: {
     requiredActions?: string[];
     requiredState?: any;
     customCondition?: () => boolean;
   };
   
-  // Rewards
   rewards?: {
     experience?: number;
     unlockFeatures?: string[];
