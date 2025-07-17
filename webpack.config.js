@@ -14,7 +14,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    alias: {
+      'phaser3-rex-plugins': path.resolve(__dirname, 'node_modules/phaser3-rex-plugins')
+    }
   },
   output: {
     filename: 'app.js',

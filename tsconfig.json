@@ -4,14 +4,16 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
   "typeRoots": [
-    "./node_modules/phaser/types"
+    "./node_modules/phaser/types",
+    "./src/types"
   ],
   "types": [
     "Phaser"
   ],
   "include": [
-    "src/*.ts"
-, "src/game/game.ts", "src/game/space.ts", "src/data-types/data-types.ts"  ]
+    "src/**/*.ts"
+  ]
 }

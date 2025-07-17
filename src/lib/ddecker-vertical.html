@@ -7110,27 +7110,27 @@ handlePointerEvent=(e, handler)=>{
 	// Pass through events on transparent areas to parent game
 	if(isPixelTransparent(x, y)) {
 		if(window.parent !== window) {
-			window.parent.postMessage({
-				type: 'decker-pointer-passthrough',
-				event: {
-					type: e.type,
-					clientX: x,
-					clientY: y,
-					button: e.button,
-					buttons: e.buttons,
-					// Include touch data for mobile support
-					touches: e.touches ? Array.from(e.touches).map(t => ({
-						clientX: t.clientX,
-						clientY: t.clientY,
-						identifier: t.identifier
-					})) : undefined,
-					changedTouches: e.changedTouches ? Array.from(e.changedTouches).map(t => ({
-						clientX: t.clientX,
-						clientY: t.clientY,
-						identifier: t.identifier
-					})) : undefined
-				}
-			}, '*')
+			// window.parent.postMessage({
+			// 	type: 'decker-pointer-passthrough',
+			// 	event: {
+			// 		type: e.type,
+			// 		clientX: x,
+			// 		clientY: y,
+			// 		button: e.button,
+			// 		buttons: e.buttons,
+			// 		// Include touch data for mobile support
+			// 		touches: e.touches ? Array.from(e.touches).map(t => ({
+			// 			clientX: t.clientX,
+			// 			clientY: t.clientY,
+			// 			identifier: t.identifier
+			// 		})) : undefined,
+			// 		changedTouches: e.changedTouches ? Array.from(e.changedTouches).map(t => ({
+			// 			clientX: t.clientX,
+			// 			clientY: t.clientY,
+			// 			identifier: t.identifier
+			// 		})) : undefined
+			// 	}
+			// }, '*')
 		}
 		return
 	}

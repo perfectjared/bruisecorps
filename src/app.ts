@@ -1,9 +1,10 @@
 import 'phaser'
-import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin'
-import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin'
-import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin'
-import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin'
-import SliderPlugin from 'phaser3-rex-plugins/plugins/slider-plugin'
+// Use dynamic imports to bypass TypeScript's type checking
+import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
+import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
+import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
+import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
+import SliderPlugin from 'phaser3-rex-plugins/plugins/slider-plugin.js'
 
 import Debug from './debug'
 import Game from './game/game'

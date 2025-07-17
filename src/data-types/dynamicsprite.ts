@@ -1,5 +1,5 @@
-import Anchor from "phaser3-rex-plugins/plugins/anchor";
-import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
+import Anchor from "phaser3-rex-plugins/plugins/anchor.js";
+import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components.js";
 import { scenes } from "../app";
 
 export default class DynamicSprite {
