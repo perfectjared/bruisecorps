@@ -17,14 +17,26 @@ src/
 ├── game/
 │   ├── game.ts - Phaser3 game scenes
 │   ├── synth.ts - Tone.js audio synthesis & metronome
+│   ├── decker-bridge.ts - API for Decker/Phaser integration
 │   └── marge/ - Driving game components
 ├── lib/
-│   ├── ddecker.html - Decker UI definitions (cards, widgets)
+│   ├── ddecker.html - Active Decker UI system (iframe loaded by index.html)
+│   ├── decker.js - Decker runtime support
+│   ├── decker-engine.js - Decker/Lil script execution engine
+│   ├── lil-engine.js - Lil language interpreter
+│   ├── archive/ - Archived unused alternative UI implementations
 │   └── hydra.html - Visual effects overlay
 └── interfaces/ - TypeScript interfaces
 ```
 
 ## Current Status
+
+### Decker Integration Architecture (UPDATED)
+- **Active Implementation:** `ddecker.html` is the only active Decker implementation
+- **Integration Method:** Loaded as an iframe in `index.html`
+- **Communication:** Two-way communication between Phaser game and Decker UI via `decker-bridge.ts`
+- **Alternative Implementations:** Several alternative layouts (horizontal, vertical, clean) have been archived in `src/lib/archive/` as they weren't being used
+- **Architecture Choice:** The current implementation uses a single Decker deck with multiple cards rather than separate specialized decks
 
 ### Coordinate System (IMPLEMENTED)
 - **Deck Size:** 512x342 (reverted from 1920x1080)

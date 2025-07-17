@@ -33,7 +33,7 @@ function draw_frame(image) {
 
 // Deck loading and initialization
 function load_deck(deckData) {
-    console.log('Loading deck:', deckData);
+    // // console.log('Loading deck:', deckData);
     deck = deckData;
     dirty = 0;
     dr.trans_mask = 0;
@@ -43,11 +43,11 @@ function load_deck(deckData) {
     context = frame = draw_frame(fb);
     
     // Set up basic deck structure
-    console.log('Deck loaded:', deck.name, 'Size:', deck.size);
+    // // console.log('Deck loaded:', deck.name, 'Size:', deck.size);
     
     // Initialize first card
     if (deck.cards && deck.cards.length > 0) {
-        console.log('Setting current card:', deck.cards[0].name);
+        // // console.log('Setting current card:', deck.cards[0].name);
         setCurrentCard(deck.cards[0]);
     } else {
         console.error('No cards found in deck!');
@@ -63,7 +63,7 @@ function setCurrentCard(card) {
 }
 
 function renderCard(card) {
-    console.log('Rendering card:', card.name, 'with', card.widgets?.length || 0, 'widgets');
+    // // console.log('Rendering card:', card.name, 'with', card.widgets?.length || 0, 'widgets');
     
     // Clear framebuffer
     fb.pix.fill(BG_MASK);
@@ -77,12 +77,13 @@ function renderCard(card) {
     
     // Render widgets
     if (card.widgets) {
-        console.log('Rendering widgets:', card.widgets.map(w => `${w.type}:${w.text || w.script}`));
+        // // console.log('Rendering widgets:', card.widgets.map(w => `${w.type}:${w.text || w.script}`));
         renderWidgets(card.widgets);
     }
     
     dirty = 1;
-    console.log('Card rendered, dirty flag set');
+    // // console.log('Card rendered, dirty flag set');
+}
 }
 
 function renderCardBackground(card) {
@@ -193,11 +194,11 @@ function sync() {
     // Everything else = opaque with color from COLORS array
     
     if (!deck) {
-        console.log('Sync called but no deck loaded');
+        // // console.log('Sync called but no deck loaded');
         return;
     }
     
-    console.log('Syncing framebuffer to canvas...');
+    // // console.log('Syncing framebuffer to canvas...');
     
     pick_palette(deck);
     
@@ -219,17 +220,16 @@ function sync() {
     if (!id || id.width !== fb.size.x || id.height !== fb.size.y) {
         id = new ImageData(fb.size.x, fb.size.y);
         id.data.fill(0);
-        console.log('Created new ImageData:', fb.size.x, 'x', fb.size.y);
+        // console.log('Created new ImageData:', fb.size.x, 'x', fb.size.y);
     }
-    
-    // CRITICAL: Canvas context with alpha support for transparency
+      // CRITICAL: Canvas context with alpha support for transparency
     const canvas = q('#display');
     const g = canvas.getContext('2d', { alpha: true });
     g.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Count non-transparent pixels for debugging
-    let opaquePixels = 0;
-    let transparentPixels = 0;
+    // Skip pixel counting for performance
+    // let opaquePixels = 0;
+    // let transparentPixels = 0;
     
     // Render pixels with proper transparency - EXACTLY LIKE WORKING VERSION
     for (let z = 0, d = 0, y = 0; y < fb.size.y; y++) {
@@ -245,19 +245,20 @@ function sync() {
                 id.data[d + 1] = 0; // G
                 id.data[d + 2] = 0; // B
                 id.data[d + 3] = 0; // A (transparent)
-                transparentPixels++;
+                // transparentPixels++; // Removed for performance
             } else {
                 // Opaque pixel with color
                 id.data[d] = 0xFF & (cv >> 16);     // R
                 id.data[d + 1] = 0xFF & (cv >> 8);  // G
                 id.data[d + 2] = 0xFF & cv;         // B
                 id.data[d + 3] = 255;               // A (opaque)
-                opaquePixels++;
+                // opaquePixels++; // Removed for performance
             }
         }
     }
     
-    console.log(`Rendered ${opaquePixels} opaque pixels, ${transparentPixels} transparent pixels`);
+    // Disabled expensive pixel counting and logging
+    // // console.log(`Rendered ${opaquePixels} opaque pixels, ${transparentPixels} transparent pixels`);
     
     // Put the image data on canvas
     g.putImageData(id, 0, 0);
@@ -306,7 +307,7 @@ function handleClick(event) {
 
 // Script execution (simplified)
 function executeScript(scriptName) {
-    console.log('Executing script:', scriptName);
+    // console.log('Executing script:', scriptName);
     
     // Simple script handling
     if (scriptName === 'home.1') {
@@ -317,13 +318,13 @@ function executeScript(scriptName) {
 
 // Initialize the engine
 function initDecker() {
-    console.log('Initializing Decker engine...');
+    // console.log('Initializing Decker engine...');
     
     // Set up canvas click handler
     const canvas = q('#display');
     if (canvas) {
         canvas.addEventListener('click', handleClick);
-        console.log('Canvas click handler set up');
+        // console.log('Canvas click handler set up');
     } else {
         console.error('Canvas #display not found!');
     }
@@ -335,7 +336,7 @@ function initDecker() {
     }
     loop();
     
-    console.log('Decker engine initialized successfully');
+    // console.log('Decker engine initialized successfully');
 }
 
 // Export the engine

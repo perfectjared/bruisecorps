@@ -61,6 +61,9 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
   private isConnected: boolean = false;
   private messageQueue: any[] = [];
   
+  // Add property for throttling
+  private _lastMouseMoveTime: number = 0;
+  
   constructor() {
     super();
     this.initializeBridge();
@@ -284,6 +287,16 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
   }
   
   private handleDeckerMessage(data: any): void {
+    // Add throttling for mousemove events
+    if (data.type === 'widget-event' && data.eventType === 'mousemove') {
+      const now = Date.now();
+      if (this._lastMouseMoveTime && now - this._lastMouseMoveTime < 50) {
+        // Skip this event (throttle to max ~20 events per second)
+        return;
+      }
+      this._lastMouseMoveTime = now;
+    }
+    
     switch (data.type) {
       case 'widget-event':
         this.handleWidgetEvent(data);
@@ -293,16 +306,24 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
         break;
       case 'iframe-ready':
         this.handleIframeReady();
-        break;
-      case 'widget-updated':
+        break;      case 'widget-updated':
         this.handleWidgetUpdated(data);
         break;
       default:
-        console.log('Unknown Decker message:', data);
+        // Completely disable logging of unknown messages to prevent performance issues
+        // Only enable this for debugging when absolutely necessary
+        // if (!data.type.includes('move')) {
+        //   console.log('Unknown Decker message:', data);
+        // }
     }
   }
   
   private handleWidgetEvent(data: any): void {
+    // Skip logging for high-frequency events like mousemove
+    const isHighFrequencyEvent = data.eventType === 'mousemove' || 
+                                 data.eventType === 'mouseover' ||
+                                 data.eventType === 'mouseout';
+    
     const event: DeckerEvent = {
       type: data.eventType,
       widget: data.widgetId,
@@ -310,7 +331,8 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
       timestamp: Date.now()
     };
     
-    this.sendEvent(event);
+    // Send event but don't emit for high-frequency events (reduces event propagation)
+    this.sendEvent(event, isHighFrequencyEvent);
   }
   
   private handleScriptResult(data: any): void {
@@ -441,7 +463,7 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
     return this.currentCard;
   }
   
-  sendEvent(event: DeckerEvent): void {
+  sendEvent(event: DeckerEvent, skipEmit: boolean = false): void {
     // Trigger local event listeners
     const widgetListeners = this.eventListeners.get(event.widget);
     if (widgetListeners) {
@@ -457,7 +479,10 @@ export class DeckerBridge extends EventEmitter implements DeckerAPI {
       event: event
     });
     
-    this.emit('decker-event', event);
+    // Only emit non-high-frequency events to reduce overhead
+    if (!skipEmit) {
+      this.emit('decker-event', event);
+    }
   }
   
   addEventListener(widgetId: string, eventType: string, callback: (data: any) => void): void {
