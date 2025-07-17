@@ -1,26 +1,14 @@
-# Bruise Corps - Interactive Driving Experience
+# Phaser 3 Typescript Boilerplate
 
-An experimental driving interface combining multiple technologies:
-- Phaser 3.70 game engine (TypeScript)
-- Decker UI system (iframe overlay)
-- Tone.js audio synthesis
-- Hydra visual effects
-- Anime.js vector graphics
+Provides the following, to enable faster development of new Phaser projects:
+- Phaser 3.70
+- Typescript 5
+- Webpack 5
 
-## Architecture
-
-The project uses multiple coordinated layers:
-- **Game Layer**: Phaser 3 game engine for the main driving experience
-- **UI Layer**: Decker for user interface elements (loaded as an iframe)
-- **Effects Layer**: Hydra for visual effects
-- **Vector Layer**: Anime.js for vector graphics animations
-
-### Decker UI System
-
-The UI is implemented using Decker, a card-based hypertext system:
-- Main Decker implementation is in `src/lib/ddecker.html`
-- Communication between game and UI occurs via `src/game/decker-bridge.ts`
-- The UI is structured as cards (screens) with interactive widgets
+Included are 3 scenes:
+- **Boot** (for minimal file loading for files needed in Preload)
+- **Preload** contains a bespoke driven by the `manifest.json`
+- **Game** primary game scene
 
 ## Installation
 
@@ -39,7 +27,3 @@ Build the production version and output files to `dist`
 - `npm run lint`
 
 Lint the codebase using ESLint
-
-## Project Memory
-
-For detailed development history and technical notes, see [PROJECT_MEMORY.md](PROJECT_MEMORY.md).

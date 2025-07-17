@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<!-- 
-  IMPORTANT: This is the ACTIVE Decker implementation used in Bruise Corps.
-  It's loaded as an iframe in index.html and communicates with the game via decker-bridge.ts.
-  Alternative implementations have been archived in the src/lib/archive/ directory.
-  See docs/DECKER_INTEGRATION.md for details on the architecture.
--->
 <html>
 <head>
 <meta charset="UTF-8">
@@ -7095,19 +7088,10 @@ handlePointerEvent=(e, handler)=>{
 		x = e.clientX
 		y = e.clientY
 	}
-		// Pass through events on transparent areas to parent game
+	
+	// Pass through events on transparent areas to parent game
 	if(isPixelTransparent(x, y)) {
 		if(window.parent !== window) {
-			// Skip frequent mousemove events for passthrough
-			if (e.type === 'mousemove') {
-				const now = performance.now();
-				// More aggressive throttling for mousemove passthrough (60+ fps to ~25 fps)
-				if (now - lastPassthroughTime < passthroughThrottle) {
-					return; // Skip this passthrough
-				}
-				lastPassthroughTime = now;
-			}
-			
 			window.parent.postMessage({
 				type: 'decker-pointer-passthrough',
 				event: {
@@ -7136,38 +7120,6 @@ handlePointerEvent=(e, handler)=>{
 	return handler(e)
 }
 
-// Performance optimization: throttle mousemove events
-let lastMoveTime = 0;
-let lastPassthroughTime = 0;
-let lastLogTime = 0;
-const moveThrottle = 25; // Only process move events every 25ms
-const passthroughThrottle = 40; // Even more aggressive throttling for passthrough
-const logThrottle = 5000; // Only log once every 5 seconds max
-
-// Throttled logging helper - prevents log spam
-function throttledLog(message) {
-	const now = performance.now();
-	if (now - lastLogTime > logThrottle) {
-		console.log(message);
-		lastLogTime = now;
-	}
-}
-
-// Optimized pointer event handler with throttling for mousemove
-const optimizedHandlePointerEvent = (e, handler) => {
-	// Skip throttling for non-move events
-	if (e.type === 'mousemove' || e.type === 'pointermove') {
-		const now = performance.now();
-		if (now - lastMoveTime < moveThrottle) {
-			return; // Skip this move event
-		}
-		lastMoveTime = now;
-	}
-
-	// Call the original handler
-	handlePointerEvent(e, handler);
-};
-
 window.onresize=_=>{update_responsive_size(),resize(),sync()}
 
 // Handle focus events in iframe and notify parent
@@ -7187,7 +7139,7 @@ window.addEventListener('orientationchange', _=>{
 })
 q('body').addEventListener('mousedown'  ,e=>handlePointerEvent(e, e=>mouse(e,down)))
 q('body').addEventListener('mouseup'    ,e=>handlePointerEvent(e, e=>mouse(e,up)))
-q('body').addEventListener('mousemove'  ,e=>optimizedHandlePointerEvent(e, e=>mouse(e,move)))
+q('body').addEventListener('mousemove'  ,e=>handlePointerEvent(e, e=>mouse(e,move)))
 q('body').addEventListener('contextmenu',e=>e.preventDefault())
 q('body').addEventListener('touchstart' ,e=>{e.preventDefault();handlePointerEvent(e, e=>touch(e,down))},{passive:false})
 q('body').addEventListener('touchend'   ,e=>handlePointerEvent(e, e=>touch({targetTouches:e.changedTouches},up)))

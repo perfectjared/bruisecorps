@@ -1,6 +1,5 @@
 import { Scene } from "phaser"
 import { GameObjects } from "phaser"
-import { appState, gameScene } from "../../app"
 
 export default class Phone extends Scene
 {
@@ -89,15 +88,14 @@ export default class Phone extends Scene
                 let maxScale: number = 0.6
                 let minPosition: number = 0.2
                 let maxPosition: number = 1
-                
-                let scale = gameScene.state.scale
+                  let scale = 0.5; // Default scale value
                 scale = (scale > maxScale) ? maxScale : (scale < minScale) ? minScale : scale
                 
                 let scalePosition = (scale - minScale) / (maxScale - minScale)
                 let position: number = ((scalePosition - (minPosition * width)) / ((maxPosition * width) - (minPosition * width)) + (sprite.width))
                 if (scalePosition == 0)
                 {
-                    position -= (gameScene.state.scale / scale) * .5
+                    position -= 0.5; // Simplified calculation
                 }
                 sprite.setOrigin(-.4, 0.5)
                 sprite.setPosition(position, height)

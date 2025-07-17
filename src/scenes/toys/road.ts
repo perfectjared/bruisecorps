@@ -1,6 +1,5 @@
 import { Scene } from 'phaser';
-import { MathHelpers } from '../../road-utilities';
-import { RenderHelpers } from '../../road-utilities';
+import { MathHelpers, RenderHelpers } from '../../lib/road-utilities';
 
 //todo clean up this whole thing
 

@@ -64,6 +64,7 @@ class App extends Phaser.Scene {
       deckerBridge.connectToIframe(deckerFrame);
     }
   }
+
   private setupSystemEventListeners(): void {
     // Game state events
     gameState.on('game-started', () => {
@@ -89,19 +90,13 @@ class App extends Phaser.Scene {
     
     // Road system events (mostly informational, not command-worthy)
     roadSystem.on('major-position-change', (data) => {
-      // Only log significant changes, not frequent updates
-      if (Math.abs(data.change) > 0.5) {
-        console.log(`Major position change: ${data.change.toFixed(3)}`);
-      }
+      console.log(`Major position change: ${data.change.toFixed(3)}`);
       // Could create a command for significant driving events
     });
     
     // History events for debugging (much cleaner now)
     gameHistory.on('command-executed', (command) => {
-      // Don't log high-frequency commands to reduce console spam
-      if (command.type !== 'pointer-move' && command.type !== 'frame-update') {
-        console.log(`Command executed: ${command.type}`);
-      }
+      console.log(`Command executed: ${command.type}`);
     });
     
     // Decker bridge events
@@ -112,10 +107,7 @@ class App extends Phaser.Scene {
     });
     
     deckerBridge.on('decker-event', (event) => {
-      // Skip logging high-frequency events like mouse movements
-      if (event.type !== 'mousemove' && event.type !== 'mouseover' && event.type !== 'mouseout') {
-        console.log(`Decker event: ${event.type} on ${event.widget}`);
-      }
+      console.log(`Decker event: ${event.type} on ${event.widget}`);
       // Decker events can create commands for menu navigation, story choices, etc.
     });
   }
@@ -154,7 +146,6 @@ interface AppData {
   gameStarted: boolean,
   playing: boolean,
   lastPointerTime: number,
-  lastPointerPassthroughTime: number,
   pointerActive: {
     active: boolean,
     targetSprite: Phaser.GameObjects.Sprite | null
@@ -175,7 +166,6 @@ var appData: AppData = {
   gameStarted: false,
   playing: false,
   lastPointerTime: 0,
-  lastPointerPassthroughTime: 0,
   pointerActive: {
     active: false,
     targetSprite: null
@@ -550,16 +540,49 @@ function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string)
 function setupDeckerCommunication() {
   appData.deckerFrame = document.getElementById('deck-iframe') as HTMLIFrameElement
   
-  // Tracking variable to limit frequent logging
-  let lastDeckMessageLogTime = 0;
-  const deckMessageLogThrottle = 5000; // Only log once every 5 seconds
-  
-  function throttledDeckLog(message) {
-    const now = Date.now();
-    if (now - lastDeckMessageLogTime > deckMessageLogThrottle) {
-      console.log(message);
-      lastDeckMessageLogTime = now;
+  // Debug iframe visibility
+  if (appData.deckerFrame) {
+    console.log('✅ Decker iframe found');
+    console.log('Iframe visibility:', window.getComputedStyle(appData.deckerFrame).visibility);
+    console.log('Iframe display:', window.getComputedStyle(appData.deckerFrame).display);
+    console.log('Iframe opacity:', window.getComputedStyle(appData.deckerFrame).opacity);
+    console.log('Iframe z-index:', window.getComputedStyle(appData.deckerFrame).zIndex);
+    
+    // Check container too
+    const container = document.getElementById('deck-container');
+    if (container) {
+      console.log('Container visibility:', window.getComputedStyle(container).visibility);
+      console.log('Container display:', window.getComputedStyle(container).display);
+      console.log('Container opacity:', window.getComputedStyle(container).opacity);
+      console.log('Container z-index:', window.getComputedStyle(container).zIndex);
     }
+      // Force visibility just in case
+    appData.deckerFrame.style.visibility = 'visible';
+    appData.deckerFrame.style.display = 'block';
+    appData.deckerFrame.style.opacity = '1';
+    
+    if (container) {
+      container.style.visibility = 'visible';
+      container.style.display = 'flex';
+      container.style.opacity = '1';
+    }
+    
+    // Wait for iframe to load, then force it to home card
+    if (appData.deckerFrame.contentWindow) {
+      setTimeout(() => {
+        console.log('🏠 Forcing Decker to home card on startup');
+        sendToDecker('go', { card: 'home' });
+      }, 1000);
+    } else {
+      appData.deckerFrame.addEventListener('load', () => {
+        setTimeout(() => {
+          console.log('🏠 Decker loaded, forcing to home card');
+          sendToDecker('go', { card: 'home' });
+        }, 500);
+      });
+    }
+  } else {
+    console.error('❌ Decker iframe NOT found!');
   }
   
   window.addEventListener('message', (event) => {
@@ -575,40 +598,49 @@ function setupDeckerCommunication() {
           if (data.camera === 'marge') switchToMargeCamera()
           else if (data.camera === 'rearview') switchToRearviewCamera()
           break
-          
-        case 'playSound':
+            case 'playSound':
           if (data.frequency && data.duration) {
             synth.triggerAttackRelease(data.frequency, data.duration)
           }
-          break        
-          case 'decker-pointer-passthrough':
+          break
+            case 'decker-pointer-passthrough':
           if (!appData.gameStarted) break
           
-          // Skip handling mousemove events unless we're specifically tracking a drag operation
           const pointerEvent = message.event
-          if (pointerEvent.type === 'mousemove') {
-            // Throttle mousemove events
-            const now = Date.now();
-            // Even more aggressive throttling - only process ~15fps worth of move events when dragging
-            // and completely skip them when not actively dragging
-            if ((!appData.pointerActive?.active) || (now - appData.lastPointerPassthroughTime < 60)) {
-              break; // Skip mousemoves when not actively dragging or throttle during drag
-            }
-            appData.lastPointerPassthroughTime = now;
-          }
-          
           const canvas = document.querySelector('canvas') as HTMLCanvasElement
+          
           if (canvas && pointerEvent) {
-            const syntheticEvent = pointerEvent.type.startsWith('touch') 
-              ? new TouchEvent(pointerEvent.type, { bubbles: true, cancelable: true })
-              : new MouseEvent(pointerEvent.type, {
-                  clientX: pointerEvent.clientX,
-                  clientY: pointerEvent.clientY,
-                  button: pointerEvent.button,
-                  buttons: pointerEvent.buttons,
-                  bubbles: true,
-                  cancelable: true
-                })
+            // Simple approach: Convert ALL touch events to mouse events
+            let eventType = pointerEvent.type
+            let clientX = pointerEvent.clientX || 0
+            let clientY = pointerEvent.clientY || 0
+            
+            // Handle touch events by converting to mouse events
+            if (pointerEvent.type.startsWith('touch')) {
+              // Convert touch event types to mouse event types
+              if (pointerEvent.type === 'touchstart') eventType = 'mousedown'
+              else if (pointerEvent.type === 'touchend') eventType = 'mouseup'
+              else if (pointerEvent.type === 'touchmove') eventType = 'mousemove'
+              
+              // Get coordinates from first touch point
+              if (pointerEvent.touches && pointerEvent.touches.length > 0) {
+                clientX = pointerEvent.touches[0].clientX
+                clientY = pointerEvent.touches[0].clientY
+              } else if (pointerEvent.changedTouches && pointerEvent.changedTouches.length > 0) {
+                clientX = pointerEvent.changedTouches[0].clientX
+                clientY = pointerEvent.changedTouches[0].clientY
+              }
+            }
+            
+            // Create and dispatch simple mouse event
+            const syntheticEvent = new MouseEvent(eventType, {
+              clientX,
+              clientY,
+              button: pointerEvent.button || 0,
+              buttons: pointerEvent.buttons || (eventType === 'mousedown' ? 1 : 0),
+              bubbles: true,
+              cancelable: true
+            })
             
             canvas.dispatchEvent(syntheticEvent)
           }
@@ -670,26 +702,21 @@ function setupDeckerCommunication() {
         setFocus(false)
       } else if (message.startsWith('health-changed:')) {
         const healthValue = parseInt(message.split(':')[1])
-        handleHealthChange(healthValue)
-      } else if (message === 'game-started') {
+        handleHealthChange(healthValue)      } else if (message === 'game-started') {
+        console.log('🎮 Game started message received');
         appData.gameStarted = true
         appData.audioStarted = true
         setFocus(true)
         
-        // Switch to Marge card and allow clicks through to Phaser
-        sendToDecker('go', { card: 'marge' })
-        
-        // Set Decker container to allow clicks through but keep iframe interactive
-        const deckContainer = document.getElementById('deck-container')
-        if (deckContainer) {
-          deckContainer.style.pointerEvents = 'none'
-          
-          // Keep iframe interactive
-          const deckIframe = document.getElementById('deck-iframe') as HTMLIFrameElement
-          if (deckIframe) {
-            deckIframe.style.pointerEvents = 'auto'
-          }
-        }
+        // Force Decker to home card first, then to marge card
+        setTimeout(() => {
+          console.log('🎯 Sending go to home card');
+          sendToDecker('go', { card: 'home' });
+          setTimeout(() => {
+            console.log('🎯 Sending go to marge card');
+            sendToDecker('go', { card: 'marge' });
+          }, 500);
+        }, 100);
       } else if (message === 'audioInitialized') {
         appData.audioStarted = true
       }
@@ -824,30 +851,14 @@ export {
 
 // New function to set up event listeners specific to the Marge scene
 function setupMargeEventListeners() {
-  // Track last log time to prevent too frequent logging
-  let lastPositionLogTime = 0;
-  let lastGearLogTime = 0;
-  const logThrottleMs = 1000; // Only log once per second max
-  
   // Vehicle control events from Marge scene
   scenes.marge.events.on('significant-position-change', (data) => {
-    const now = Date.now();
-    // Only log if enough time has passed since last log
-    if (now - lastPositionLogTime > logThrottleMs) {
-      console.log(`Significant driving event: position ${data.position.toFixed(3)}`);
-      lastPositionLogTime = now;
-    }
+    console.log(`Significant driving event: position ${data.position.toFixed(3)}`);
     // This could trigger story events or game state changes
   });
   
   scenes.marge.events.on('gear-changed', (data) => {
-    const now = Date.now();
-    // Only log if enough time has passed since last log
-    if (now - lastGearLogTime > logThrottleMs) {
-      console.log(`Gear changed to: ${data.newValue.toFixed(2)}`);
-      lastGearLogTime = now;
-    }
-    
+    console.log(`Gear changed to: ${data.newValue.toFixed(2)}`);
     // Only create commands for meaningful gear changes (like first time putting in gear)
     if (data.oldValue >= 1 && data.newValue < 1) {
       console.log('Player first engaged gear - significant game event');

@@ -1,7 +1,6 @@
 import { Scene } from 'phaser'
 import Anchor from 'phaser3-rex-plugins/templates/ui/ui-components'
 import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
-import { ConfirmAction } from 'phaser3-rex-plugins/templates/ui/ui-components'
 
 import { appData, colors, scenes, UIPlugin } from '../../app'
 import DynamicSprite from '../../data-types/dynamicsprite'
