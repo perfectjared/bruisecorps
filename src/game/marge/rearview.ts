@@ -1,8 +1,9 @@
 import { Scene } from 'phaser';
-import { scenes, cameras, markSceneReady, switchToMargeCamera } from '../../app';
-import DynamicSprite from '../../data-types/dynamicsprite';
-import DragDial from '../../data-types/dragdial'
-import DragSlider from '../../data-types/dragslider'
+import { scenes, cameras } from '../../app';
+import { markSceneReady, switchToMargeCamera } from '../../systems/camera-manager';
+import DynamicSprite from '../../types/dynamicsprite';
+import DragDial from '../../types/dragdial';
+import DragSlider from '../../types/dragslider';
 
 export default class Rearview extends Scene
 {

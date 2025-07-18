@@ -1,6 +1,6 @@
 import { appData, scenes } from '../app'
 import { Scene, Physics } from 'phaser';
-import DynamicSprite from '../data-types/dynamicsprite';
+import DynamicSprite from '../types/dynamicsprite';
 import CameraManager from './cameramanager'
 
 import * as trashTour from '../data/trsh-tour.json'

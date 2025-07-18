@@ -1,6 +1,5 @@
 import Anchor from "phaser3-rex-plugins/plugins/anchor.js";
 import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components.js";
-import { scenes } from "../app";
 
 export default class DynamicSprite {
     scene: Phaser.Scene;
@@ -23,20 +22,18 @@ export default class DynamicSprite {
     create() {
         this.scene.add.existing(this.sprite);
         
-        const anchorPlugin = this.scene.plugins.get('rexAnchor') as any;
-        if (anchorPlugin) {
+        const anchorPlugin = this.scene.plugins.get('rexAnchor') as any;        if (anchorPlugin) {
             this.anchor = anchorPlugin.add(this.sprite, this.anchorConfig);
         }
         
-        this.uiPlugin = this.scene.plugins.get('rexUI') || scenes.menu?.['rexUI'];
+        this.uiPlugin = this.scene.plugins.get('rexUI');
         if (this.uiPlugin) {
             this.sizer = this.uiPlugin.add.sizer(new Sizer(this.scene));
         }
     }
 
-    update() {
-        if (!this.uiPlugin) {
-            this.uiPlugin = this.scene.plugins.get('rexUI') || scenes.menu?.['rexUI'];
+    update() {        if (!this.uiPlugin) {
+            this.uiPlugin = this.scene.plugins.get('rexUI');
         }
         this.draw();
     }

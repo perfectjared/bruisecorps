@@ -1,11 +1,10 @@
 import { Scene } from 'phaser';
 import { appData, datGui, scenes } from './app';
-import { Tamagotchi } from './game/tamagotchi/tamagotchi'
+import { Tamagotchi } from './game/tamagotchi'
 
-export var debugFlags
-{
-  true
-  true
+export var debugFlags = {
+  showMargeDebug: true,
+  showFPS: true
 }
 
 export var debugGraphics: Phaser.GameObjects.Graphics[]

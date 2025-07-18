@@ -1,7 +1,7 @@
 import { Scene } from 'phaser'
 import Slider from 'phaser3-rex-plugins/plugins/slider'
 import DynamicSprite from './dynamicsprite'
-import { appData, scenes } from '../app'
+import { appData } from '../app'
 
 export interface IDragSliderConfig
 {
@@ -65,16 +65,15 @@ export default class DragSlider
             }
         )
         this.slider.on('valuechange', function(newValue, prevValue)
-        {
-
-        }, this)
+        {        }, this)
 
         this.relEndPoints = [ { x: 0, y:0 }, { x: 0, y:0 }]
+        
         scene.events.on('update', function()
         {
             if (!this.slider.isDragging && this.buffer.lastDragging)
             {
-                if (this.snaps != null) this.snap(this.slider, this.snaps)
+                if (this.snaps != null) this.snap()
             }
 
             if (this.relEndPoints[0].x == 0 && this.dSprite.sprite.x != 0 && this.dSprite.sprite.x)

@@ -1,7 +1,9 @@
 import DragRotate from "phaser3-rex-plugins/plugins/dragrotate"
 import { Scene } from "phaser"
 import DynamicSprite from "./dynamicsprite"
-import { scenes, appData } from "../app"
+import { getAppData } from "../config/app-config"
+
+// DragDial component for interactive rotating controls
 
 export interface IDragDialConfig
 {
@@ -26,11 +28,12 @@ export default class DragDial
             y: number,
             width: number
         },
-        last
+        last: any
     }
 
     // Track relative position for repositioning
     relativePosition: { x: number, y: number } = { x: 0, y: 0 }
+    isPositionInitialized: boolean = false
 
     dragRotatePlugin: any
     dragRotate: DragRotate
@@ -88,6 +91,7 @@ export default class DragDial
             )
             this.initialSpriteRotation = this.sprite.rotation
         })
+        
         this.dragRotate.on('dragstart', function()
         {
             this.dragging = true
@@ -111,10 +115,14 @@ export default class DragDial
 
         scene.events.on('update', function()
         {
-            this.updateRelativePosition()
-            this.placeRelative()
             this.handleGlobalPointerTracking()
             if (this.config.return) this.returnToCenter()
+            
+            // Only update positioning occasionally, not every frame
+            if (!this.isPositionInitialized || this.scene.time.now % 200 < 16) { // Every ~200ms
+                this.updateRelativePosition()
+                this.placeRelative()
+            }
         }, this)
 
         scene.events.on('render', function()
@@ -123,35 +131,47 @@ export default class DragDial
             this.graphics.strokeCircle(this.sprite.x, this.sprite.y, this.dragRotate.maxRadius)
         }, this)
     }
-
+    
     updateRelativePosition()
     {
-        // Store relative position when it's first calculated
-        if (this.relativePosition.x === 0 && this.dSprite.sprite.x !== 0) {
+        const appData = getAppData()
+        // Only store relative position once when sprite is properly positioned and we haven't initialized yet
+        if (!this.isPositionInitialized && this.dSprite.sprite.x > 0 && this.dSprite.sprite.y > 0) {
             this.relativePosition.x = this.dSprite.sprite.x / appData.width
             this.relativePosition.y = this.dSprite.sprite.y / appData.height
+            this.isPositionInitialized = true
+            console.log(`🎯 DragDial: Initialized relative position: ${this.relativePosition.x.toFixed(3)}, ${this.relativePosition.y.toFixed(3)}`)
         }
     }
 
     placeRelative()
     {
-        // Update sprite position based on relative position and current window size
-        if (this.relativePosition.x !== 0) {
-            this.sprite.x = this.relativePosition.x * appData.width
-            this.sprite.y = this.relativePosition.y * appData.height
+        const appData = getAppData()
+        // Only update position if we have properly initialized relative coordinates
+        if (this.isPositionInitialized && this.relativePosition.x > 0) {
+            const newX = this.relativePosition.x * appData.width
+            const newY = this.relativePosition.y * appData.height
+            
+            // Only update if position has significantly changed to avoid constant repositioning
+            if (Math.abs(this.sprite.x - newX) > 5 || Math.abs(this.sprite.y - newY) > 5) {
+                console.log(`🎯 DragDial: Position changed significantly - updating from ${this.sprite.x.toFixed(1)}, ${this.sprite.y.toFixed(1)} to ${newX.toFixed(1)}, ${newY.toFixed(1)}`)
+                
+                this.sprite.x = newX
+                this.sprite.y = newY
+                
+                // Update drag plugin position to match
+                this.dragRotate.x = this.sprite.x
+                this.dragRotate.y = this.sprite.y
+                this.dragRotate.maxRadius = this.sprite.displayWidth / 2
+            }
         }
-        
-        // Update drag plugin position and constraints
-        this.dragRotate.x = this.sprite.x
-        this.dragRotate.y = this.sprite.y
-        this.dragRotate.maxRadius = this.sprite.displayWidth / 2
     }
 
     returnToCenter(speed = .1)
     {
         if (this.dragging || this.isPressed) return
 
-        const center = Phaser.Math.DegToRad(this.config.startAngle)
+        const center = Phaser.Math.DegToRad(this.config.startAngle || 0)
         const rotation = this.sprite.rotation
 
         const diff = Phaser.Math.Angle.ShortestBetween(rotation, center)
@@ -173,6 +193,14 @@ export default class DragDial
     {
         // Create the underlying DynamicSprite
         this.dSprite.create()
+        
+        // Delay relative position initialization to ensure sprite is properly positioned
+        this.scene.time.delayedCall(200, () => {
+            console.log(`🎯 DragDial: Delayed initialization - sprite position: ${this.dSprite.sprite.x}, ${this.dSprite.sprite.y}`)
+            if (!this.isPositionInitialized) {
+                this.updateRelativePosition()
+            }
+        })
     }
 
     update()
@@ -182,6 +210,7 @@ export default class DragDial
 
     handleGlobalPointerTracking()
     {
+        const appData = getAppData()
         if (this.isPressed && !appData.pointerActive.active)
         {
             this.isPressed = false

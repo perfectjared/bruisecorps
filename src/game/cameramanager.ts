@@ -1,5 +1,4 @@
-import { scenes } from "../app"
-import DynamicSprite from "../data-types/dynamicsprite"
+import DynamicSprite from "../types/dynamicsprite"
 
 export default class CameraManager
 {

@@ -1,4 +1,5 @@
-import { appData, sendSynthDataToHydra } from '../app'
+import { appData } from '../app'
+import { sendSynthDataToHydra } from '../systems/hydra-integration'
 import { Scene } from 'phaser'
 import * as Tone from 'tone'
 

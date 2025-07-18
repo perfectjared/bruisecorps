@@ -1,10 +1,11 @@
+// Main application entry point - now modular and organized
 import 'phaser'
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import DragRotatePlugin from 'phaser3-rex-plugins/plugins/dragrotate-plugin.js'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
-import SliderPlugin from 'phaser3-rex-plugins/plugins/slider-plugin.js'
+import * as Tone from 'tone'
+import { GUI } from 'dat.gui'
 
+// Scene imports
 import Debug from './debug'
 import Game from './game/game'
 import Marge from './game/marge/marge'
@@ -13,14 +14,64 @@ import Synth from './game/synth'
 import Road from './game/marge/road'
 import Rearview from './game/marge/rearview'
 
+// Configuration
+import { AppData, createInitialAppData, setGlobalAppData } from './config/app-config'
+import { createGameConfig } from './config/game-config'
+
+// Core game systems
+import { gameState } from './game/state'
+import { gameHistory } from './game/history'
+import { storyManager } from './game/story'
+import { deckerBridge } from './game/decker-bridge'
+
+// Modular systems
+import { 
+  markSceneReady, 
+  initializeCameras, 
+  resizeCameras,
+  switchToMargeCamera, 
+  switchToRearviewCamera,
+  handleCardChange,
+  cameras,
+  setAppData
+} from './systems/camera-manager'
+import { 
+  setupPointerTracking, 
+  isPointerActive, 
+  getPointerTarget, 
+  isPointerOnSprite 
+} from './systems/pointer-tracker'
+import { setupDeckerCommunication, sendToDecker } from './systems/decker-communication'
+import { 
+  setupHydraEffects, 
+  sendToHydra, 
+  sendSynthDataToHydra, 
+  sendPointerToHydra, 
+  sendGameDataToHydra 
+} from './systems/hydra-integration'
+import { setFocus, setupWindowEventListeners } from './systems/focus-manager'
+import { setupKeyboardControls } from './systems/keyboard-controls'
+
+// Utilities
 import { initVectorGraphics } from './lib/vector-graphics'
 import colors from './data/colors'
 
-import { gameState } from './game/state'
-import { gameHistory } from './game/history'
-//import { roadSystem } from './game/road'
-import { storyManager } from './game/story'
-import { deckerBridge } from './game/decker-bridge'
+// Global application data and synth
+let appData: AppData
+const synth = new Tone.Synth().toDestination()
+
+// Initialize dat.gui debugging panels
+const datGui = {
+  macro: new GUI({ name: 'macro' }),
+  meso: new GUI({ name: 'meso' }),
+  micro: new GUI({ name: 'micro' })
+}
+datGui.macro.domElement.id = 'macroGUI'
+datGui.macro.domElement.setAttribute('style', 'opacity: 0.33')
+datGui.meso.domElement.id = 'mesoGUI'
+datGui.meso.domElement.setAttribute('style', 'opacity: 0.33')
+datGui.micro.domElement.id = 'microGUI'
+datGui.micro.domElement.setAttribute('style', 'opacity: 0.33')
 
 class App extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics
@@ -35,8 +86,7 @@ class App extends Phaser.Scene {
   }
 
   create() {
-    // Initialize core systems first
-    this.initializeCoreSystemsAndEventListeners();
+    this.initializeCoreSystemsAndEventListeners()
     
     // Launch scenes
     this.scene.launch('SynthScene')
@@ -45,65 +95,53 @@ class App extends Phaser.Scene {
   }
 
   private initializeCoreSystemsAndEventListeners(): void {
-    gameState.startGame();
+    gameState.startGame()
+    storyManager.startStory()
+    this.setupSystemEventListeners()
     
-    storyManager.startStory();
-    
-    this.setupSystemEventListeners();
-    
-    //roadSystem.reset();
-    
-    const deckerFrame = appData.deckerFrame;
+    const deckerFrame = appData.deckerFrame
     if (deckerFrame) {
-      deckerBridge.connectToIframe(deckerFrame);
+      deckerBridge.connectToIframe(deckerFrame)
     }
   }
 
   private setupSystemEventListeners(): void {
     // Game state events
     gameState.on('game-started', () => {
-      console.log('Game started');
-      appData.gameStarted = true;
-    });
+      console.log('Game started')
+      appData.gameStarted = true
+    })
     
     gameState.on('game-paused', () => {
-      console.log('Game paused');
-      appData.gameStarted = false;
-    });
+      console.log('Game paused')
+      appData.gameStarted = false
+    })
     
-    // Story events (these can create commands)
+    // Story events
     storyManager.on('story-node-entered', (node) => {
-      console.log(`Story node entered: ${node.title}`);
-      deckerBridge.syncStoryState();
-    });
+      console.log(`Story node entered: ${node.title}`)
+      deckerBridge.syncStoryState()
+    })
     
     storyManager.on('objective-completed', (objective) => {
-      console.log(`Objective completed: ${objective.title}`);
-      // This could create a command for major objectives
-    });
+      console.log(`Objective completed: ${objective.title}`)
+    })
     
-    // Road system events (mostly informational, not command-worthy)
-    // roadSystem.on('major-position-change', (data) => {
-    //   console.log(`Major position change: ${data.change.toFixed(3)}`);
-    //   // Could create a command for significant driving events
-    // });
-    
-    // History events for debugging (much cleaner now)
+    // History events for debugging
     gameHistory.on('command-executed', (command) => {
-      console.log(`Command executed: ${command.type}`);
-    });
+      console.log(`Command executed: ${command.type}`)
+    })
     
     // Decker bridge events
     deckerBridge.on('decker-connected', () => {
-      console.log('Decker bridge connected');
-      deckerBridge.syncGameState();
-      deckerBridge.syncStoryState();
-    });
+      console.log('Decker bridge connected')
+      deckerBridge.syncGameState()
+      deckerBridge.syncStoryState()
+    })
     
     deckerBridge.on('decker-event', (event) => {
-      console.log(`Decker event: ${event.type} on ${event.widget}`);
-      // Decker events can create commands for menu navigation, story choices, etc.
-    });
+      console.log(`Decker event: ${event.type} on ${event.widget}`)
+    })
   }
 
   update() {
@@ -115,6 +153,7 @@ class App extends Phaser.Scene {
   }
 }
 
+// Scene collection
 const scenes = {
   app: new App(),
   debug: new Debug(),
@@ -126,692 +165,83 @@ const scenes = {
   synth: new Synth()
 }
 
-export { gameState, gameHistory, storyManager, deckerBridge };
-
-interface AppData {
-  game: Phaser.Game,
-  gameConfig: Phaser.Types.Core.GameConfig,
-  width: number,
-  height: number,
-  scaleRatio: number,
-  audioStarted: boolean,
-  hasFocus: boolean,
-  gameStarted: boolean,
-  playing: boolean,
-  lastPointerTime: number,
-  pointerActive: {
-    active: boolean,
-    targetSprite: Phaser.GameObjects.Sprite | null
-  },
-  viewport: Phaser.Geom.Rectangle,
-  deckerFrame: HTMLIFrameElement | null,
-  hydraFrame: HTMLIFrameElement | null
+// Health change handler
+function handleHealthChange(healthValue: number): void {
+  sendToDecker(appData, 'healthChanged', { health: healthValue })
 }
 
-var appData: AppData = {
-  game: null,
-  gameConfig: null,
-  width: 0,
-  height: 0,
-  scaleRatio: window.devicePixelRatio / 3,
-  audioStarted: false,
-  hasFocus: false,
-  gameStarted: false,
-  playing: false,
-  lastPointerTime: 0,
-  pointerActive: {
-    active: false,
-    targetSprite: null
-  },
-  viewport: new Phaser.Geom.Rectangle(0, 0, window.innerWidth, window.innerHeight),
-  deckerFrame: null,
-  hydraFrame: null
-}
-
-let focusTimeout: ReturnType<typeof setTimeout> | null = null
-
-function setFocus(focused: boolean, immediate = false) {
-  if (focusTimeout) clearTimeout(focusTimeout)
-  
-  if (focused) {
-    appData.hasFocus = true
-  } else if (immediate) {
-    appData.hasFocus = false
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
-  } else {
-    focusTimeout = setTimeout(() => {
-      if (!document.hasFocus()) {
-        appData.hasFocus = false
-        appData.pointerActive.active = false
-        appData.pointerActive.targetSprite = null
-      }
-    }, 100)
-  }
-}
-
-const gameConfig: Phaser.Types.Core.GameConfig =
-{
-  title: 'bruisecorps presents summer-tour: margemaster',
-  scene: [scenes.app, scenes.debug, scenes.game, scenes.marge, scenes.menu, scenes.road, scenes.rearview, scenes.synth],
-  backgroundColor: colors[3],
-  scale:
-  {
-    mode: Phaser.Scale.RESIZE,
-    parent: 'game-container',
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    min:
-    {
-      width: 320
-    }
-  },
-  type: Phaser.CANVAS,
-  plugins:
-  {
-    scene:
-    [
-      {
-        key: 'rexUI',
-        plugin: UIPlugin,
-        mapping: 'rexUI'
-      }
-    ],
-    global:
-    [
-      {
-        key: 'rexDragRotate',
-        plugin: DragRotatePlugin,
-        start: true
-      },
-      {
-        key: 'rexAnchor',
-        plugin: AnchorPlugin,
-        start: true,
-        mapping: 'rexAnchor'
-      },
-      {
-        key: 'rexRoundRectanglePlugin',
-        plugin: RoundRectanglePlugin,
-        start: true,
-        mapping: 'rexRoundRectanglePlugin'
-      },
-      {
-          key: 'rexSlider',
-          plugin: SliderPlugin,
-          start: true
-      }
-    ]
-  },
-  physics:
-  {
-    default: 'matter',
-    matter:
-    {
-      enabled: true,
-      enableSleeping: false,
-      gravity:
-      {
-        y: 0.1
-      },
-      debug: true
-    }
-  }
-};
-
-import { GUI } from 'dat.gui'
-const datGui =
-{
-  macro: new GUI(
-  {
-    name: 'macro'
-  }),
-  meso: new GUI(
-  {
-    name: 'meso'
-  }),
-  micro: new GUI(
-  {
-    name: 'micro'
-  })
-}
-datGui.macro.domElement.id = 'macroGUI'
-datGui.macro.domElement.setAttribute('style', 'opacity: 0.33')
-datGui.meso.domElement.id = 'mesoGUI'
-datGui.meso.domElement.setAttribute('style', 'opacity: 0.33')
-datGui.micro.domElement.id = 'microGUI'
-datGui.micro.domElement.setAttribute('style', 'opacity: 0.33')
-
-import * as Tone from 'tone'
-const synth = new Tone.Synth().toDestination()
-
-const cameras =
-{
-  marge: null as Phaser.Cameras.Scene2D.Camera | null,
-  rearview: null as Phaser.Cameras.Scene2D.Camera | null
-}
-
-const scenesReady =
-{
-  marge: false,
-  rearview: false
-}
-
-function markSceneReady(sceneName: keyof typeof scenesReady) {
-  if (scenesReady[sceneName]) return
-
-  scenesReady[sceneName] = true
-
-  // Set up event listeners when specific scenes are ready
-  if (sceneName === 'marge') {
-    setupMargeEventListeners();
-  }
-
-  if (Object.values(scenesReady).every(ready => ready)) {
-    initializeCameras()
-  }
-}
-
-function initializeCameras() {
-  if (!appData.game) return
-
-  Object.keys(cameras).forEach(key => {
-    const cameraKey = key as keyof typeof cameras
-    if (!cameras[cameraKey]) {
-      let sceneName = ''
-      switch (key) {
-        case 'marge':
-          sceneName = 'MargeScene'
-          break
-        case 'rearview':
-          sceneName = 'RearviewScene'
-          break
-      }
-
-      if (sceneName) {
-        const scene = appData.game.scene.getScene(sceneName)
-        if (scene) {
-          const camera = scene.cameras.main
-          camera.setViewport(0, 0, appData.width, appData.height)
-          cameras[cameraKey] = camera
-        }
-      }
-    } else {
-      const camera = cameras[cameraKey]
-      if (camera) {
-        camera.setViewport(0, 0, appData.width, appData.height)
-      }
-    }
-  })
-
-  if (cameras.marge && cameras.rearview) {
-    cameras.marge.setVisible(true)
-    cameras.rearview.setVisible(false)
-  }
-}
-
-function resizeCameras() {
-  Object.keys(cameras).forEach(key => {
-    const camera = cameras[key as keyof typeof cameras]
-    if (camera) {
-      camera.setViewport(0, 0, appData.width, appData.height)
-    }
-  })
-}
-
-function switchToMargeCamera() {
-  if (cameras.marge && cameras.rearview) {
-    cameras.marge.setVisible(true)
-    cameras.rearview.setVisible(false)
-    // Also switch Decker to marge card
-    sendToDecker('switchCard', { card: 'marge' })
-  }
-}
-
-function switchToRearviewCamera() {
-  if (cameras.marge && cameras.rearview) {
-    cameras.marge.setVisible(false)
-    cameras.rearview.setVisible(true)
-    // Also switch Decker to rearview card
-    sendToDecker('switchCard', { card: 'rearview' })
-  }
-}
-
-function handleCardChange(cardName: string) {
-  // Switch camera view based on card
-  if (cardName === 'marge') {
-    if (cameras.marge && cameras.rearview) {
-      cameras.marge.setVisible(true)
-      cameras.rearview.setVisible(false)
-    }
-  } else if (cardName === 'rearview') {
-    if (cameras.marge && cameras.rearview) {
-      cameras.marge.setVisible(false)
-      cameras.rearview.setVisible(true)
-    }
-  }
-}
-
-function handleHealthChange(healthValue: number) {
-  sendToDecker('healthChanged', { health: healthValue })
-}
-
-function setupKeyboardControls() {
-  document.addEventListener('keydown', (event) => {
-    if (!appData.gameStarted) return
-    
-    if (!appData.audioStarted) appData.audioStarted = true
-    
-    switch (event.key) {
-      case '1':
-        switchToMargeCamera()
-        break
-      case '2':
-        switchToRearviewCamera()
-        break
-    }
-  })
-}
-
-function setupPointerTracking() {
-  function initializeAudio() {
-    if (appData.gameStarted && !appData.audioStarted) {
-      appData.audioStarted = true
-    }
-  }
-
-  function getSpriteUnderPointer(x: number, y: number): Phaser.GameObjects.Sprite | null {
-    if (!appData.game) return null
-    
-    const activeScenes = appData.game.scene.getScenes(true)
-    
-    for (const scene of activeScenes) {
-      if (!scene.cameras.main) continue
-      
-      const camera = scene.cameras.main
-      const worldX = camera.scrollX + (x - camera.x) / camera.zoom
-      const worldY = camera.scrollY + (y - camera.y) / camera.zoom
-      
-      let foundSprite: Phaser.GameObjects.Sprite | null = null
-      
-      scene.children.list.forEach((child) => {
-        if (child instanceof Phaser.GameObjects.Sprite && child.visible && child.active) {
-          const bounds = child.getBounds()
-          if (bounds.contains(worldX, worldY)) {
-            foundSprite = child
-          }
-        }
-      })
-      
-      if (foundSprite) return foundSprite
-    }
-    
-    return null
-  }
-
-  document.addEventListener('ponterdown', (event) => {
-    initializeAudio()
-    //const sprite = getSpriteUnderPointer(event.width, event.height)
-    appData.pointerActive.active = true
-    //appData.pointerActive.targetSprite = sprite
-    appData.lastPointerTime = Date.now()
-    //sendPointerToHydra(event.clientX, event.clientY, true)
+// Event listeners specific to the Marge scene
+function setupMargeEventListeners(): void {
+  // Vehicle control events from Marge scene
+  scenes.marge.events.on('significant-position-change', (data) => {
+    console.log(`Significant driving event: position ${data.position.toFixed(3)}`)
+    // This could trigger story events or game state changes
   })
   
-  document.addEventListener('pointerup', (event) => {
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
-    sendPointerToHydra(event.clientX, event.clientY, false)
-  })
-  
-  document.addEventListener('pointermove', (event) => {
-    appData.lastPointerTime = Date.now()
-    sendPointerToHydra(event.clientX, event.clientY, appData.pointerActive.active)
-  })
-  
-  document.addEventListener('touchstart', (event) => {
-    initializeAudio()
-    if (event.touches.length > 0) {
-      const touch = event.touches[0]
-      const sprite = getSpriteUnderPointer(touch.clientX, touch.clientY)
-      appData.pointerActive.active = true
-      appData.pointerActive.targetSprite = sprite
-      appData.lastPointerTime = Date.now()
-      sendPointerToHydra(touch.clientX, touch.clientY, true)
+  scenes.marge.events.on('gear-changed', (data) => {
+    console.log(`Gear changed to: ${data.newValue.toFixed(2)}`)
+    // Only create commands for meaningful gear changes (like first time putting in gear)
+    if (data.oldValue >= 1 && data.newValue < 1) {
+      console.log('Player first engaged gear - significant game event')
+      // This could trigger story progression
     }
   })
-  
-  document.addEventListener('touchend', (event) => {
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
-    if (event.changedTouches.length > 0) {
-      const touch = event.changedTouches[0]
-      sendPointerToHydra(touch.clientX, touch.clientY, false)
-    }
-  })
-  
-  document.addEventListener('touchmove', (event) => {
-    if (event.touches.length > 0) {
-      const touch = event.touches[0]
-      appData.lastPointerTime = Date.now()
-      sendPointerToHydra(touch.clientX, touch.clientY, appData.pointerActive.active)
-    }
-  })
-  
-  document.addEventListener('mouseleave', () => {
-    appData.pointerActive.active = false
-    appData.pointerActive.targetSprite = null
-  })
-}
-
-function isPointerActive(): boolean {
-  return appData.pointerActive.active
-}
-
-function getPointerTarget(): Phaser.GameObjects.Sprite | null {
-  return appData.pointerActive.targetSprite
-}
-
-function isPointerOnSprite(spriteOrTexture?: Phaser.GameObjects.Sprite | string): boolean {
-  if (!appData.pointerActive.active || !appData.pointerActive.targetSprite) {
-    return false
-  }
-  
-  if (!spriteOrTexture) {
-    return true
-  }
-  
-  if (typeof spriteOrTexture === 'string') {
-    return appData.pointerActive.targetSprite.texture.key === spriteOrTexture
-  }
-  
-  return appData.pointerActive.targetSprite === spriteOrTexture
-}
-
-function setupDeckerCommunication() {
-  appData.deckerFrame = document.getElementById('deck-iframe') as HTMLIFrameElement
-  
-  // Debug iframe visibility
-  if (appData.deckerFrame) {
-    console.log('✅ Decker iframe found');
-    console.log('Iframe visibility:', window.getComputedStyle(appData.deckerFrame).visibility);
-    console.log('Iframe display:', window.getComputedStyle(appData.deckerFrame).display);
-    console.log('Iframe opacity:', window.getComputedStyle(appData.deckerFrame).opacity);
-    console.log('Iframe z-index:', window.getComputedStyle(appData.deckerFrame).zIndex);
-    
-    // Check container too
-    const container = document.getElementById('deck-container');
-    if (container) {
-      console.log('Container visibility:', window.getComputedStyle(container).visibility);
-      console.log('Container display:', window.getComputedStyle(container).display);
-      console.log('Container opacity:', window.getComputedStyle(container).opacity);
-      console.log('Container z-index:', window.getComputedStyle(container).zIndex);
-    }
-      // Force visibility just in case
-    appData.deckerFrame.style.visibility = 'visible';
-    appData.deckerFrame.style.display = 'block';
-    appData.deckerFrame.style.opacity = '1';
-    
-    if (container) {
-      container.style.visibility = 'visible';
-      container.style.display = 'flex';
-      container.style.opacity = '1';
-    }
-    
-    // Wait for iframe to load, then force it to home card
-    if (appData.deckerFrame.contentWindow) {
-      setTimeout(() => {
-        console.log('🏠 Forcing Decker to home card on startup');
-        sendToDecker('go', { card: 'home' });
-      }, 1000);
-    } else {
-      appData.deckerFrame.addEventListener('load', () => {
-        setTimeout(() => {
-          console.log('🏠 Decker loaded, forcing to home card');
-          sendToDecker('go', { card: 'home' });
-        }, 500);
-      });
-    }
-  } else {
-    console.error('❌ Decker iframe NOT found!');
-  }
-  
-  window.addEventListener('message', (event) => {
-    if (event.source !== appData.deckerFrame?.contentWindow) return
-    
-    const message = event.data
-    
-    if (typeof message === 'object' && message.type) {
-      const { type, data } = message
-      
-      switch (type) {
-        case 'switchCamera':
-          if (data.camera === 'marge') switchToMargeCamera()
-          else if (data.camera === 'rearview') switchToRearviewCamera()
-          break
-            case 'playSound':
-          if (data.frequency && data.duration) {
-            synth.triggerAttackRelease(data.frequency, data.duration)
-          }
-          break
-            case 'decker-pointer-passthrough':
-          if (!appData.gameStarted) break
-          
-          const pointerEvent = message.event
-          const canvas = document.querySelector('canvas') as HTMLCanvasElement
-          
-          if (canvas && pointerEvent) {
-            // Simple approach: Convert ALL touch events to mouse events
-            let eventType = pointerEvent.type
-            let clientX = pointerEvent.clientX || 0
-            let clientY = pointerEvent.clientY || 0
-            
-            // Handle touch events by converting to mouse events
-            if (pointerEvent.type.startsWith('touch')) {
-              // Convert touch event types to mouse event types
-              if (pointerEvent.type === 'touchstart') eventType = 'mousedown'
-              else if (pointerEvent.type === 'touchend') eventType = 'mouseup'
-              else if (pointerEvent.type === 'touchmove') eventType = 'mousemove'
-              
-              // Get coordinates from first touch point
-              if (pointerEvent.touches && pointerEvent.touches.length > 0) {
-                clientX = pointerEvent.touches[0].clientX
-                clientY = pointerEvent.touches[0].clientY
-              } else if (pointerEvent.changedTouches && pointerEvent.changedTouches.length > 0) {
-                clientX = pointerEvent.changedTouches[0].clientX
-                clientY = pointerEvent.changedTouches[0].clientY
-              }
-            }
-            
-            // Create and dispatch simple mouse event
-            const syntheticEvent = new MouseEvent(eventType, {
-              clientX,
-              clientY,
-              button: pointerEvent.button || 0,
-              buttons: pointerEvent.buttons || (eventType === 'mousedown' ? 1 : 0),
-              bubbles: true,
-              cancelable: true
-            })
-            
-            canvas.dispatchEvent(syntheticEvent)
-          }
-          break
-          
-        case 'requestGameState':
-          sendToDecker('gameState', {
-            hasFocus: appData.hasFocus,
-            pointerActive: appData.pointerActive.active,
-            targetSprite: appData.pointerActive.targetSprite?.texture.key || null,
-            width: appData.width,
-            height: appData.height
-          })
-          break
-          
-        case 'deckScript':
-          if (data.action === 'switchCamera') {
-            if (data.target === 'marge') switchToMargeCamera()
-            else if (data.target === 'rearview') switchToRearviewCamera()
-          } else if (data.action === 'playSound') {
-            synth.triggerAttackRelease(data.frequency || 440, data.duration || 0.5)
-          }
-          break
-          
-        case 'decker-message':
-          if (message.message === 'focus') setFocus(true)
-          else if (message.message === 'blur') setFocus(false)
-          else if (message.data?.action === 'game-started') {
-            appData.gameStarted = true
-            setFocus(true)
-          }
-          break
-      }
-    }
-    
-    if (typeof message === 'string') {
-      if (message.startsWith('camera:')) {
-        const camera = message.split(':')[1]
-        if (camera === 'marge') switchToMargeCamera()
-        else if (camera === 'rearview') switchToRearviewCamera()
-      } else if (message.startsWith('sound:')) {
-        if (!appData.gameStarted) return
-        
-        if (!appData.audioStarted) appData.audioStarted = true
-        const params = message.split(':')[1]
-        const [freq, dur] = params.split(',')
-        synth.triggerAttackRelease(parseFloat(freq) || 440, parseFloat(dur) || 0.5)
-      } else if (message === 'getState') {
-        sendToDecker('gameState', {
-          hasFocus: appData.hasFocus,
-          pointerActive: appData.pointerActive.active,
-          targetSprite: appData.pointerActive.targetSprite?.texture.key || null,
-          width: appData.width,
-          height: appData.height
-        })
-      } else if (message === 'focus') {
-        setFocus(true)
-      } else if (message === 'blur') {
-        setFocus(false)
-      } else if (message.startsWith('health-changed:')) {
-        const healthValue = parseInt(message.split(':')[1])
-        handleHealthChange(healthValue)      } else if (message === 'game-started') {
-        console.log('🎮 Game started message received');
-        appData.gameStarted = true
-        appData.audioStarted = true
-        setFocus(true)
-        
-        // Force Decker to home card first, then to marge card
-        setTimeout(() => {
-          console.log('🎯 Sending go to home card');
-          sendToDecker('go', { card: 'home' });
-          setTimeout(() => {
-            console.log('🎯 Sending go to marge card');
-            sendToDecker('go', { card: 'marge' });
-          }, 500);
-        }, 100);
-      } else if (message === 'audioInitialized') {
-        appData.audioStarted = true
-      }
-    }
-  })
-  
-  // Send periodic updates to Decker
-  setInterval(() => {
-    sendToDecker('pointerUpdate', {
-      active: appData.pointerActive.active,
-      targetSprite: appData.pointerActive.targetSprite?.texture.key || null
-    })
-  }, 100)
-}
-
-function sendToDecker(type: string, data: any) {
-  if (appData.deckerFrame?.contentWindow) {
-    appData.deckerFrame.contentWindow.postMessage({ type, data }, '*')
-  }
-}
-
-// Hydra Integration Functions
-function sendToHydra(data: any) {
-  if (appData.hydraFrame?.contentWindow) {
-    appData.hydraFrame.contentWindow.postMessage(data, '*');
-  }
-}
-
-function sendSynthDataToHydra(data: { bpm?: number, step?: number, volume?: number, frequency?: number }) {
-  sendToHydra({ type: 'hydra-synth-data', data });
-}
-
-function sendPointerToHydra(x: number, y: number, pressed: boolean) {
-  sendToHydra({ 
-    type: 'hydra-pointer', 
-    x: x / window.innerWidth,
-    y: y / window.innerHeight,
-    pressed 
-  });
-}
-
-function sendGameDataToHydra(data: { scene?: string, level?: number, speed?: number, intensity?: number, position?: number }) {
-  sendToHydra({ type: 'hydra-game-data', data });
-}
-
-function setupHydraEffects() {
-  appData.hydraFrame = document.getElementById('hydra-container') as HTMLIFrameElement;
-  
-  window.addEventListener('message', (event) => {
-    if (event.source === appData.hydraFrame?.contentWindow && event.data.type === 'hydra-ready') {
-      // Hydra is ready
-    }
-  });
 }
 
 // Initialize application
 let game: Phaser.Game
+
 window.addEventListener('load', () => {
+  // Initialize app data
+  appData = createInitialAppData()
+  setGlobalAppData(appData)
+  
+  // Create game configuration
+  const gameConfig = createGameConfig(scenes)
+  appData.gameConfig = gameConfig
+    // Create and start Phaser game
   game = new Phaser.Game(gameConfig)
   window['game'] = game
   appData.game = game
+  
+  // Initialize camera system with appData
+  setAppData(appData)
+  
+  // Set up all systems with proper dependencies
+  const wrappedSwitchToMarge = () => switchToMargeCamera(() => sendToDecker(appData, 'switchCard', { card: 'marge' }))
+  const wrappedSwitchToRearview = () => switchToRearviewCamera(() => sendToDecker(appData, 'switchCard', { card: 'rearview' }))
+  const wrappedSetFocus = (focused: boolean, immediate = false) => setFocus(appData, focused, immediate)
+  const wrappedResizeCameras = () => resizeCameras(appData)
+  
+  // Initialize all systems
+  setupKeyboardControls(appData, wrappedSwitchToMarge, wrappedSwitchToRearview)
+  setupPointerTracking(appData, (x, y, pressed) => sendPointerToHydra(appData, x, y, pressed))
+  setupDeckerCommunication(
+    appData, 
+    synth, 
+    wrappedSwitchToMarge, 
+    wrappedSwitchToRearview,
+    handleHealthChange,
+    wrappedSetFocus
+  )  
+  setupHydraEffects(appData)
+  setupWindowEventListeners(appData, wrappedResizeCameras)
   
   // Initialize debug canvas monitoring
   setTimeout(() => {
     const canvas = document.querySelector('canvas')
     if (canvas) {
-      // Canvas found and ready
+      console.log('Canvas found and ready')
     }
   }, 1000)
   
-  setupKeyboardControls()
-  setupPointerTracking()
-  setupDeckerCommunication()
-  setupHydraEffects()
-  
+  // Initialize vector graphics
   setTimeout(() => {
     initVectorGraphics()
   }, 100)
-
-  window.addEventListener('focus', () => {
-    if (appData.gameStarted) setFocus(true)
-  })
-  window.addEventListener('blur', () => {
-    if (appData.gameStarted) setFocus(false)
-  })
-  
-  document.addEventListener('visibilitychange', () => {
-    if (appData.gameStarted) setFocus(!document.hidden, true)
-  })
-  
-  appData.hasFocus = !document.hidden && document.hasFocus()
 })
 
-window.addEventListener('resize', () => {
-  appData.width = window.innerWidth
-  appData.height = window.innerHeight
-  appData.viewport.width = appData.width
-  appData.viewport.height = appData.height
-  appData.scaleRatio = window.devicePixelRatio / 3
-  resizeCameras()
-})
-
-appData.width = window.innerWidth
-appData.height = window.innerHeight
-
+// Export core systems and data for other modules
 export {
   UIPlugin,
   AnchorPlugin,
@@ -820,7 +250,6 @@ export {
   colors,
   datGui,
   game,
-  gameConfig,
   scenes,
   synth,
   cameras,
@@ -836,23 +265,11 @@ export {
   sendSynthDataToHydra,
   sendPointerToHydra,
   sendGameDataToHydra,
-  setupHydraEffects
-}
-
-// New function to set up event listeners specific to the Marge scene
-function setupMargeEventListeners() {
-  // Vehicle control events from Marge scene
-  scenes.marge.events.on('significant-position-change', (data) => {
-    console.log(`Significant driving event: position ${data.position.toFixed(3)}`);
-    // This could trigger story events or game state changes
-  });
-  
-  scenes.marge.events.on('gear-changed', (data) => {
-    console.log(`Gear changed to: ${data.newValue.toFixed(2)}`);
-    // Only create commands for meaningful gear changes (like first time putting in gear)
-    if (data.oldValue >= 1 && data.newValue < 1) {
-      console.log('Player first engaged gear - significant game event');
-      // This could trigger story progression
-    }
-  });
+  setupHydraEffects,
+  handleCardChange,
+  setupMargeEventListeners,
+  gameState,
+  gameHistory,
+  storyManager,
+  deckerBridge
 }
